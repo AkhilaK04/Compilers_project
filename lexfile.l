@@ -85,7 +85,11 @@ d_arr ("=>")
     }
     if(strcmp(yytext,")") == 0){
         fprintf(tokfile,"special symbol: %s\n",yytext);
+<<<<<<< HEAD
         return CLOSECC;
+=======
+        return OPENCC;
+>>>>>>> f300a8b764503832a44efed93dccc830080f87b7
     }
     if(strcmp(yytext,"[") == 0){
         fprintf(tokfile,"special symbol: %s\n",yytext);
