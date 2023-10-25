@@ -20,42 +20,42 @@ d_arr ("=>")
     //fprintf(tokfile,"operator: %s\n",yytext);
     //fprintf(parsefile,"%s",yytext);
     
-    if(strcmp(yytext,"^") == 0 || strcmp(yytext,"*") == 0 || strcmp(yytext,"/") == 0 || strcmp(yytext,"%") == 0 || strcmp(yytext,"+") == 0 || strcmp(yytext,"-") == 0) return BIOP; 
+    return BIOP; 
 }
 
 {rel_op} {
     //fprintf(tokfile,"operator: %s\n",yytext);
     //fprintf(parsefile,"%s",yytext);
     
-    if(strcmp(yytext,"==") == 0 || strcmp(yytext,"!=") == 0 || strcmp(yytext,"<=") == 0 || strcmp(yytext,"<") == 0 || strcmp(yytext,">") == 0 || strcmp(yytext,">=") == 0) return RELOP; 
+    return RELOP; 
 }
 
 {logic_op} {
     //fprintf(tokfile,"operator: %s\n",yytext);
     //fprintf(parsefile,"%s",yytext);
     
-    if(strcmp(yytext,"&") == 0 || strcmp(yytext,"|") == 0 ) return LOGICOP; 
+    return LOGICOP; 
 }
 
 {uni_op} {
     //fprintf(tokfile,"operator: %s\n",yytext);
     //fprintf(parsefile,"%s",yytext);
     
-    if(strcmp(yytext,"++") == 0 || strcmp(yytext,"--") == 0 ) return UNIOP; 
+    return UNIOP; 
 }
 
 {assgn_op} {
     //fprintf(tokfile,"operator: %s\n",yytext);
     //fprintf(parsefile,"%s",yytext);
     
-    if(strcmp(yytext,"=") == 0 ) return ASSGN; 
+    return ASSGN; 
 }
 
 {d_arr} {
     //fprintf(tokfile,"operator: %s\n",yytext);
     //fprintf(parsefile,"%s",yytext);
     
-    if(strcmp(yytext,"=>") == 0 ) return DARR; 
+    return DARR; 
 }
 
 %%
