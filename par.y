@@ -57,7 +57,10 @@ void yyerror();
 %token <sval> CLOSECU
 %token <sval> DOLLAR
 %token <sval> DOT
-%token <sval> PUNCTUATION
+%token <sval> DOUBLE_QUOTE
+%token <sval> SINGLE_QUOTE
+%token <sval> COMMA
+%token <sval> COLON
 %token <sval> ARROW
 %token <sval> BIOP
 %token <sval> RELOP
@@ -69,6 +72,11 @@ void yyerror();
 
 %start program
 %%
+
+constant : INTEGER_CONSTANT
+         | STRING_CONSTANT
+         | FLOAT_CONSTANT
+         ;
 
 program:
 	| program funcdef 
