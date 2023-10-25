@@ -68,6 +68,12 @@ void yyerror();
 
 
 %start program
+%%
+
+program:
+	| program funcdef 
+	| program classdef 
+	;
 
 program 
     : START { }
