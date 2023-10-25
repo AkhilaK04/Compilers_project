@@ -14,7 +14,7 @@ punctuation [,""'':]
 
 dot (".")
 
-special_sym ("(" | ")" | "[" | "]" | "{" | "}")
+special_sym [\{\}\[\]\(\)]
 
 primi_datatype ("int"|"double"|"string"|"bool")
 
@@ -23,21 +23,22 @@ non_pri_datatype ("mass"|"time"|"position"|"velocity"|"acc"|"energy"|"theta"|"e"
 reserved_keywords ("input"|"output"|"true"|"false"|"setr"|"addr"|"setv"|"addv"|"seta"|"adda"|"ke_after"|"pe_after"|"te_after"|"angle_after"|"get_traj"|"collide"|"time_to_collide"|"roc_after"|"p_after"|"s_after"|"time_to"|"loop"|"break"|"start"|"sin"|"cos"|"tan"|"mag")
 
 bi_op ("^"|"*"|"/"|"%"|"+"|"-")
-rel_op ( "==" | "!=" | "<=" | "<" | ">" | ">=" )
+rel_op ("=="|"!="|"<="|"<"|">"|">=")
 logic_op [&|]
-uni_op ("++" | "--"| "!")
+uni_op ("++"|"--"|"!")
 assgn_op ("=") /* only assignment operator */
 d_arr ("=>")
+
 
 %%
 
 {primi_datatype} {
-    fprintf(tokfile,"datatype: %s\n",yytext)
+    fprintf(tokfile,"datatype: %s\n",yytext);
     return PRIMI_DATATYPE;
 }
 
 {non_pri_datatype} {
-    fprintf(tokfile,"datatype: %s\n",yytext)
+    fprintf(tokfile,"datatype: %s\n",yytext);
     return NON_PRI_DATATYPE;
 }
 
@@ -79,34 +80,16 @@ d_arr ("=>")
 
 
 {special_sym} {
-    if(strcmp(yytext,"(") == 0){
-        fprintf(tokfile,"special symbol: %s\n",yytext);
-        return OPENCC;
-    }
-    if(strcmp(yytext,")") == 0){
-        fprintf(tokfile,"special symbol: %s\n",yytext);
-        return CLOSECC;
-    }
-    if(strcmp(yytext,"[") == 0){
-        fprintf(tokfile,"special symbol: %s\n",yytext);
-        return OPENSQ;
-    }
-    if(strcmp(yytext,"]") == 0){
-        fprintf(tokfile,"special symbol: %s\n",yytext);
-        return CLOSESQ;
-    }
-    if(strcmp(yytext,"{") == 0){
-        fprintf(tokfile,"special symbol: %s\n",yytext);
-        return OPENCU;
-    }
-    if(strcmp(yytext,"}") == 0){
-        fprintf(tokfile,"special symbol: %s\n",yytext);
-        return CLOSECU;
-    }
-    if(strcmp(yytext,"$") == 0){
-        fprintf(tokfile,"special symbol: %s\n",yytext);
-        return DOLLAR;
-    }
+
+    fprintf(tokfile,"special symbol: %s\n",yytext);
+
+    if(strcmp(yytext,"(") == 0) return OPENCC;
+    else if(strcmp(yytext,")") == 0) return CLOSECC;
+    else if(strcmp(yytext,"[") == 0) return OPENSQ;
+    else if(strcmp(yytext,"]") == 0) return CLOSESQ;
+    else if(strcmp(yytext,"{") == 0) return OPENCU;
+    else if(strcmp(yytext,"}") == 0) return CLOSECU;
+    else if(strcmp(yytext,"$") == 0) return DOLLAR;
 }
 
 {dot} {
@@ -150,7 +133,7 @@ d_arr ("=>")
     return UNIOP; 
 }
 
-{assgn_op} {
+= {
     fprintf(tokfile,"operator: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     return ASSGN; 
@@ -189,12 +172,21 @@ d_arr ("=>")
 
 \"([^"]*)\" {
     fprintf(tokfile, "punctuation:    \"\nconstant:    %s\npunctuation:    \"\n", yytext);
-    fprintf(yyc, "%s", yytext);
+    fprintf(parsefile, "%s", yytext);
     return STRING_CONSTANT;
 }
 
+[\n] {
+    fprintf(tokfile, " \n : %s\n", yytext);
+    return SLASHN;
+}
 
 [ \n\t]  { /* ignore whitespace */ ; fprintf(parsefile, "%s", yytext);}
+
+.* {
+    fprintf(tokfile, "comment statement: %s\n", yytext);
+    return LINE;
+}
 
 %%
 int yywrap(){
