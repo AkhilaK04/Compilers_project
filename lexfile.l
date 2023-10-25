@@ -7,6 +7,67 @@
     FILE* parsefile;
 %}
 
+arrow ("->")
+
+punctuation [,""'':]
+
+dot (".")
+
+special_sym ("(" | ")" | "[" | "]" | "{" | "}")
+
+primi_datatype ("int"|"double"|"string"|"bool")
+
+%%
+
+{primi_datatype} {
+    // fprintf(out_token,"datatype: %s\n",yytext)
+    return PRIMI_DATATYPE;
+}
+
+{special_sym} {
+    if(strcmp(yytext,"(") == 0){
+        fprintf(tokenout,"special symbol: %s\n",yytext);
+        return OPENCC;
+    }
+    if(strcmp(yytext,")") == 0){
+        fprintf(tokenout,"special symbol: %s\n",yytext);
+        return OPENCC;
+    }
+    if(strcmp(yytext,"[") == 0){
+        fprintf(tokenout,"special symbol: %s\n",yytext);
+        return OPENSQ;
+    }
+    if(strcmp(yytext,"]") == 0){
+        fprintf(tokenout,"special symbol: %s\n",yytext);
+        return CLOSESQ;
+    }
+    if(strcmp(yytext,"{") == 0){
+        fprintf(tokenout,"special symbol: %s\n",yytext);
+        return OPENCU;
+    }
+    if(strcmp(yytext,"}") == 0){
+        fprintf(tokenout,"special symbol: %s\n",yytext);
+        return CLOSECU;
+    }
+}
+
+{dot} {
+    fprintf(tokenout,"punctuation: %s\n",yytext);
+    return DOT;
+}
+
+{punctuation} {
+    fprintf(tokenout,"punctuation: %s\n",yytext);
+    return PUNCTUATION;
+}
+
+{arrow} {
+    fprintf(tokenout,"operator: %s\n",yytext);
+    return ARROW;
+}
+
+%%
+
 biop ("^"|"*"|"/"|"%"|"")
 
  /* Comment  */
