@@ -153,12 +153,6 @@ d_arr ("=>")
     return FLOAT_CONSTANT;
 }
 
-/* \"([^"]*)\" {
-    fprintf(tokfile, "punctuation:    \"\nconstant:    %s\npunctuation:    \"\n", yytext);
-    fprintf(yyc, "%s", yytext);
-    return STRING_CONSTANT;
-} */
-
 [a-zA-Z0-9]*[a-zA-Z][a-zA-Z0-9]* {
     fprintf(tokfile, "ID: %s\n", yytext);
     fprintf(parsefile, "%s", yytext);
@@ -170,14 +164,6 @@ d_arr ("=>")
     fprintf(parsefile, "%s", yytext);
     return ID;
 }
-
-/* [-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? {
-    fprintf(tokfile, "constant: %s\n", yytext);
-    fprintf(parsefile, "%s", yytext);
-    
-    return FLOAT_CONSTANT;
-} */
-
 
 \"([^"]*)\" {
     fprintf(tokfile, "punctuation:    \"\nconstant:    %s\npunctuation:    \"\n", yytext);
