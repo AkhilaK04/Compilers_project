@@ -166,6 +166,7 @@ d_arr ("=>")
 [-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? {
     fprintf(tokfile, "constant: %s\n", yytext);
     fprintf(parsefile, "%s", yytext);
+    
     return FLOAT_CONSTANT;
 }
 
