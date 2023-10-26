@@ -10,9 +10,9 @@
 
 arrow ("->")
 
-punctuation [.,""'':]
+punctuation [:.,]
 
-special_sym [\{\}\[\]\(\)]
+special_sym [\{\}\[\]\(\)$]
 
 primi_datatype ("int"|"double"|"string"|"bool")
 
@@ -28,7 +28,17 @@ assgn_op ("=") /* only assignment operator */
 d_arr ("=>")
 
 
+
 %%
+\$[ \t\n]*[^$]*[ \t\n]*\$ {
+    fprintf(tokfile,"multiCmt: %s\n",yytext);
+    return MCMT;
+}
+
+\$[ \t]*[^$]*[ \t]*\n {
+    fprintf(tokfile,"singleCmt: %s\n",yytext);
+    return SCMT;
+}
 
 {primi_datatype} {
     fprintf(tokfile,"datatype: %s\n",yytext);
@@ -171,18 +181,12 @@ d_arr ("=>")
     return STRING_CONSTANT;
 }
 
-[\n] {
-    fprintf(tokfile, " \n : %s\n", yytext);
-    return SLASHN;
-}
-
 [ \n\t]  { /* ignore whitespace */ ; fprintf(parsefile, "%s", yytext);}
 
-.* {
-    fprintf(tokfile, "comment statement: %s\n", yytext);
-    return LINE;
+. {
+	fprintf(tokfile,"ERROR! Invalid token");
+    return 0; 
 }
-
 %%
 int yywrap(){
     return 1;
