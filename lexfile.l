@@ -23,7 +23,8 @@ reserved_keywords ("input"|"output"|"true"|"false"|"setr"|"addr"|"setv"|"addv"|"
 bi_op ("^"|"*"|"/"|"%"|"+"|"-")
 rel_op ("=="|"!="|"<="|"<"|">"|">=")
 logic_op [&|]
-uni_op ("++"|"--"|"!")
+uni_op ("++"|"--")
+uni_neg ("!")
 assgn_op ("=") /* only assignment operator */
 d_arr ("=>")
 
@@ -32,12 +33,24 @@ d_arr ("=>")
 
 {primi_datatype} {
     fprintf(tokfile,"datatype: %s\n",yytext);
-    return PRIMI_DATATYPE;
+    if(strcmp(yytext,"int") == 0) return INT;
+    else if(strcmp(yytext,"double") == 0) return DOUBLE;
+    else if(strcmp(yytext,"string") == 0) return STRING;
+    else if(strcmp(yytext,"bool") == 0) return BOOL;
 }
 
 {non_pri_datatype} {
     fprintf(tokfile,"datatype: %s\n",yytext);
-    return NON_PRI_DATATYPE;
+    if(strcmp(yytext,"mass") == 0) return MASS;
+    else if(strcmp(yytext,"time") == 0) return TIME;
+    else if(strcmp(yytext,"position") == 0) return POSITION;
+    else if(strcmp(yytext,"velocity") == 0) return VELOCITY;
+    else if(strcmp(yytext,"acc") == 0) return ACC;
+    else if(strcmp(yytext,"energy") == 0) return ENERGY;
+    else if(strcmp(yytext,"theta") == 0) return THETA;
+    else if(strcmp(yytext,"e") == 0) return E;
+    else if(strcmp(yytext,"distance") == 0) return DISTANCE;
+    else if(strcmp(yytext,"momentum") == 0) return MOMENTUM;
 }
 
 {reserved_keywords} {
@@ -105,16 +118,23 @@ d_arr ("=>")
 }
 
 {bi_op} {
-    
     fprintf(tokfile,"operator: %s\n",yytext);
-    fprintf(parsefile,"%s",yytext); 
-    return BIOP; 
+    if(strcmp(yytext,"+") == 0) return ADD;
+    else if(strcmp(yytext,"-") == 0) return SUB;
+    else if(strcmp(yytext,"*") == 0) return MUL;
+    else if(strcmp(yytext,"/") == 0) return DIV;
+    else if(strcmp(yytext,"%") == 0) return MOD;
+    else if(strcmp(yytext,"^") == 0) return EXP;
 }
 
 {rel_op} {
     fprintf(tokfile,"operator: %s\n",yytext);
-    fprintf(parsefile,"%s",yytext);
-    return RELOP; 
+    if(strcmp(yytext,"==") == 0) return EQL;
+    else if(strcmp(yytext,"!=") == 0) return NEQ;
+    else if(strcmp(yytext,">=") == 0) return GEQ;
+    else if(strcmp(yytext,">") == 0) return GT;
+    else if(strcmp(yytext,"<=") == 0) return LEQ;
+    else if(strcmp(yytext,"<") == 0) return LT;
 }
 
 {logic_op} {
@@ -127,6 +147,12 @@ d_arr ("=>")
     fprintf(tokfile,"operator: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     return UNIOP; 
+}
+
+{uni_neg}{
+    fprintf(tokfile,"operator: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
+    return UNINEG; 
 }
 
 = {
