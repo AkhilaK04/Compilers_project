@@ -69,7 +69,10 @@ void yyerror();
 %token CLOSECU
 %token DOLLAR
 %token DOT
-%token PUNCTUATION
+%token DOUBLE_QUOTE
+%token SINGLE_QUOTE
+%token COMMA
+%token COLON
 %token ARROW
 %token ADD
 %token SUB
