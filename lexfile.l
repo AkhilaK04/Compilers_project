@@ -10,9 +10,7 @@
 
 arrow ("->")
 
-punctuation [,""'':]
-
-dot (".")
+punctuation [.,""'':]
 
 special_sym [\{\}\[\]\(\)]
 
@@ -92,14 +90,13 @@ d_arr ("=>")
     else if(strcmp(yytext,"$") == 0) return DOLLAR;
 }
 
-{dot} {
-    fprintf(tokfile,"punctuation: %s\n",yytext);
-    return DOT;
-}
-
 {punctuation} {
     fprintf(tokfile,"punctuation: %s\n",yytext);
-    return PUNCTUATION;
+    if(strcmp(yytext,"\"") == 0) return DOUBLE_QUOTE;
+    else if(strcmp(yytext,"'") == 0) return SINGLE_QUOTE;
+    else if(strcmp(yytext,":") == 0) return COLON;
+    else if(strcmp(yytext,",") == 0) return COMMA;
+    else if(strcmp(yytext,".") == 0) return DOT;
 }
 
 {arrow} {
@@ -110,8 +107,7 @@ d_arr ("=>")
 {bi_op} {
     
     fprintf(tokfile,"operator: %s\n",yytext);
-    fprintf(parsefile,"%s",yytext);
-    
+    fprintf(parsefile,"%s",yytext); 
     return BIOP; 
 }
 
@@ -151,6 +147,18 @@ d_arr ("=>")
     return INTEGER_CONSTANT; 
 }
 
+[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? {
+    fprintf(tokfile, "constant: %s\n", yytext);
+    fprintf(parsefile, "%s", yytext);
+    return FLOAT_CONSTANT;
+}
+
+/* \"([^"]*)\" {
+    fprintf(tokfile, "punctuation:    \"\nconstant:    %s\npunctuation:    \"\n", yytext);
+    fprintf(yyc, "%s", yytext);
+    return STRING_CONSTANT;
+} */
+
 [a-zA-Z0-9]*[a-zA-Z][a-zA-Z0-9]* {
     fprintf(tokfile, "ID: %s\n", yytext);
     fprintf(parsefile, "%s", yytext);
@@ -163,12 +171,12 @@ d_arr ("=>")
     return ID;
 }
 
-[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? {
+/* [-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? {
     fprintf(tokfile, "constant: %s\n", yytext);
     fprintf(parsefile, "%s", yytext);
     
     return FLOAT_CONSTANT;
-}
+} */
 
 
 \"([^"]*)\" {
