@@ -44,6 +44,12 @@ void yyerror();
 %start program
 %%
 
+program:
+	| comments
+    | program start
+    | program function_decl 
+	;
+
 BI_OP : ADD
       | SUB
       | MUL
@@ -82,10 +88,6 @@ DATATYPE: PRIMI_DATATYPE
         | NON_PRI_DATATYPE
         ; 
 
-program:
-	| 
-	;
-
 comments: SCMT
     | MCMT
     ;
@@ -93,6 +95,26 @@ comments: SCMT
 ids: ID
    | ID COMMA ids
    ;
+
+operand: ID
+	| INTEGER_CONSTANT
+	| STRING_CONSTANT
+    | FLOAT_CONSTANT
+    | TRUE
+    | FALSE
+	;
+
+funccallargs: operand
+	| operand COMMA funccallargs
+	;
+
+funccall: ID OPENCC CLOSECC
+	| ID OPENCC funccallargs CLOSECC
+	;
+
+call_stmt_without_dot: funccall
+    ;
+
 
 call_stmt_without_dots: call_stmt_without_dot
                       | call_stmt_without_dot COMMA call_stmt_without_dots
@@ -153,7 +175,7 @@ exp_stmt: ID ASSGN rhs_exp DOT
 
 body: decl_stmt body
          | exp_stmt body
-         | call_stmt body
+         | call_stmt_without_dot body
          | conditional_stmt body
          | loop_stmt body
          | unary_operation_without_dot DOT body
@@ -164,7 +186,7 @@ body: decl_stmt body
 
 loop_body: decl_stmt loop_body
          | exp_stmt loop_body
-         | call_stmt loop_body
+         | call_stmt_without_dot loop_body
          | conditional_stmt loop_body
          | loop_conditional loop_body
          | loop_stmt loop_body
@@ -185,7 +207,7 @@ break_body: decl_stmt body
          | BREAK DOT body
          | unary_operation_without_dot DOT body
          | return_stmt body
-         | {}-
+         | {}
          | comments
          ;
 
