@@ -35,7 +35,7 @@ void yyerror();
 %token COLON
 %token ARROW
 %token ADD SUB MUL DIV MOD EXP
-%token EQ NEQ GEQ LEQ GT LT
+%token EQ NEQ GEQ LEQ GT LT EQL
 %token LOGICOP UNIOP UNINEG
 %token ASSGN
 %token DARR
@@ -44,11 +44,19 @@ void yyerror();
 %start program
 %%
 
-program:
+
+programStart:
 	| comments
-    | program start
-    | program function_decl 
+    | program startfn
 	;
+
+startfn: START OPENCU body CLOSECU
+    ;
+
+program:
+    | comments
+    | program function_decl
+    ;
 
 BI_OP : ADD
       | SUB

@@ -17,7 +17,7 @@ primi_datatype ("int"|"double"|"string"|"bool")
 
 non_pri_datatype ("mass"|"time"|"position"|"velocity"|"acc"|"energy"|"theta"|"e"|"distance"|"momentum")
 
-reserved_keywords ("input"|"output"|"true"|"false"|"setr"|"addr"|"setv"|"addv"|"seta"|"adda"|"ke_after"|"pe_after"|"te_after"|"angle_after"|"get_traj"|"collide"|"time_to_collide"|"roc_after"|"p_after"|"s_after"|"time_to"|"loop"|"break"|"start"|"sin"|"cos"|"tan"|"mag")
+reserved_keywords ("input"|"output"|"true"|"false"|"setr"|"addr"|"setv"|"addv"|"seta"|"adda"|"ke_after"|"pe_after"|"te_after"|"angle_after"|"get_traj"|"collide"|"time_to_collide"|"roc_after"|"p_after"|"s_after"|"time_to"|"loop"|"break"|"sin"|"cos"|"tan"|"mag")
 
 bi_op ("^"|"*"|"/"|"%"|"+"|"-")
 
@@ -46,6 +46,13 @@ d_arr ("=>")
     fprintf(tokfile,"singleCmt: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     return SCMT;
+}
+
+"start" {
+    fprintf(tokfile,"start called: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
+
+    return START;
 }
 
 {primi_datatype} {
@@ -100,7 +107,7 @@ d_arr ("=>")
     else if(strcmp(yytext,"time_to") == 0) return TIME_TO;
     else if(strcmp(yytext,"loop") == 0) return LOOP;
     else if(strcmp(yytext,"break") == 0) return BREAK;
-    else if(strcmp(yytext,"start") == 0) return START;
+    // else if(strcmp(yytext,"start") == 0) return START;
     else if(strcmp(yytext,"sin") == 0) return SIN;
     else if(strcmp(yytext,"cos") == 0) return COS;
     else if(strcmp(yytext,"tan") == 0) return TAN;

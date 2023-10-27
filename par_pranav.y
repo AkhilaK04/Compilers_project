@@ -12,75 +12,47 @@ void yyerror();
     int val;
     char* sval;
 } */
-
-%token INTEGER_CONSTANT
-%token STRING_CONSTANT
-%token FLOAT_CONSTANT
+%token INTEGER_CONSTANT STRING_CONSTANT FLOAT_CONSTANT TRUE FALSE
+%token INT DOUBLE STRING  BOOL
+%token MASS TIME POSITION VELOCITY ACC ENERGY THETA E DISTANCE MOMENTUM
 %token ID 
-%token PRIMI_DATATYPE
-%token NON_PRI_DATATYPE
-%token INPUT
-%token OUTPUT
-%token TRUE
-%token FALSE
-%token SETR
-%token ADDR
-%token SETV
-%token ADDV
-%token SETA
-%token ADDA
-%token KE_AFTER
-%token PE_AFTER
-%token TE_AFTER
-%token ANGLE_AFTER
-%token GET_TRAJ
-%token COLLIDE
-%token TIME_TO_COLLIDE
-%token ROC_AFTER
-%token P_AFTER
-%token S_AFTER
-%token TIME_TO
+%token INPUT OUTPUT
+%token SETR ADDR SETV ADDV SETA ADDA SETP
+%token KE_AFTER PE_AFTER TE_AFTER ANGLE_AFTER V_AFTER
+%token GET_TRAJ COLLIDE TIME_TO_COLLIDE ROC_AFTER
+%token P_AFTER S_AFTER TIME_TO
 %token LOOP
 %token BREAK
 %token START
-%token SIN 
-%token COS 
-%token TAN 
+%token SIN COS TAN
 %token MAG
-%token SETP
-%token V_AFTER
-%token OPENCC
-%token CLOSECC
-%token OPENSQ
-%token CLOSESQ
-%token OPENCU
-%token CLOSECU
+%token OPENCC CLOSECC OPENSQ CLOSESQ OPENCU CLOSECU
 %token DOLLAR
 %token DOT
-%token PUNCTUATION
+%token DOUBLE_QUOTE SINGLE_QUOTE
+%token COMMA
+%token COLON
 %token ARROW
-%token BIOP
-%token RELOP
-%token LOGICOP
-%token UNIOP
+%token ADD SUB MUL DIV MOD EXP
+%token EQ NEQ GEQ LEQ GT LT EQL
+%token LOGICOP UNIOP UNINEG
 %token ASSGN
 %token DARR
-%token LINE
-%token SLASHN
-%token COLON
-%token DOUBLE_QUOTE
-%token SINGLE_QUOTE
-%token COMMA
-%token SCMT
-%token MCMT
+%token MCMT SCMT
 
-%start program
+%start programStart
 %%
 
-program:
+programStart: startfn
+	;
+
+startfn: START OPENCU CLOSECU
+    ;
+
+/* program:
 	| SCMT
     | MCMT
-	;
+	; */
 
 
 /* print_statement
