@@ -43,17 +43,36 @@ void yyerror();
 %start programStart
 %%
 
-programStart: startfn
-	;
+/* programStart: startfn
+	; */
 
-startfn: START OPENCU CLOSECU
-    ;
+/* startfn: START OPENCU CLOSECU
+    ; */
 
 /* program:
 	| SCMT
     | MCMT
 	; */
 
+program:
+    | std_lib
+    ;
+
+std_lib: rel_to_mag
+    | rel_to_pos
+    ;
+
+rel_to_mag: MAG OPENCC ID CLOSECC
+    | MAG OPENCC vectors CLOSECC
+    ;
+
+rel_to_pos: OPENCC ID CLOSECC SETR OPENCC ID CLOSECC
+    | OPENCC ID CLOSECC ADDR OPENCC ID CLOSECC
+    | OPENCC ID CLOSECC R_AFTER OPENCC ID CLOSECC
+    ;
+
+vectors: OPENCC constant COMMA constant CLOSECC
+       ;
 
 /* print_statement
     : OUTPUT COLON STRING_CONSTANT 

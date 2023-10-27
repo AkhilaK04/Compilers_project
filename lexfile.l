@@ -17,7 +17,7 @@ primi_datatype ("int"|"double"|"string"|"bool")
 
 non_pri_datatype ("mass"|"time"|"position"|"velocity"|"acc"|"energy"|"theta"|"e"|"distance"|"momentum")
 
-reserved_keywords ("input"|"output"|"true"|"false"|"setr"|"addr"|"setv"|"addv"|"seta"|"adda"|"ke_after"|"pe_after"|"te_after"|"angle_after"|"get_traj"|"collide"|"time_to_collide"|"roc_after"|"p_after"|"s_after"|"time_to"|"loop"|"break"|"sin"|"cos"|"tan"|"mag")
+reserved_keywords ("input"|"output"|"true"|"false"|"setr"|"addr"|"setv"|"addv"|"seta"|"adda"|"ke_after"|"pe_after"|"te_after"|"angle_after"|"get_traj"|"collide"|"time_to_collide"|"roc_after"|"p_after"|"s_after"|"time_to"|"loop"|"break"|"sin"|"cos"|"tan"|"mag"|"setp"|"v_after"|"r_after")
 
 bi_op ("^"|"*"|"/"|"%"|"+"|"-")
 
@@ -114,6 +114,7 @@ d_arr ("=>")
     else if(strcmp(yytext,"mag") == 0) return MAG;
     else if(strcmp(yytext,"setp") == 0) return SETP;
     else if(strcmp(yytext,"v_after") == 0) return V_AFTER;
+    else if(strcmp(yytext,"r_after") == 0) return R_AFTER;
 }
 
 
