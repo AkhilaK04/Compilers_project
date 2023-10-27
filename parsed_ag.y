@@ -123,13 +123,8 @@ funccall: ID OPENCC CLOSECC
 call_stmt_without_dot: funccall
     ;
 
-<<<<<<< HEAD
-call_stmt : call_stmt_without_dot DOT
-          ;
-=======
 call_stmt_with_dot: call_stmt_without_dot DOT
     ;
->>>>>>> 2fe7bdafe76f7fe2ec192f4e261dbc1db2b2d3b1
 
 call_stmt_without_dots: call_stmt_without_dot
                       | call_stmt_without_dot COMMA call_stmt_without_dots
