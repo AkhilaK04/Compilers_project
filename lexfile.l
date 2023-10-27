@@ -29,7 +29,7 @@ uni_op ("++"|"--")
 
 uni_neg ("!")
 
-assgn_op ("=") /* only assignment operator */
+assgn_op ("=")
 
 d_arr ("=>")
 
@@ -188,7 +188,7 @@ d_arr ("=>")
     return UNINEG; 
 }
 
-= {
+{assgn_op} {
     fprintf(tokfile,"operator: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     return ASSGN; 
