@@ -21,28 +21,38 @@ non_pri_datatype ("mass"|"time"|"position"|"velocity"|"acc"|"energy"|"theta"|"e"
 reserved_keywords ("input"|"output"|"true"|"false"|"setr"|"addr"|"setv"|"addv"|"seta"|"adda"|"ke_after"|"pe_after"|"te_after"|"angle_after"|"get_traj"|"collide"|"time_to_collide"|"roc_after"|"p_after"|"s_after"|"time_to"|"loop"|"break"|"start"|"sin"|"cos"|"tan"|"mag")
 
 bi_op ("^"|"*"|"/"|"%"|"+"|"-")
+
 rel_op ("=="|"!="|"<="|"<"|">"|">=")
+
 logic_op [&|]
+
 uni_op ("++"|"--")
+
 uni_neg ("!")
+
 assgn_op ("=") /* only assignment operator */
+
 d_arr ("=>")
 
 
-
 %%
+
 \$[ \t\n]*[^$]*[ \t\n]*\$ {
     fprintf(tokfile,"multiCmt: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     return MCMT;
 }
 
 \$[ \t]*[^$]*[ \t]*\n {
     fprintf(tokfile,"singleCmt: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     return SCMT;
 }
 
 {primi_datatype} {
     fprintf(tokfile,"datatype: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
+
     if(strcmp(yytext,"int") == 0) return INT;
     else if(strcmp(yytext,"double") == 0) return DOUBLE;
     else if(strcmp(yytext,"string") == 0) return STRING;
@@ -51,6 +61,7 @@ d_arr ("=>")
 
 {non_pri_datatype} {
     fprintf(tokfile,"datatype: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"mass") == 0) return MASS;
     else if(strcmp(yytext,"time") == 0) return TIME;
     else if(strcmp(yytext,"position") == 0) return POSITION;
@@ -65,6 +76,7 @@ d_arr ("=>")
 
 {reserved_keywords} {
     fprintf(tokfile,"reserved keyword: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
 
     if(strcmp(yytext,"input") == 0) return INPUT;
     else if(strcmp(yytext,"output") == 0) return OUTPUT;
@@ -101,8 +113,8 @@ d_arr ("=>")
 
 
 {special_sym} {
-
     fprintf(tokfile,"special symbol: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
 
     if(strcmp(yytext,"(") == 0) return OPENCC;
     else if(strcmp(yytext,")") == 0) return CLOSECC;
@@ -115,6 +127,7 @@ d_arr ("=>")
 
 {punctuation} {
     fprintf(tokfile,"punctuation: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"\"") == 0) return DOUBLE_QUOTE;
     else if(strcmp(yytext,"'") == 0) return SINGLE_QUOTE;
     else if(strcmp(yytext,":") == 0) return COLON;
@@ -124,11 +137,13 @@ d_arr ("=>")
 
 {arrow} {
     fprintf(tokfile,"operator: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     return ARROW;
 }
 
 {bi_op} {
     fprintf(tokfile,"operator: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"+") == 0) return ADD;
     else if(strcmp(yytext,"-") == 0) return SUB;
     else if(strcmp(yytext,"*") == 0) return MUL;
@@ -139,6 +154,7 @@ d_arr ("=>")
 
 {rel_op} {
     fprintf(tokfile,"operator: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"==") == 0) return EQL;
     else if(strcmp(yytext,"!=") == 0) return NEQ;
     else if(strcmp(yytext,">=") == 0) return GEQ;
@@ -159,7 +175,7 @@ d_arr ("=>")
     return UNIOP; 
 }
 
-{uni_neg}{
+{uni_neg} {
     fprintf(tokfile,"operator: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     return UNINEG; 
@@ -189,11 +205,6 @@ d_arr ("=>")
     return FLOAT_CONSTANT;
 }
 
-[a-zA-Z0-9]*[a-zA-Z][a-zA-Z0-9]* {
-    fprintf(tokfile, "ID: %s\n", yytext);
-    fprintf(parsefile, "%s", yytext);
-    return ID;
-}
 
 [a-zA-Z_][a-zA-Z0-9_]* {
     fprintf(tokfile, "ID: %s\n", yytext);
@@ -214,6 +225,7 @@ d_arr ("=>")
     return 0; 
 }
 %%
+
 int yywrap(){
     return 1;
 }
