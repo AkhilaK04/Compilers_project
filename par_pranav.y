@@ -67,22 +67,21 @@ void yyerror();
 %token DARR
 %token LINE
 %token SLASHN
-
+%token COLON
+%token DOUBLE_QUOTE
+%token SINGLE_QUOTE
+%token COMMA
+%token SCMT
+%token MCMT
 
 %start program
 %%
 
 program:
-	| cmt_stmt
+	| SCMT
+    | MCMT
 	;
 
-cmt_body: cmt_body LINE
-    | LINE
-    ;
-
-cmt_stmt: DOLLAR LINE SLASHN
-    | DOLLAR cmt_body DOLLAR
-    ;
 
 /* print_statement
     : OUTPUT COLON STRING_CONSTANT 
@@ -96,11 +95,15 @@ conditional_statement
     ; */
 %%
 
+void yyerror(char* s){
+	{fprintf(parsefile,"\ninvalid statement");}
+}
+
 int main(int argc ,char * argv[]){
 
 	// yyin = fopen(strcat(argv[1],".clike"),"r");
     
-	yyin = fopen("inp.txt","r");
+	yyin = fopen("inp_pranav.txt","r");
 	tokfile = fopen("pt_seq_tokens_1.txt","w");
 	parsefile = fopen("pt_parser_1.parsed","w");
 
