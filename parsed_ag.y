@@ -96,6 +96,11 @@ DATATYPE: PRIMI_DATATYPE
         | NON_PRI_DATATYPE
         ; 
 
+decl_stmt : DATATYPE ids DOT
+            ;
+predicate : ids
+;
+
 comments: SCMT
     | MCMT
     ;
@@ -231,7 +236,7 @@ conditional_stmt: LT predicate GT OPENCU body CLOSECU
 loop_stmt: LOOP LT predicate GT OPENCU loop_body CLOSECU
          ; 
 
-return_val: ID
+return_val: id
           | constant_for_bo
           | call_stmt_without_dot
           | DOUBLE_QUOTE STRING_CONSTANT DOUBLE_QUOTE
@@ -255,6 +260,8 @@ std_lib: rel_to_mag
     | rel_to_pos
     | rel_to_energy
     | rel_to_angle
+    | rel_to_collision
+    | miscellaneous
     ;
 
 rel_to_mag: MAG OPENCC ID CLOSECC
@@ -273,6 +280,17 @@ rel_to_energy: OPENCC ID CLOSECC KE_AFTER OPENCC ID CLOSECC
 
 rel_to_angle: OPENCC ID CLOSECC ANGLE_AFTER OPENCC ID CLOSECC
             ;
+
+rel_to_collision: OPENCC ID CLOSECC COLLIDE OPENCC ID COMMA E CLOSECC
+                | OPENCC ID CLOSECC COLLIDE OPENCC ID CLOSECC
+                | OPENCC ID CLOSECC TIME_TO_COLLIDE OPENCC CLOSECC ID CLOSECC
+                ;
+
+miscellaneous: OPENCC ID CLOSECC S_AFTER OPENCC CLOSECC ID CLOSECC
+             | OPENCC ID CLOSECC ROC_AFTER OPENCC CLOSECC ID CLOSECC
+             | OPENCC ID CLOSECC P_AFTER OPENCC CLOSECC ID CLOSECC
+             | OPENCC ID CLOSECC TIME_TO OPENCC CLOSECC ID CLOSECC
+             ;
 
 %%
 
