@@ -92,8 +92,7 @@ void yyerror();
 %token ASSGN
 %token DARR
 %token LINE
-%token SLASHN
-
+%token MCMT SCMT
 
 %start program
 %%
@@ -137,15 +136,11 @@ DATATYPE: PRIMI_DATATYPE
         ; 
 
 program:
-	| cmt_stmt
+	| 
 	;
 
-cmt_body: cmt_body LINE
-    | LINE
-    ;
-
-cmt_stmt: DOLLAR LINE SLASHN
-    | DOLLAR cmt_body DOLLAR
+comments: SCMT
+    | MCMT
     ;
 
 ids: ID
@@ -217,6 +212,7 @@ body: decl_stmt body
          | unary_operation_without_dot DOT body
          | return_stmt body
          | {}
+         | comments
          ;
 
 loop_body: decl_stmt loop_body
@@ -228,6 +224,7 @@ loop_body: decl_stmt loop_body
          | unary_operation_without_dot DOT loop_body
          | return_stmt loop_body
          | {}
+         | comments
          ;
 
 loop_stmt: loop LT predicate GT OPENCU loop_body CLOSECU
@@ -242,6 +239,7 @@ break_body: decl_stmt body
          | unary_operation_without_dot DOT body
          | return_stmt body
          | {}-
+         | comments
          ;
 
 loop_conditional: LT predicate GT OPENCU break_body CLOSECU
