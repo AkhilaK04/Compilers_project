@@ -126,10 +126,6 @@ call_stmt_without_dot: funccall
 call_stmt_with_dot: call_stmt_without_dot DOT
     ;
 
-call_stmt_without_dots: call_stmt_without_dot
-                      | call_stmt_without_dot COMMA call_stmt_without_dots
-                      ;
-
 constant: INTEGER_CONSTANT
         | STRING_CONSTANT
         | FLOAT_CONSTANT
@@ -159,7 +155,7 @@ unary_operation_without_dot: ID UNIOP
 
 binary_operands: ID
                | constant_for_bo
-               | binary_operation
+               /* | binary_operation */
                | call_stmt_without_dot
                ;
 
@@ -183,59 +179,67 @@ rhs_exp: constant
 exp_stmt: ID ASSGN rhs_exp DOT
         ;
 
-body: decl_stmt body
+body:    decl_stmt body
          | exp_stmt body
          | call_stmt_with_dot body
          | conditional_stmt body
          | loop_stmt body
          | unary_operation_without_dot DOT body
          | return_stmt body
+         | comments body
+         | output_stmt body
+         | input_stmt body
          | {}
-         | comments
+         ;
+
+break_body: decl_stmt break_body
+         | exp_stmt break_body
+         | call_stmt_with_dot break_body
+         | conditional_stmt break_body
+         | loop_stmt break_body
+         | BREAK DOT break_body
+         | unary_operation_without_dot DOT break_body
+         | return_stmt break_body
+         | comments break_body
+         | output_stmt break_body
+         | input_stmt break_body
+         | {}
          ;
 
 loop_body: decl_stmt loop_body
          | exp_stmt loop_body
          | call_stmt_with_dot loop_body
-         | conditional_stmt loop_body
+         /* | conditional_stmt loop_body */
          | loop_conditional loop_body
          | loop_stmt loop_body
          | unary_operation_without_dot DOT loop_body
          | return_stmt loop_body
+         | comments loop_body
+         | output_stmt loop_body
+         | input_stmt loop_body
+         | BREAK DOT loop_body
          | {}
-         | comments
-         ;
-
-loop_stmt: LOOP LT predicate GT OPENCU loop_body CLOSECU
-         ; 
-
-break_body: decl_stmt body
-         | exp_stmt body
-         | call_stmt_with_dot body
-         | conditional_stmt body
-         | loop_stmt body
-         | BREAK DOT body
-         | unary_operation_without_dot DOT body
-         | return_stmt body
-         | {}
-         | comments
          ;
 
 loop_conditional: LT predicate GT OPENCU break_body CLOSECU
                 | LT predicate GT OPENCU break_body CLOSECU OPENCU break_body CLOSECU
+                ;
 
 conditional_stmt: LT predicate GT OPENCU body CLOSECU
                 | LT predicate GT OPENCU body CLOSECU OPENCU body CLOSECU
                 ;
 
+loop_stmt: LOOP LT predicate GT OPENCU loop_body CLOSECU
+         ; 
+
 return_val: ID
           | constant_for_bo
           | call_stmt_without_dot
-          | {}
           | DOUBLE_QUOTE STRING_CONSTANT DOUBLE_QUOTE
           | TRUE
           | FALSE
           | predicate
+          | {}
           ;
 
 return_stmt: ARROW return_val DOT
@@ -250,6 +254,8 @@ function_decl: DATATYPE ID ASSGN OPENCC parameters CLOSECC ARROW OPENCU body CLO
 
 std_lib: rel_to_mag
     | rel_to_pos
+    | rel_to_energy
+    | rel_to_angle
     ;
 
 rel_to_mag: MAG OPENCC ID CLOSECC
@@ -260,6 +266,14 @@ rel_to_pos: OPENCC ID CLOSECC SETR OPENCC ID CLOSECC
     | OPENCC ID CLOSECC ADDR OPENCC ID CLOSECC
     | OPENCC ID CLOSECC R_AFTER OPENCC ID CLOSECC
     ;
+
+rel_to_energy: OPENCC ID CLOSECC KE_AFTER OPENCC ID CLOSECC
+             | OPENCC ID CLOSECC PE_AFTER OPENCC ID CLOSECC
+             | OPENCC ID CLOSECC TE_AFTER OPENCC ID CLOSECC
+             ;
+
+rel_to_angle: OPENCC ID CLOSECC ANGLE_AFTER OPENCC ID CLOSECC
+            ;
 
 %%
 
