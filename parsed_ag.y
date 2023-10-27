@@ -123,6 +123,8 @@ funccall: ID OPENCC CLOSECC
 call_stmt_without_dot: funccall
     ;
 
+call_stmt : call_stmt_without_dot DOT
+          ;
 
 call_stmt_without_dots: call_stmt_without_dot
                       | call_stmt_without_dot COMMA call_stmt_without_dots
@@ -204,7 +206,7 @@ loop_body: decl_stmt loop_body
          | comments
          ;
 
-loop_stmt: loop LT predicate GT OPENCU loop_body CLOSECU
+loop_stmt: LOOP LT predicate GT OPENCU loop_body CLOSECU
          ; 
 
 break_body: decl_stmt body
