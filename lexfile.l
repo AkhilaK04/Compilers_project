@@ -7,7 +7,6 @@
     FILE* parsefile;
 %}
 
-
 arrow ("->")
 
 punctuation [:.,]
