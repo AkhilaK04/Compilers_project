@@ -217,7 +217,6 @@ loop_body: decl_stmt loop_body
          | comments loop_body
          | output_stmt loop_body
          | input_stmt loop_body
-         | BREAK DOT loop_body
          | {}
          ;
 
