@@ -123,8 +123,13 @@ funccall: ID OPENCC CLOSECC
 call_stmt_without_dot: funccall
     ;
 
+<<<<<<< HEAD
 call_stmt : call_stmt_without_dot DOT
           ;
+=======
+call_stmt_with_dot: call_stmt_without_dot DOT
+    ;
+>>>>>>> 2fe7bdafe76f7fe2ec192f4e261dbc1db2b2d3b1
 
 call_stmt_without_dots: call_stmt_without_dot
                       | call_stmt_without_dot COMMA call_stmt_without_dots
@@ -185,7 +190,7 @@ exp_stmt: ID ASSGN rhs_exp DOT
 
 body: decl_stmt body
          | exp_stmt body
-         | call_stmt_without_dot body
+         | call_stmt_with_dot body
          | conditional_stmt body
          | loop_stmt body
          | unary_operation_without_dot DOT body
@@ -196,7 +201,7 @@ body: decl_stmt body
 
 loop_body: decl_stmt loop_body
          | exp_stmt loop_body
-         | call_stmt_without_dot loop_body
+         | call_stmt_with_dot loop_body
          | conditional_stmt loop_body
          | loop_conditional loop_body
          | loop_stmt loop_body
@@ -211,7 +216,7 @@ loop_stmt: LOOP LT predicate GT OPENCU loop_body CLOSECU
 
 break_body: decl_stmt body
          | exp_stmt body
-         | call_stmt body
+         | call_stmt_with_dot body
          | conditional_stmt body
          | loop_stmt body
          | BREAK DOT body
