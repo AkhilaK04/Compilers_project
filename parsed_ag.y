@@ -105,20 +105,12 @@ predicate : term
 
 PRED_OP : RELOP
         | LOGICOP
+        | BI_OP
         ;  
-
-term : temp
-	 | UNINEG temp
+term : binary_term
 	 | UNINEG OPENCC term CLOSECC
 	 | unary_operation_without_dot
      | binary_operation
-	 ;
-
-temp
-	 : ID
-	 | constant_for_bo
-	 | TRUE
-	 | FALSE
 	 ;
 
 comments: SCMT
@@ -129,20 +121,16 @@ ids: ID
    | ID COMMA ids
    ;
 
-operand: ID
-	| INTEGER_CONSTANT
-	| STRING_CONSTANT
-    | FLOAT_CONSTANT
-    | TRUE
-    | FALSE
-    | call_stmt_without_dot
-	;
+operand: binary_term
+	   | STRING_CONSTANT
+	   ;
 
 binary_term : ID    
             | INTEGER_CONSTANT
             | FLOAT_CONSTANT
             | TRUE
             | FALSE
+            | call_stmt_without_dot
             ;
 
 funccallargs: operand
@@ -163,11 +151,6 @@ constant: INTEGER_CONSTANT
         | STRING_CONSTANT
         | FLOAT_CONSTANT
         ;
-
-constant_for_bo: INTEGER_CONSTANT
-               | FLOAT_CONSTANT
-               ;
-
 input_stmt: INPUT COLON ids DOT
           ;
 
@@ -184,29 +167,19 @@ output_stmt: OUTPUT COLON for_out DOT
            ;
 
 unary_operation_without_dot: ID UNIOP
-                           | UNINEG ID
+                           | UNINEG binary_term
                            ;
-
-/* binary_operands: ID
-               | constant_for_bo
-               /* | binary_operation 
-               | call_stmt_without_dot
-               ;
-
-binary_operation: OPENCC binary_operation CLOSECC 
-                | binary_operands BI_OP binary_operands
-                ; */
-
 binary_operation : 
+/* binary_term BI_OP binary_term
+                 | OPENCC binary_operation CLOSECC 
+                 | binary_operation BI_OP binary_operation */
+                 /* | */
+                 ;
 
 vectors: OPENCC operand COMMA operand CLOSECC
        ;
 
 rhs_exp: operand
-       | ID
-       | TRUE
-       | FALSE
-       | call_stmt_without_dot
        | unary_operation_without_dot
        | binary_operation
        | vectors
@@ -269,7 +242,6 @@ loop_stmt: LOOP LT predicate GT OPENCU loop_body CLOSECU
 
 return_val: operand
           | predicate
-          | {}
           ;
 
 return_stmt: ARROW return_val DOT
