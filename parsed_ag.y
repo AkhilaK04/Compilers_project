@@ -41,21 +41,19 @@ void yyerror();
 %token DARR
 %token MCMT SCMT
 
-%start program
+%start code
 %%
 
-
-programStart:
-	| comments
-    | program startfn
+code: code_subpart
+    | code_subpart code
 	;
 
-startfn: START OPENCU body CLOSECU
-    ;
+code_subpart: comments
+            | startfn
+            | function_decl
+            ;
 
-program:
-    | comments
-    | program function_decl
+startfn: START OPENCU body CLOSECU
     ;
 
 BI_OP : ADD
@@ -98,8 +96,30 @@ DATATYPE: PRIMI_DATATYPE
 
 decl_stmt : DATATYPE ids DOT
             ;
-predicate : ids
-;
+
+predicate : term
+          | OPENCC predicate CLOSECC
+		  | predicate PRED_OP term
+		  | predicate PRED_OP OPENCC term CLOSECC
+            ;
+
+PRED_OP : RELOP
+        | LOGICOP
+        ;  
+
+term : temp
+	 | UNINEG temp
+	 | UNINEG OPENCC term CLOSECC
+	 | unary_operation_without_dot
+     | binary_operation
+	 ;
+
+temp
+	 : ID
+	 | constant_for_bo
+	 | TRUE
+	 | FALSE
+	 ;
 
 comments: SCMT
     | MCMT
@@ -135,6 +155,7 @@ constant: INTEGER_CONSTANT
         | STRING_CONSTANT
         | FLOAT_CONSTANT
         ;
+
 constant_for_bo: INTEGER_CONSTANT
                | FLOAT_CONSTANT
                ;
@@ -168,7 +189,7 @@ binary_operation: OPENCC binary_operation CLOSECC
                 | binary_operands BI_OP binary_operands
                 ;
 
-vectors: OPENCC constant COMMA constant CLOSECC
+vectors: OPENCC operand COMMA operand CLOSECC
        ;
 
 rhs_exp: constant
@@ -236,12 +257,8 @@ conditional_stmt: LT predicate GT OPENCU body CLOSECU
 loop_stmt: LOOP LT predicate GT OPENCU loop_body CLOSECU
          ; 
 
-return_val: id
-          | constant_for_bo
-          | call_stmt_without_dot
+return_val: call_stmt_without_dot
           | DOUBLE_QUOTE STRING_CONSTANT DOUBLE_QUOTE
-          | TRUE
-          | FALSE
           | predicate
           | {}
           ;
@@ -293,6 +310,11 @@ miscellaneous: OPENCC ID CLOSECC S_AFTER OPENCC CLOSECC ID CLOSECC
               ;
 
 %%
+
+void yyerror(char* s){
+	printf("Syntax Error : In line number %d\n",yylineno);
+	fprintf(parsefile," %s\n",s);
+}
 
 int main(int argc ,char * argv[]){
 
