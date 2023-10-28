@@ -135,7 +135,15 @@ operand: ID
     | FLOAT_CONSTANT
     | TRUE
     | FALSE
+    | call_stmt_without_dot
 	;
+
+binary_term : ID    
+            | INTEGER_CONSTANT
+            | FLOAT_CONSTANT
+            | TRUE
+            | FALSE
+            ;
 
 funccallargs: operand
 	| operand COMMA funccallargs
@@ -179,20 +187,22 @@ unary_operation_without_dot: ID UNIOP
                            | UNINEG ID
                            ;
 
-binary_operands: ID
+/* binary_operands: ID
                | constant_for_bo
-               /* | binary_operation */
+               /* | binary_operation 
                | call_stmt_without_dot
                ;
 
 binary_operation: OPENCC binary_operation CLOSECC 
                 | binary_operands BI_OP binary_operands
-                ;
+                ; */
+
+binary_operation : 
 
 vectors: OPENCC operand COMMA operand CLOSECC
        ;
 
-rhs_exp: constant
+rhs_exp: operand
        | ID
        | TRUE
        | FALSE
@@ -257,8 +267,7 @@ conditional_stmt: LT predicate GT OPENCU body CLOSECU
 loop_stmt: LOOP LT predicate GT OPENCU loop_body CLOSECU
          ; 
 
-return_val: call_stmt_without_dot
-          | DOUBLE_QUOTE STRING_CONSTANT DOUBLE_QUOTE
+return_val: operand
           | predicate
           | {}
           ;
