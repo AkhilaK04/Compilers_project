@@ -59,10 +59,18 @@ d_arr ("=>")
     fprintf(tokfile,"datatype: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
 
-    if(strcmp(yytext,"int") == 0) return INT;
-    else if(strcmp(yytext,"double") == 0) return DOUBLE;
-    else if(strcmp(yytext,"string") == 0) return STRING;
-    else if(strcmp(yytext,"bool") == 0) return BOOL;
+    if(strcmp(yytext,"int") == 0){
+        return INT;
+    }
+    if(strcmp(yytext,"double") == 0){
+        return DOUBLE;
+    }
+    if(strcmp(yytext,"string") == 0){
+        return STRING;
+    }
+    if(strcmp(yytext,"bool") == 0){
+        return BOOL;
+    }
 }
 
 {non_pri_datatype} {
