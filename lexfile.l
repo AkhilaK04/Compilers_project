@@ -37,26 +37,26 @@ d_arr ("=>")
 %%
 
 \$[ \t\n]*[^$]*[ \t\n]*\$ {
-    fprintf(tokfile,"multiCmt: %s\n",yytext);
+    fprintf(tokfile,"multi-line comment: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     return MCMT;
 }
 
 \$[ \t]*[^$]*[ \t]*\n {
-    fprintf(tokfile,"singleCmt: %s\n",yytext);
+    fprintf(tokfile,"single-line comment: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     return SCMT;
 }
 
 "start" {
-    fprintf(tokfile,"start called: %s\n",yytext);
+    fprintf(tokfile,"main function: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
 
     return START;
 }
 
 {primi_datatype} {
-    fprintf(tokfile,"datatype: %s\n",yytext);
+    fprintf(tokfile,"primitive datatype: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
 
     if(strcmp(yytext,"int") == 0){
@@ -74,7 +74,7 @@ d_arr ("=>")
 }
 
 {non_pri_datatype} {
-    fprintf(tokfile,"datatype: %s\n",yytext);
+    fprintf(tokfile,"non-primitive datatype: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"mass") == 0) return MASS;
     else if(strcmp(yytext,"time") == 0) return TIME;
@@ -157,7 +157,7 @@ d_arr ("=>")
 }
 
 {bi_op} {
-    fprintf(tokfile,"operator: %s\n",yytext);
+    fprintf(tokfile,"binary operator: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"+") == 0) return ADD;
     else if(strcmp(yytext,"-") == 0) return SUB;
@@ -168,7 +168,7 @@ d_arr ("=>")
 }
 
 {rel_op} {
-    fprintf(tokfile,"operator: %s\n",yytext);
+    fprintf(tokfile,"relational operator: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"==") == 0) return EQL;
     else if(strcmp(yytext,"!=") == 0) return NEQ;
@@ -179,25 +179,25 @@ d_arr ("=>")
 }
 
 {logic_op} {
-    fprintf(tokfile,"operator: %s\n",yytext);
+    fprintf(tokfile,"logical operator: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     return LOGICOP; 
 }
 
 {uni_op} {
-    fprintf(tokfile,"operator: %s\n",yytext);
+    fprintf(tokfile,"unary operator: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     return UNIOP; 
 }
 
 {uni_neg} {
-    fprintf(tokfile,"operator: %s\n",yytext);
+    fprintf(tokfile,"unary operator: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     return UNINEG; 
 }
 
 {assgn_op} {
-    fprintf(tokfile,"operator: %s\n",yytext);
+    fprintf(tokfile,"assignment operator: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     return ASSGN; 
 }
