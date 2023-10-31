@@ -1,0 +1,72 @@
+$ Below "start" is the first function on execution. $
+
+start {
+    nextfn{}.
+}
+
+bool nextfn = {acceleration a, velocity v, time t} => {
+
+    int a,b.
+    double _a1 , _b1 = 0.1.
+    velocity new_v = [5 ,10.7], u_old1.
+
+    x = 10.4.
+    u_old1 = [0.3 ,-0.99].
+    valid = true .
+    return_val = nextfn_2{ u_old1 , fn2{a,b,c} }.
+
+$
+This test case verifies
+grammar of Complex
+Expressions.
+$
+
+    c = p * q + ((5 + 9.9)^(r % a)/2).
+        
+    [!5&6|(p==q)|(hi&hi|s)]
+    {
+    $ Do Nothing. $
+    }
+
+    [5>=x]
+    {
+        => "true".
+    }
+    otherwise {
+        break.
+    }
+
+    loop [!2] {
+
+        break.
+        => 0.5.
+
+        input: a,e2.
+        output: "afasf".
+        output: fn{a}+id+"hasd"+ok. 
+   
+        x++.
+        y--.
+    }
+
+=> "false".
+}
+
+velocity nextfn_2 = {velocity u,mass m}{
+
+    velocity now.
+    now = (u + {m}getv )/2.
+
+=> now.
+}
+
+$sd$
+
+$ just a sample multi
+line comment
+$
+$ just a sample multi
+line comment
+$
+$ just a sample multi
+line comment $
