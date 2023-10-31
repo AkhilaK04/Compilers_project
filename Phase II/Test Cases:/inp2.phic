@@ -4,9 +4,13 @@ int solve = {} =>{
     int loop_var2 = 10.
 
     loop [loop_var1--]{
-        loop [loop_var2--]{
-            arr[loop_var1][loop_var2] = loop_var1%loop_var2.
-        }
+        SCOPEOPEN {
+            SCOPEOPEN {
+                loop [loop_var2--]{
+                    arr[loop_var1][loop_var2] = loop_var1%loop_var2.
+                }
+            SCOPECLOSE}
+        SCOPECLOSE}
     }
 
     [p & t>5 | r ( ( u==5 & r & (!t | (q<=31) ) ) | q)] {
