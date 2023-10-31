@@ -35,11 +35,11 @@ void yyerror(char *s);
 %token COLON
 %token ARROW
 %token ADD SUB MUL DIV MOD EXP
-%token EQ NEQ GEQ LEQ GT LT EQL
+%token EQ NEQ GEQ LEQ GT LT
 %token LOGICOP UNIOP UNINEG
 %token ASSGN
 %token DARR
-%token MCMT SCMT
+%token CMT
 %token QUESTION
 %token NON_NEGATIVE_INT
 %token FIRST
@@ -159,6 +159,7 @@ anything_with_value : single_variable
                     | FALSE
                     | call_stmt_without_dot
                     | vectors
+                    | UNINEG anything_with_value
                     | call_stmt_without_dot ARROW pos
                     | vectors ARROW pos
                     | ID ARROW pos
@@ -214,13 +215,12 @@ unary_operation_without_dot: single_variable UNIOP
 
 /* RETURN STATEMENT */
     
-return_stmt: ARROW rhs_exp DOT
+return_stmt: DARR rhs_exp DOT
            ;
 
 /* COMMENT STATEMENT */
 
-comments : SCMT
-         | MCMT
+comments : CMT
          ;
 
 /* OUTPUT STATEMENT */
@@ -309,7 +309,7 @@ expression : single_variable ASSGN rhs_exp
 
 /* FUNCTION DECLARATION */
 
-function_decl : datatypes ID ASSGN OPENCU parameters CLOSECU ARROW OPENCU body CLOSECU
+function_decl : datatypes ID ASSGN OPENCU parameters CLOSECU DARR OPENCU body CLOSECU
               ;
 
 parameters: datatypes ID
@@ -332,7 +332,7 @@ int main(int argc ,char * argv[]){
 
 	// yyin = fopen(strcat(argv[1],".clike"),"r");
     
-	yyin = fopen("inp.txt","r");
+	yyin = fopen("inp_pranav.txt","r");
 	tokfile = fopen("pt_seq_tokens_1.txt","w");
 	parsefile = fopen("pt_parser_1.parsed","w");
 

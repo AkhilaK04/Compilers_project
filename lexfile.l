@@ -39,15 +39,9 @@ question ("?")
 %%
 
 \$[ \t\n]*[^$]*[ \t\n]*\$ {
-    fprintf(tokfile,"multi-line comment: %s\n",yytext);
+    fprintf(tokfile,"comment: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
-    return MCMT;
-}
-
-\$[ \t]*[^$]*[ \t]*\n {
-    fprintf(tokfile,"single-line comment: %s\n",yytext);
-    fprintf(parsefile,"%s",yytext);
-    return SCMT;
+    return CMT;
 }
 
 "start" {
@@ -179,7 +173,7 @@ question ("?")
 {rel_op} {
     fprintf(tokfile,"relational operator: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
-    if(strcmp(yytext,"==") == 0) return EQL;
+    if(strcmp(yytext,"==") == 0) return EQ;
     else if(strcmp(yytext,"!=") == 0) return NEQ;
     else if(strcmp(yytext,">=") == 0) return GEQ;
     else if(strcmp(yytext,">") == 0) return GT;
