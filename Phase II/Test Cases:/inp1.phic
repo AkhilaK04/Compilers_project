@@ -52,7 +52,7 @@ $
 => "false".
 }
 
-velocity nextfn_2 = {velocity u,mass m}{
+velocity nextfn_2 = {velocity u,mass m} => {
 
     velocity now.
     now = (u + {m}getv )/2.
