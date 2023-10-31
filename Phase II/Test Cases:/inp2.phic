@@ -1,0 +1,25 @@
+int solve = {} =>{
+    double arr[10][10].
+    int loop_var1 = 10.
+    int loop_var2 = 10.
+
+    loop [loop_var1--]{
+        loop [loop_var2--]{
+            arr[loop_var1][loop_var2] = loop_var1%loop_var2.
+        }
+    }
+
+    [p & t>5 | r ( ( u==5 & r & (!t | (q<=31) ) ) | q)] {
+        $Entered 
+        IF BLOCK.$
+    => arr[5][1].
+    }
+
+    count = ((p * q)%b+((4+2+2)/5))^5.
+
+=> (hq>6)&3. 
+}
+
+start {
+    output: solve{} + " Success ".
+}
