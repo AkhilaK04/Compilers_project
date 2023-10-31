@@ -33,6 +33,8 @@ assgn_op ("=")
 
 d_arr ("=>")
 
+question ("?")
+
 
 %%
 
@@ -53,6 +55,13 @@ d_arr ("=>")
     fprintf(parsefile,"%s",yytext);
 
     return START;
+}
+
+{question} {
+    fprintf(tokfile,"question: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
+    
+    return QUESTION;
 }
 
 {primi_datatype} {
@@ -208,6 +217,12 @@ d_arr ("=>")
     return DARR; 
 }
 
+[1-9][0-9]* {
+    fprintf(tokfile, "constant: %s\n", yytext);
+    fprintf(parsefile, "%s", yytext);
+    return NON_NEGATIVE_INT; 
+}
+
 [-]?[1-9][0-9]*|0 {
     fprintf(tokfile, "constant: %s\n", yytext);
     fprintf(parsefile, "%s", yytext);
@@ -228,7 +243,13 @@ d_arr ("=>")
 }
 
 \"([^"]*)\" {
-    fprintf(tokfile, "punctuation:    \"\nconstant:    %s\npunctuation:    \"\n", yytext);
+    fprintf(tokfile,"punctuation: \"\n");
+	fprintf(tokfile,"constant: ");
+	for(int i=1;i<yyleng-1;i++){
+		fprintf(tokfile,"%c",yytext[i]);
+	}
+	fprintf(tokfile,"\n");
+	fprintf(tokfile,"punctuation: \"\n");
     fprintf(parsefile, "%s", yytext);
     return STRING_CONSTANT;
 }
