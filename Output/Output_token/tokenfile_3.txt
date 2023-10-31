@@ -1,0 +1,337 @@
+main function: start
+special symbol: {
+reserved keyword: mag
+special symbol: {
+ID: x
+special symbol: }
+punctuation: .
+reserved keyword: mag
+special symbol: {
+special symbol: [
+constant: 0
+punctuation: ,
+constant: 9
+special symbol: ]
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: setr
+special symbol: {
+ID: ac
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: addr
+special symbol: {
+special symbol: [
+constant: 1
+punctuation: ,
+constant: 60
+special symbol: ]
+special symbol: }
+punctuation: .
+non-primitive datatype: position
+ID: p
+assignment operator: =
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: r_after
+special symbol: {
+reserved keyword: sin
+special symbol: (
+constant: 30
+special symbol: )
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: setv
+special symbol: {
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: setr
+special symbol: {
+special symbol: [
+constant: 5
+punctuation: ,
+constant: 6
+special symbol: ]
+special symbol: }
+special symbol: }
+punctuation: .
+non-primitive datatype: velocity
+ID: ve
+assignment operator: =
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: addv
+special symbol: {
+special symbol: {
+ID: m
+special symbol: }
+reserved keyword: setp
+special symbol: {
+ID: po
+special symbol: }
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: v_after
+special symbol: {
+ID: t1
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: seta
+special symbol: {
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: addv
+special symbol: {
+special symbol: {
+ID: m
+special symbol: }
+reserved keyword: setr
+special symbol: {
+ID: po
+special symbol: }
+special symbol: }
+special symbol: }
+punctuation: .
+non-primitive datatype: acceleration
+ID: a
+assignment operator: =
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: adda
+special symbol: {
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: setr
+special symbol: {
+ID: ac
+special symbol: }
+special symbol: }
+punctuation: .
+non-primitive datatype: momentum
+ID: pe
+assignment operator: =
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: setp
+special symbol: {
+special symbol: {
+ID: m
+special symbol: }
+reserved keyword: v_after
+special symbol: {
+ID: po
+special symbol: }
+special symbol: }
+punctuation: .
+special symbol: [
+ID: x
+relational operator: !=
+ID: y
+logical operator: &
+ID: u
+special symbol: ]
+special symbol: {
+non-primitive datatype: e
+ID: coeff
+punctuation: .
+reserved keyword: input
+punctuation: :
+ID: coeff
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: collide
+special symbol: {
+ID: m2
+punctuation: ,
+ID: coeff
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: collide
+special symbol: {
+ID: m2
+special symbol: }
+punctuation: .
+special symbol: }
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: ke_after
+special symbol: {
+reserved keyword: mag
+special symbol: {
+ID: r1
+special symbol: }
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: pe_after
+special symbol: {
+ID: function
+special symbol: {
+ID: a
+punctuation: ,
+ID: b
+punctuation: ,
+ID: c
+special symbol: }
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: te_after
+special symbol: {
+reserved keyword: tan
+special symbol: (
+ID: foo
+special symbol: {
+special symbol: }
+special symbol: )
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: angle_after
+special symbol: {
+ID: t2
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: s_after
+special symbol: {
+special symbol: {
+ID: m3
+special symbol: }
+reserved keyword: r_after
+special symbol: {
+reserved keyword: sin
+special symbol: (
+constant: 30
+special symbol: )
+special symbol: }
+operator: ->
+reserved keyword: second
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: roc_after
+special symbol: {
+special symbol: {
+ID: m2
+special symbol: }
+reserved keyword: p_after
+special symbol: {
+special symbol: {
+ID: m3
+special symbol: }
+reserved keyword: r_after
+special symbol: {
+reserved keyword: mag
+special symbol: {
+special symbol: [
+constant: 12
+punctuation: ,
+constant: 67
+special symbol: ]
+special symbol: }
+special symbol: }
+operator: ->
+reserved keyword: second
+special symbol: }
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: p_after
+special symbol: {
+special symbol: [
+constant: 12
+punctuation: ,
+constant: 5
+special symbol: ]
+operator: ->
+reserved keyword: first
+special symbol: }
+punctuation: .
+reserved keyword: loop
+special symbol: [
+ID: time_u
+relational operator: !=
+constant: 0
+special symbol: ]
+special symbol: {
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: time_to_collide
+special symbol: {
+ID: m2
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: time_to_r
+special symbol: {
+special symbol: {
+ID: m2
+special symbol: }
+reserved keyword: setr
+special symbol: {
+special symbol: [
+constant: 8
+punctuation: ,
+constant: 7
+special symbol: ]
+special symbol: }
+punctuation: ,
+ID: ma
+operator: ->
+reserved keyword: second
+special symbol: }
+punctuation: .
+reserved keyword: output
+punctuation: :
+punctuation: "
+constant: time to collision:
+punctuation: "
+binary operator: +
+ID: time_u
+punctuation: .
+special symbol: }
+special symbol: }

@@ -1,0 +1,258 @@
+comment: $
+Q) ( JEE ADVANCED 2022 P2 ) A projectile is fired from
+ground with velocity v at an angle theta from horizontal .
+If at the highest point the gravity changes from g to
+newg where newg = g /0.81 , If newd = n * d , where d is
+projectile range without change in gravity and newd is
+the range when above said thing is done , find the value
+of n .
+$
+non-primitive datatype: time
+ID: find_time
+assignment operator: =
+special symbol: {
+primitive datatype: double
+ID: k
+punctuation: ,
+primitive datatype: int
+ID: vel
+special symbol: }
+operator: =>
+special symbol: {
+operator: =>
+ID: vel
+binary operator: /
+ID: k
+punctuation: .
+special symbol: }
+non-primitive datatype: time
+ID: find_time_2
+assignment operator: =
+special symbol: {
+primitive datatype: double
+ID: a
+punctuation: ,
+primitive datatype: int
+ID: h
+special symbol: }
+operator: =>
+special symbol: {
+operator: =>
+special symbol: (
+constant: 2
+binary operator: *
+ID: h
+binary operator: /
+ID: a
+special symbol: )
+binary operator: ^
+special symbol: (
+constant: 1
+binary operator: /
+constant: 2
+special symbol: )
+punctuation: .
+special symbol: }
+main function: start
+special symbol: {
+ID: y
+assignment operator: =
+unary operator: !
+ID: x
+punctuation: .
+non-primitive datatype: mass
+ID: m
+assignment operator: =
+constant: 20
+punctuation: .
+non-primitive datatype: theta
+ID: t
+assignment operator: =
+constant: 45
+punctuation: .
+non-primitive datatype: position
+ID: thi
+assignment operator: =
+special symbol: [
+constant: 0
+punctuation: ,
+constant: 0
+special symbol: ]
+punctuation: .
+non-primitive datatype: acceleration
+ID: g1
+assignment operator: =
+special symbol: [
+constant: 0
+punctuation: ,
+constant: -10
+special symbol: ]
+punctuation: .
+special symbol: {
+ID: m
+special symbol: }
+reserved keyword: seta
+special symbol: {
+ID: g
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m
+special symbol: }
+reserved keyword: setv
+special symbol: {
+constant: 10
+special symbol: }
+punctuation: .
+primitive datatype: double
+ID: temp
+assignment operator: =
+special symbol: {
+ID: m
+special symbol: }
+reserved keyword: v_after
+special symbol: {
+constant: 0
+special symbol: }
+operator: ->
+reserved keyword: first
+punctuation: .
+non-primitive datatype: time
+ID: max_point
+assignment operator: =
+ID: find_time
+special symbol: {
+constant: 10
+punctuation: ,
+ID: temp
+special symbol: }
+punctuation: .
+non-primitive datatype: position
+ID: tyu
+assignment operator: =
+special symbol: {
+ID: m
+special symbol: }
+reserved keyword: r_after
+special symbol: {
+ID: max_point
+special symbol: }
+punctuation: .
+primitive datatype: int
+ID: distance_travelled
+assignment operator: =
+ID: top
+operator: ->
+reserved keyword: first
+punctuation: .
+non-primitive datatype: mass
+ID: newm
+assignment operator: =
+constant: 20
+punctuation: .
+special symbol: {
+ID: newm
+special symbol: }
+reserved keyword: setr
+special symbol: {
+ID: top
+special symbol: }
+punctuation: .
+special symbol: {
+ID: newm
+special symbol: }
+reserved keyword: setv
+special symbol: {
+special symbol: {
+ID: m
+special symbol: }
+reserved keyword: v_after
+special symbol: {
+ID: max_point
+special symbol: }
+special symbol: }
+punctuation: .
+comment: $   g = g / 0.81. 
+    or this can be done
+    $
+primitive datatype: double
+ID: a
+assignment operator: =
+ID: gr
+operator: ->
+reserved keyword: second
+punctuation: .
+ID: a
+assignment operator: =
+ID: a
+binary operator: /
+constant: 0.81
+punctuation: .
+special symbol: {
+ID: m
+special symbol: }
+reserved keyword: seta
+special symbol: {
+special symbol: [
+constant: 0
+punctuation: ,
+ID: a
+special symbol: ]
+special symbol: }
+punctuation: .
+special symbol: {
+ID: newm
+special symbol: }
+reserved keyword: seta
+special symbol: {
+ID: g
+special symbol: }
+punctuation: .
+primitive datatype: int
+ID: max_height_vertical
+assignment operator: =
+ID: top
+operator: ->
+reserved keyword: second
+punctuation: .
+ID: max_point
+assignment operator: =
+ID: find_time_2
+special symbol: {
+ID: a
+punctuation: ,
+ID: max_height_vertical
+special symbol: }
+punctuation: .
+non-primitive datatype: position
+ID: final
+assignment operator: =
+special symbol: {
+ID: newm
+special symbol: }
+reserved keyword: r_after
+special symbol: {
+ID: max_point
+special symbol: }
+punctuation: .
+ID: n
+assignment operator: =
+ID: final
+operator: ->
+reserved keyword: first
+binary operator: /
+special symbol: (
+constant: 2
+binary operator: *
+ID: distance_travelled
+special symbol: )
+punctuation: .
+reserved keyword: output
+punctuation: :
+punctuation: "
+constant: The value of n is 
+punctuation: "
+binary operator: +
+ID: n
+punctuation: .
+special symbol: }

@@ -1,0 +1,237 @@
+comment: $ Below "start" is the first function on execution. $
+main function: start
+special symbol: {
+ID: nextfn
+special symbol: {
+special symbol: }
+punctuation: .
+special symbol: }
+primitive datatype: bool
+ID: nextfn
+assignment operator: =
+special symbol: {
+non-primitive datatype: acceleration
+ID: a
+punctuation: ,
+non-primitive datatype: velocity
+ID: v
+punctuation: ,
+non-primitive datatype: time
+ID: t
+special symbol: }
+operator: =>
+special symbol: {
+primitive datatype: int
+ID: a
+punctuation: ,
+ID: b
+punctuation: .
+primitive datatype: double
+ID: _a1
+punctuation: ,
+ID: _b1
+assignment operator: =
+constant: 0.1
+punctuation: .
+non-primitive datatype: velocity
+ID: new_v
+assignment operator: =
+special symbol: [
+constant: 5
+punctuation: ,
+constant: 10.7
+special symbol: ]
+punctuation: ,
+ID: u_old1
+punctuation: .
+ID: x
+assignment operator: =
+constant: 10.4
+punctuation: .
+ID: u_old1
+assignment operator: =
+special symbol: [
+constant: 0.3
+punctuation: ,
+constant: -0.99
+special symbol: ]
+punctuation: .
+ID: valid
+assignment operator: =
+reserved keyword: true
+punctuation: .
+ID: return_val
+assignment operator: =
+ID: nextfn_2
+special symbol: {
+ID: u_old1
+punctuation: ,
+ID: fn2
+special symbol: {
+ID: a
+punctuation: ,
+ID: b
+punctuation: ,
+ID: c
+special symbol: }
+special symbol: }
+punctuation: .
+comment: $
+This test case verifies
+grammar of Complex
+Expressions.
+$
+ID: c
+assignment operator: =
+ID: p
+binary operator: *
+ID: q
+binary operator: +
+special symbol: (
+special symbol: (
+constant: 5
+binary operator: +
+constant: 9.9
+special symbol: )
+binary operator: ^
+special symbol: (
+ID: r
+binary operator: %
+ID: a
+special symbol: )
+binary operator: /
+constant: 2
+special symbol: )
+punctuation: .
+special symbol: [
+unary operator: !
+constant: 5
+logical operator: &
+constant: 6
+logical operator: |
+special symbol: (
+ID: p
+relational operator: ==
+ID: q
+special symbol: )
+logical operator: |
+special symbol: (
+ID: hi
+logical operator: &
+ID: hi
+logical operator: |
+ID: s
+special symbol: )
+special symbol: ]
+special symbol: {
+comment: $ Do Nothing. $
+special symbol: }
+special symbol: [
+constant: 5
+relational operator: >=
+ID: x
+special symbol: ]
+special symbol: {
+operator: =>
+punctuation: "
+constant: true
+punctuation: "
+punctuation: .
+special symbol: }
+reserved keyword: otherwise
+special symbol: {
+reserved keyword: break
+punctuation: .
+special symbol: }
+reserved keyword: loop
+special symbol: [
+unary operator: !
+constant: 2
+special symbol: ]
+special symbol: {
+reserved keyword: break
+punctuation: .
+operator: =>
+constant: 0.5
+punctuation: .
+reserved keyword: input
+punctuation: :
+ID: a
+punctuation: ,
+ID: e2
+punctuation: .
+reserved keyword: output
+punctuation: :
+punctuation: "
+constant: afasf
+punctuation: "
+punctuation: .
+reserved keyword: output
+punctuation: :
+ID: fn
+special symbol: {
+ID: a
+special symbol: }
+binary operator: +
+ID: id
+binary operator: +
+punctuation: "
+constant: hasd
+punctuation: "
+binary operator: +
+ID: ok
+punctuation: .
+ID: x
+unary operator: ++
+punctuation: .
+ID: y
+unary operator: --
+punctuation: .
+special symbol: }
+operator: =>
+punctuation: "
+constant: false
+punctuation: "
+punctuation: .
+special symbol: }
+non-primitive datatype: velocity
+ID: nextfn_2
+assignment operator: =
+special symbol: {
+non-primitive datatype: velocity
+ID: u
+punctuation: ,
+non-primitive datatype: mass
+ID: m
+special symbol: }
+operator: =>
+special symbol: {
+non-primitive datatype: velocity
+ID: now
+punctuation: .
+ID: now
+assignment operator: =
+special symbol: (
+ID: u
+binary operator: +
+special symbol: {
+ID: m
+special symbol: }
+reserved keyword: getv
+special symbol: )
+binary operator: /
+constant: 2
+punctuation: .
+operator: =>
+ID: now
+punctuation: .
+special symbol: }
+comment: $sd$
+comment: $ just a sample multi
+line comment
+$
+comment: $ just a sample multi
+line comment
+$
+comment: $ just a sample multi
+line comment $

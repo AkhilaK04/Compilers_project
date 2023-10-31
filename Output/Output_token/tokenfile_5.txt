@@ -1,0 +1,255 @@
+comment: $
+    Q) 2 objects A,B are seperated by distance 36m, are
+    projected with equal velocities 10^(1/2) with angle 45
+    and 135 anticlock. Find out several properties of objects
+    before and after collision.   
+    
+$
+main function: start
+special symbol: {
+non-primitive datatype: mass
+ID: m1
+assignment operator: =
+constant: 10
+punctuation: .
+non-primitive datatype: mass
+ID: m2
+assignment operator: =
+constant: 15
+punctuation: .
+non-primitive datatype: time
+ID: t
+punctuation: .
+primitive datatype: double
+ID: vel_val
+punctuation: .
+non-primitive datatype: theta
+ID: angle1
+punctuation: ,
+ID: angle2
+punctuation: .
+comment: $ user provides values in terminal -> 45,135 (Given) $
+reserved keyword: input
+punctuation: :
+ID: angle1
+punctuation: ,
+ID: angle2
+punctuation: .
+reserved keyword: input
+punctuation: :
+ID: vel_val
+punctuation: .
+comment: $ Given, vel = 10^(1/2). $
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: setv
+special symbol: {
+special symbol: [
+ID: vel_val
+binary operator: *
+reserved keyword: sin
+special symbol: (
+ID: angle
+special symbol: )
+punctuation: ,
+ID: vel_val
+binary operator: *
+reserved keyword: cos
+special symbol: (
+ID: angle
+special symbol: )
+special symbol: ]
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m2
+special symbol: }
+reserved keyword: setv
+special symbol: {
+special symbol: [
+constant: -1
+binary operator: *
+ID: vel_val
+binary operator: *
+reserved keyword: sin
+special symbol: (
+ID: angle
+special symbol: )
+punctuation: ,
+ID: vel_val
+binary operator: *
+reserved keyword: cos
+special symbol: (
+ID: angle
+special symbol: )
+special symbol: ]
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: setp
+special symbol: {
+special symbol: [
+constant: -18
+punctuation: ,
+constant: 0
+special symbol: ]
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m2
+special symbol: }
+reserved keyword: setp
+special symbol: {
+special symbol: [
+constant: 18
+punctuation: ,
+constant: 0
+special symbol: ]
+special symbol: }
+punctuation: .
+ID: t
+assignment operator: =
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: time_to_collide
+special symbol: {
+ID: m2
+special symbol: }
+punctuation: .
+special symbol: [
+special symbol: (
+ID: t
+relational operator: !=
+constant: 1
+special symbol: )
+special symbol: ]
+special symbol: {
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: setv
+special symbol: {
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: v_after
+special symbol: {
+ID: t
+special symbol: }
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: setv
+special symbol: {
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: r_after
+special symbol: {
+ID: t
+special symbol: }
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m2
+special symbol: }
+reserved keyword: setv
+special symbol: {
+special symbol: {
+ID: m2
+special symbol: }
+reserved keyword: v_after
+special symbol: {
+ID: t
+special symbol: }
+special symbol: }
+punctuation: .
+special symbol: {
+ID: m2
+special symbol: }
+reserved keyword: setv
+special symbol: {
+special symbol: {
+ID: m2
+special symbol: }
+reserved keyword: r_after
+special symbol: {
+ID: t
+special symbol: }
+special symbol: }
+punctuation: .
+ID: LE
+assignment operator: =
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: collide
+special symbol: {
+ID: m2
+punctuation: ,
+ID: e1
+special symbol: }
+punctuation: .
+special symbol: }
+reserved keyword: output
+punctuation: :
+punctuation: "
+constant: Time taken to collide
+punctuation: "
+binary operator: +
+ID: t
+punctuation: .
+reserved keyword: output
+punctuation: :
+punctuation: "
+constant: Radius of curvature at 10s
+punctuation: "
+binary operator: +
+ID: roc
+special symbol: {
+constant: 10
+special symbol: }
+punctuation: .
+reserved keyword: output
+punctuation: :
+punctuation: "
+constant: Distance travelled before collision
+punctuation: "
+binary operator: +
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: r_after
+special symbol: {
+ID: t
+special symbol: }
+punctuation: .
+reserved keyword: output
+punctuation: :
+punctuation: "
+constant: Angle at t = 10s
+punctuation: "
+binary operator: +
+special symbol: {
+ID: m1
+special symbol: }
+reserved keyword: angle_after
+special symbol: {
+constant: 10
+special symbol: }
+punctuation: .
+reserved keyword: output
+punctuation: :
+punctuation: "
+constant: Energy loss during collision
+punctuation: "
+binary operator: +
+ID: LE
+punctuation: .
+special symbol: }

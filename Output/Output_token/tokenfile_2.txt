@@ -1,0 +1,154 @@
+primitive datatype: int
+ID: solve
+assignment operator: =
+special symbol: {
+special symbol: }
+operator: =>
+special symbol: {
+primitive datatype: double
+ID: arr
+special symbol: [
+constant: 10
+special symbol: ]
+special symbol: [
+constant: 10
+special symbol: ]
+punctuation: .
+primitive datatype: int
+ID: loop_var1
+assignment operator: =
+constant: 10
+punctuation: .
+primitive datatype: int
+ID: loop_var2
+assignment operator: =
+constant: 10
+punctuation: .
+reserved keyword: loop
+special symbol: [
+ID: loop_var1
+unary operator: --
+special symbol: ]
+special symbol: {
+reserved keyword: SCOPEOPEN
+special symbol: {
+reserved keyword: SCOPEOPEN
+special symbol: {
+reserved keyword: loop
+special symbol: [
+ID: loop_var2
+unary operator: --
+special symbol: ]
+special symbol: {
+ID: arr
+special symbol: [
+ID: loop_var1
+special symbol: ]
+special symbol: [
+ID: loop_var2
+special symbol: ]
+assignment operator: =
+ID: loop_var1
+binary operator: %
+ID: loop_var2
+punctuation: .
+special symbol: }
+reserved keyword: SCOPECLOSE
+special symbol: }
+reserved keyword: SCOPECLOSE
+special symbol: }
+special symbol: }
+special symbol: [
+ID: p
+logical operator: &
+ID: t
+relational operator: >
+constant: 5
+logical operator: |
+ID: r
+relational operator: <=
+special symbol: (
+special symbol: (
+ID: u
+relational operator: ==
+constant: 5
+logical operator: &
+ID: r
+logical operator: &
+special symbol: (
+unary operator: !
+ID: t
+logical operator: |
+special symbol: (
+ID: q
+relational operator: <=
+constant: 31
+special symbol: )
+special symbol: )
+special symbol: )
+logical operator: |
+ID: q
+special symbol: )
+special symbol: ]
+special symbol: {
+comment: $Entered 
+        IF BLOCK.$
+operator: =>
+ID: arr
+special symbol: [
+constant: 5
+special symbol: ]
+special symbol: [
+constant: 1
+special symbol: ]
+punctuation: .
+special symbol: }
+ID: count
+assignment operator: =
+special symbol: (
+special symbol: (
+ID: p
+binary operator: *
+ID: q
+special symbol: )
+binary operator: %
+ID: b
+binary operator: +
+special symbol: (
+special symbol: (
+constant: 4
+binary operator: +
+constant: 2
+binary operator: +
+constant: 2
+special symbol: )
+binary operator: /
+constant: 5
+special symbol: )
+special symbol: )
+binary operator: ^
+constant: 5
+punctuation: .
+operator: =>
+special symbol: (
+ID: hq
+relational operator: >
+constant: 6
+special symbol: )
+logical operator: &
+constant: 3
+punctuation: .
+special symbol: }
+main function: start
+special symbol: {
+reserved keyword: output
+punctuation: :
+ID: solve
+special symbol: {
+special symbol: }
+binary operator: +
+punctuation: "
+constant:  Success 
+punctuation: "
+punctuation: .
+special symbol: }
