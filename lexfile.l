@@ -15,9 +15,9 @@ special_sym [\{\}\[\]\(\)$]
 
 primi_datatype ("int"|"double"|"string"|"bool")
 
-non_pri_datatype ("mass"|"time"|"position"|"velocity"|"acc"|"energy"|"theta"|"e"|"distance"|"momentum")
+non_pri_datatype ("mass"|"time"|"position"|"velocity"|"acceleration"|"energy"|"theta"|"e"|"distance"|"momentum")
 
-reserved_keywords ("input"|"output"|"true"|"false"|"setr"|"addr"|"setv"|"addv"|"seta"|"adda"|"ke_after"|"pe_after"|"te_after"|"angle_after"|"get_traj"|"collide"|"time_to_collide"|"roc_after"|"p_after"|"s_after"|"time_to"|"loop"|"break"|"sin"|"cos"|"tan"|"mag"|"setp"|"v_after"|"r_after")
+reserved_keywords ("input"|"output"|"true"|"false"|"setr"|"addr"|"setv"|"addv"|"seta"|"adda"|"ke_after"|"pe_after"|"te_after"|"angle_after"|"get_traj"|"collide"|"time_to_collide"|"roc_after"|"p_after"|"s_after"|"time_to_r"|"time_to_v"|"loop"|"break"|"sin"|"cos"|"tan"|"mag"|"setp"|"v_after"|"r_after"|"getr"|"getv"|"geta"|"first"|"second"|"otherwise")
 
 bi_op ("^"|"*"|"/"|"%"|"+"|"-")
 
@@ -42,6 +42,18 @@ question ("?")
     fprintf(tokfile,"comment: %s\n",yytext);
     fprintf(parsefile,"%s",yytext);
     return CMT;
+}
+
+SCOPEOPEN {
+    fprintf(tokfile,"reserved keyword: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
+    return SCOPEOPEN;
+}
+
+SCOPECLOSE {
+    fprintf(tokfile,"reserved keyword: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
+    return SCOPECLOSE;
 }
 
 "start" {
@@ -83,7 +95,7 @@ question ("?")
     else if(strcmp(yytext,"time") == 0) return TIME;
     else if(strcmp(yytext,"position") == 0) return POSITION;
     else if(strcmp(yytext,"velocity") == 0) return VELOCITY;
-    else if(strcmp(yytext,"acc") == 0) return ACC;
+    else if(strcmp(yytext,"acceleration") == 0) return ACC;
     else if(strcmp(yytext,"energy") == 0) return ENERGY;
     else if(strcmp(yytext,"theta") == 0) return THETA;
     else if(strcmp(yytext,"e") == 0) return E;
@@ -115,7 +127,8 @@ question ("?")
     else if(strcmp(yytext,"roc_after") == 0) return ROC_AFTER;
     else if(strcmp(yytext,"p_after") == 0) return P_AFTER;
     else if(strcmp(yytext,"s_after") == 0) return S_AFTER;
-    else if(strcmp(yytext,"time_to") == 0) return TIME_TO;
+    else if(strcmp(yytext,"time_to_r") == 0) return TIME_TO_R;
+    else if(strcmp(yytext,"time_to_v") == 0) return TIME_TO_V;
     else if(strcmp(yytext,"loop") == 0) return LOOP;
     else if(strcmp(yytext,"break") == 0) return BREAK;
     // else if(strcmp(yytext,"start") == 0) return START;
@@ -126,6 +139,13 @@ question ("?")
     else if(strcmp(yytext,"setp") == 0) return SETP;
     else if(strcmp(yytext,"v_after") == 0) return V_AFTER;
     else if(strcmp(yytext,"r_after") == 0) return R_AFTER;
+    else if(strcmp(yytext,"getr") == 0) return GETR;
+    else if(strcmp(yytext,"getv") == 0) return GETV;
+    else if(strcmp(yytext,"geta") == 0) return GETA;
+    else if(strcmp(yytext,"first") == 0) return FIRST;
+    else if(strcmp(yytext,"second") == 0) return SECOND;
+    else if(strcmp(yytext,"otherwise") == 0) return OTHERWISE;
+
 }
 
 
@@ -223,7 +243,7 @@ question ("?")
     return INTEGER_CONSTANT; 
 }
 
-[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? {
+[-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? {
     fprintf(tokfile, "constant: %s\n", yytext);
     fprintf(parsefile, "%s", yytext);
     return FLOAT_CONSTANT;
