@@ -13,7 +13,7 @@ int solve = {} =>{
         SCOPECLOSE}
     }
 
-    [p & t>5 | r ( ( u==5 & r & (!t | (q<=31) ) ) | q)] {
+    [p & t>5 | r <= ( ( u==5 & r & (!t | (q<=31) ) ) | q)] {
         $Entered 
         IF BLOCK.$
     => arr[5][1].
