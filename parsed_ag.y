@@ -5,7 +5,7 @@
 extern FILE *yyin, *tokfile, *parsefile;
 extern int yylineno;
 int yylex();
-void yyerror();
+void yyerror(char *s);
 %}
 
 /* %union {
@@ -40,6 +40,8 @@ void yyerror();
 %token ASSGN
 %token DARR
 %token MCMT SCMT
+%token QUESTION
+%token NON_NEGATIVE_INT
 
 %start code
 %%
@@ -53,10 +55,26 @@ code_subpart: comments
             | function_decl
             ;
 
-startfn: START OPENCU body CLOSECU
-    ;
+startfn : START OPENCU body CLOSECU
+        ;
 
-BI_OP : ADD
+body : 
+        /* decl_stmt body */
+     exp_stmt body
+     | call_stmt_with_dot body
+     | conditional_stmt body
+     | loop_stmt body
+     | unary_operation_without_dot DOT body
+     | return_stmt body
+     | comments body
+     | output_stmt body
+     | input_stmt body
+     | {}
+     /* | inbuilt_functions body */
+     | decl_stmt_with_exp body
+     ;
+
+bi_op : ADD
       | SUB
       | MUL
       | DIV
@@ -64,21 +82,24 @@ BI_OP : ADD
       | EXP
       ;
 
-RELOP: EQ
-     | NEQ
-     | GEQ
-     | GT
-     | LEQ
-     | LT
-     ;
+relop : EQ
+      | NEQ
+      | GEQ
+      | GT
+      | LEQ
+      | LT
+      ;
+/* 
+vectors : OPENCC rhs_exp COMMA rhs_exp CLOSECC
+        ; */
 
-PRIMI_DATATYPE: INT
+primi_datatype: INT
               | DOUBLE
               | BOOL
               | STRING
               ;
             
-NON_PRI_DATATYPE: MASS
+non_pri_datatype: MASS
                 | TIME
                 | POSITION
                 | VELOCITY
@@ -90,171 +111,145 @@ NON_PRI_DATATYPE: MASS
                 | MOMENTUM
                 ;
             
-DATATYPE: PRIMI_DATATYPE
-        | NON_PRI_DATATYPE
-        ; 
+datatypes : primi_datatype
+          | non_pri_datatype
+          ; 
 
-decl_stmt : DATATYPE ids DOT
-            ;
+/* DECLARATION STATEMENT */
 
-predicate : term
-          | OPENCC predicate CLOSECC
-		  | predicate PRED_OP term
-		  | predicate PRED_OP OPENCC term CLOSECC
-            ;
-
-PRED_OP : RELOP
-        | LOGICOP
-        | BI_OP
-        ;  
-term : binary_term
-	 | UNINEG OPENCC term CLOSECC
-	 | unary_operation_without_dot
-     | binary_operation
-	 ;
-
-comments: SCMT
-    | MCMT
-    ;
-
-ids: ID
-   | ID COMMA ids
-   ;
-
-operand: binary_term
-	   | STRING_CONSTANT
-	   ;
-
-binary_term : ID    
-            | INTEGER_CONSTANT
-            | FLOAT_CONSTANT
-            | TRUE
-            | FALSE
-            | call_stmt_without_dot
-            ;
-
-funccallargs: operand
-	| operand COMMA funccallargs
-	;
-
-funccall: ID OPENCC CLOSECC
-	| ID OPENCC funccallargs CLOSECC
-	;
-
-call_stmt_without_dot: funccall
-    ;
-
-call_stmt_with_dot: call_stmt_without_dot DOT
-    ;
-
-constant: INTEGER_CONSTANT
-        | STRING_CONSTANT
-        | FLOAT_CONSTANT
-        ;
-input_stmt: INPUT COLON ids DOT
+/* decl_stmt : datatypes variables DOT
           ;
 
-STR: DOUBLE_QUOTE STRING_CONSTANT DOUBLE_QUOTE 
-   | ID
-   | call_stmt_without_dot
-   ;
+variables : single_variable COMMA variables
+          | single_variable
+          ;   */
 
-for_out: STR
-       | STR ADD for_out
-       ;
-
-output_stmt: OUTPUT COLON for_out DOT
-           ;
-
-unary_operation_without_dot: ID UNIOP
-                           | UNINEG binary_term
-                           ;
-binary_operation : 
-/* binary_term BI_OP binary_term
-                 | OPENCC binary_operation CLOSECC 
-                 | binary_operation BI_OP binary_operation */
-                 /* | */
-                 ;
-
-vectors: OPENCC operand COMMA operand CLOSECC
-       ;
-
-rhs_exp: operand
-       | unary_operation_without_dot
-       | binary_operation
-       | vectors
-       ;
-
-exp_stmt: ID ASSGN rhs_exp DOT
-        ;
-
-body:    decl_stmt body
-         | exp_stmt body
-         | call_stmt_with_dot body
-         | conditional_stmt body
-         | loop_stmt body
-         | unary_operation_without_dot DOT body
-         | return_stmt body
-         | comments body
-         | output_stmt body
-         | input_stmt body
-         | {}
-         ;
-
-break_body: decl_stmt break_body
-         | exp_stmt break_body
-         | call_stmt_with_dot break_body
-         | conditional_stmt break_body
-         | loop_stmt break_body
-         | BREAK DOT break_body
-         | unary_operation_without_dot DOT break_body
-         | return_stmt break_body
-         | comments break_body
-         | output_stmt break_body
-         | input_stmt break_body
-         | {}
-         ;
-
-loop_body: decl_stmt loop_body
-         | exp_stmt loop_body
-         | call_stmt_with_dot loop_body
-         /* | conditional_stmt loop_body */
-         | loop_conditional loop_body
-         | loop_stmt loop_body
-         | unary_operation_without_dot DOT loop_body
-         | return_stmt loop_body
-         | comments loop_body
-         | output_stmt loop_body
-         | input_stmt loop_body
-         | {}
-         ;
-
-loop_conditional: LT predicate GT OPENCU break_body CLOSECU
-                | LT predicate GT OPENCU break_body CLOSECU OPENCU break_body CLOSECU
+single_variable : ID
+                | ID dimensions 
                 ;
 
-conditional_stmt: LT predicate GT OPENCU body CLOSECU
-                | LT predicate GT OPENCU body CLOSECU OPENCU body CLOSECU
-                ;
-
-loop_stmt: LOOP LT predicate GT OPENCU loop_body CLOSECU
-         ; 
-
-return_val: operand
-          | predicate
-          ;
-
-return_stmt: ARROW return_val DOT
+dimensions : OPENSQ rhs_exp CLOSESQ
+           | OPENSQ rhs_exp CLOSESQ dimensions
            ;
 
-parameters: DATATYPE ID
-          | DATATYPE ID COMMA parameters
-          ;
+/* EXPRESSION STATEMENT */
 
-function_decl: DATATYPE ID ASSGN OPENCC parameters CLOSECC ARROW OPENCU body CLOSECU
+exp_stmt : single_variable ASSGN rhs_exp DOT
+         /* | ID OPENSQ rhs_exp CLOSESQ ASSGN rhs_exp DOT    */
+         ;
+
+anything_with_value : single_variable
+                    | NON_NEGATIVE_INT
+                    | INTEGER_CONSTANT
+                    | FLOAT_CONSTANT
+                    | STRING_CONSTANT
+                    | TRUE
+                    | FALSE
+                    | call_stmt_without_dot
+                    ;
+        
+operations : bi_op
+           | LOGICOP
+           | relop
+           ;
+
+rhs_term : OPENCC anything_with_value
+         | anything_with_value CLOSECC
+
+rhs_exp : rhs_term operations rhs_exp
+        | anything_with_value operations rhs_exp
+        | rhs_term
+        | anything_with_value
+        ;
+
+/* CALL STATEMENT WITH DOT */
+
+call_stmt_with_dot : call_stmt_without_dot DOT
+                   ;
+
+call_stmt_without_dot : ID OPENCU CLOSECU
+	                  | ID OPENCU funccallargs CLOSECU
+	                  ;
+
+funccallargs : rhs_exp
+             | rhs_exp COMMA funccallargs
              ;
 
-std_lib: rel_to_mag
+/* CONDITIONAL STATEMENT  */
+
+
+conditional_stmt: OPENSQ rhs_exp CLOSESQ OPENCU body CLOSECU
+                | OPENSQ rhs_exp CLOSESQ OPENCU body CLOSECU OPENCU body CLOSECU
+                ;
+
+/* LOOP STATEMENT */
+      
+loop_stmt: LOOP OPENSQ rhs_exp CLOSESQ OPENCU body CLOSECU
+         ; 
+
+/* UNIRARY OPERATION WITHOUT DOT */
+     
+unary_operation_without_dot: single_variable UNIOP
+                           | UNINEG rhs_exp
+                           ;
+
+/* RETURN STATEMENT */
+    
+return_stmt: ARROW rhs_exp DOT
+           ;
+
+/* COMMENT STATEMENT */
+
+comments : SCMT
+         | MCMT
+         ;
+
+/* OUTPUT STATEMENT */
+     
+output_stmt : OUTPUT COLON rhs_exp DOT
+            ;
+
+/* INPUT STATEMENT */
+     
+input_stmt : INPUT COLON ids DOT
+           ;
+
+ids : single_variable COMMA ids
+    | single_variable
+    ;
+
+/* INBUILT STATEMENT */
+/*      
+inbuilt_functions : 
+                  ; */
+
+/* DECLARATION OR DECLARATION WITH INITIALIZATION STATEMENT */
+     
+decl_stmt_with_exp : datatypes expressions DOT
+                   ;
+
+expressions : expression COMMA expressions
+            | expression
+            ;
+
+expression : single_variable ASSGN rhs_exp
+           | single_variable
+           ;
+
+/* FUNCTION DECLARATION */
+
+function_decl : datatypes ID ASSGN OPENCU parameters CLOSECU ARROW OPENCU body CLOSECU
+              ;
+
+parameters: datatypes ID
+          | datatypes ID COMMA parameters
+          ;
+
+/*  */
+
+
+
+/* std_lib: rel_to_mag
     | rel_to_pos
     | rel_to_energy
     | rel_to_angle
@@ -288,7 +283,7 @@ miscellaneous: OPENCC ID CLOSECC S_AFTER OPENCC CLOSECC ID CLOSECC
              | OPENCC ID CLOSECC ROC_AFTER OPENCC CLOSECC ID CLOSECC
              | OPENCC ID CLOSECC P_AFTER OPENCC CLOSECC ID CLOSECC
              | OPENCC ID CLOSECC TIME_TO OPENCC CLOSECC ID CLOSECC
-              ;
+              ; */
 
 %%
 
