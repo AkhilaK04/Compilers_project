@@ -1,0 +1,72 @@
+$ Below "start" is the first function on execution. $ : comment
+
+start { : main function
+    nextfn{}. : call statement
+}
+
+bool nextfn = {acceleration a, velocity v, time t} => { : function declaration
+
+    int a,b. : declaration statement
+    double _a1 , _b1 = 0.1. : declaration statement
+    velocity new_v = [5 ,10.7], u_old1. : declaration statement
+
+    x = 10.4. : expression statement
+    u_old1 = [0.3 ,-0.99]. : expression statement
+    valid = true . : expression statement
+    return_val = nextfn_2{ u_old1 , fn2{a,b,c} }. : expression statement
+
+$
+This test case verifies
+grammar of Complex
+Expressions.
+$ : comment 
+
+    c = p * q + ((5 + 9.9)^(r % a)/2). : expression statement
+        
+    [!5&6|(p==q)|(hi&hi|s)]
+    {
+    $ Do Nothing. $ : comment statement
+    }
+
+    [ : conditional statement5>=x]
+    {
+        => "true". : return statement
+    }
+    otherwise {
+        break. : break statement
+    } : conditional statement
+
+    loop [!2] {
+
+        break. : break statement
+        => 0.5. : return statement
+
+        input: a,e2. : input statement
+        output: "afasf". : output statement
+        output: fn{a}+id+"hasd"+ok. : output statement 
+   
+        x++. : call statement
+        y--. : call statement
+    } : loop statement
+
+=> "false". : return statement
+}
+
+velocity nextfn_2 = {velocity u,mass m} => { : function declaration
+
+    velocity now. : declaration statement
+    now = (u + {m}getv )/2. : expression statement
+
+=> now. : return statement
+}
+
+$sd$ : comment
+
+$ just a sample multi
+line comment
+$ : comment
+$ just a sample multi
+line comment
+$ : comment
+$ just a sample multi
+line comment $ : comment

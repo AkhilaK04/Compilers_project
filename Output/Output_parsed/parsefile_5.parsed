@@ -1,0 +1,45 @@
+$
+    Q) 2 objects A,B are seperated by distance 36m, are
+    projected with equal velocities 10^(1/2) with angle 45
+    and 135 anticlock. Find out several properties of objects
+    before and after collision.   
+    
+$ : comment
+
+    start{ : main function
+    
+    mass m1 = 10. : declaration statement
+    mass m2 = 15. : declaration statement
+    time t. : declaration statement
+
+    double vel_val. : declaration statement
+    theta angle1,angle2. : declaration statement  $ user provides values in terminal -> 45,135 (Given) $ : comment 
+
+    input : angle1,angle2. : input statement
+    input : vel_val. : input statement        
+    $ Given, vel = 10^(1/2). $ : comment 
+    {m1} setv {[vel_val * sin(angle), vel_val * cos(angle)]}. : standard-library
+    {m2} setv {[-1*vel_val * sin(angle), vel_val * cos(angle)]}. : standard-library
+    {m1} setp {[-18,0]}. : standard-library
+    {m2} setp {[18,0]}. : standard-library
+    
+    t = {m1} time_to_collide {m2}. : expression statement
+    
+    [(t != 1)] {
+        {m1} setv {{m1} v_after {t}}. : standard-library
+        {m1} setv {{m1} r_after {t}}. : standard-library
+        
+        {m2} setv {{m2} v_after {t}}. : standard-library
+        {m2} setv {{m2} r_after {t}}. : standard-library
+
+        LE = {m1} collide {m2,e1}. : expression statement
+    }
+    
+    output : conditional statement: "Time taken to collide" + t. : output statement
+    output: "Radius of curvature at 10s" + roc{10}. : output statement
+    output: "Distance travelled before collision" 
+            + {m1} r_after {t}. : output statement
+    output: "Angle at t = 10s" +  {m1} angle_after {10}. : output statement
+    output: "Energy loss during collision" + LE. : output statement
+      
+    }

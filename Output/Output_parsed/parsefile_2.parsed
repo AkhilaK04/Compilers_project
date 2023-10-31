@@ -1,0 +1,29 @@
+int solve = {} =>{ : function declaration
+    double arr[10][10]. : declaration statement
+    int loop_var1 = 10. : declaration statement
+    int loop_var2 = 10. : declaration statement
+
+    loop [loop_var1--]{
+        SCOPEOPEN { : opening of new scope
+            SCOPEOPEN { : opening of new scope
+                loop [loop_var2--]{
+                    arr[loop_var1][loop_var2] = loop_var1%loop_var2. : expression statement
+                } : loop statement
+            SCOPECLOSE} : ending of new scope
+        SCOPECLOSE} : ending of new scope
+    } : loop statement
+
+    [p & t>5 | r <= ( ( u==5 & r & (!t | (q<=31) ) ) | q)] {
+        $Entered 
+        IF BLOCK.$ : comment statement
+    => arr[5][1]. : return statement
+    }
+
+    count : conditional statement = ((p * q)%b+((4+2+2)/5))^5. : expression statement
+
+=> (hq>6)&3. : return statement 
+}
+
+start { : main function
+    output: solve{} + " Success ". : output statement
+}

@@ -1,0 +1,58 @@
+
+$
+Q) ( JEE ADVANCED 2022 P2 ) A projectile is fired from
+ground with velocity v at an angle theta from horizontal .
+If at the highest point the gravity changes from g to
+newg where newg = g /0.81 , If newd = n * d , where d is
+projectile range without change in gravity and newd is
+the range when above said thing is done , find the value
+of n .
+$ : comment
+
+time find_time = {double k,int vel} => { : function declaration
+    => vel/k. : return statement
+}
+
+time find_time_2 = {double a ,int h} => { : function declaration
+    => (2*h/a)^(1/2). : return statement 
+}
+
+
+start { : main function
+    y = !x. : expression statement
+    mass m = 20. : declaration statement
+    theta t = 45. : declaration statement
+    position thi = [0,0]. : declaration statement 
+    acceleration g1 = [0,-10]. : declaration statement
+    {m} seta {g}. : standard-library 
+    {m} setv {10}. : standard-library 
+
+    double temp = {m} v_after {0} -> first. : declaration statement
+    time max_point = find_time{10,temp}. : declaration statement
+
+    position tyu = {m} r_after {max_point}. : declaration statement
+    int distance_travelled = top->first. : declaration statement 
+ 
+    mass newm = 20. : declaration statement
+    {newm} setr {top}. : standard-library
+    {newm} setv {{m} v_after {max_point}}. : standard-library
+    
+    $   g = g / 0.81. 
+    or this can be done
+    $ : comment 
+
+    double a = gr -> second. : declaration statement
+    a = a / 0.81. : expression statement
+    {m} seta {[0,a]}. : standard-library
+    {newm} seta {g}. : standard-library
+
+    int max_height_vertical = top->second. : declaration statement
+    max_point = find_time_2{a,max_height_vertical}. : expression statement
+
+    position final = {newm} r_after {max_point}. : declaration statement
+
+    n = final->first / (2*distance_travelled). : expression statement
+
+    output : "The value of n is " + n. : output statement
+
+}

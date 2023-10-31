@@ -1,0 +1,47 @@
+ start { : main function
+
+    mag{x}. : standard-library
+    mag{[0,9]}. : standard-library
+
+    {m1} setr {ac}. : standard-library
+    {m1} addr {[1,60]}. : standard-library
+    position p = {m1} r_after {sin(30)}. : declaration statement
+
+    {m1} setv {{m1} setr {[5,6]}}. : standard-library 
+    velocity ve = {m1} addv {{m} setp {po}}. : declaration statement
+    {m1} v_after {t1}. : standard-library
+
+    {m1} seta {{m1} addv {{m} setr {po}}}. : standard-library
+    acceleration a = {m1} adda {{m1} setr {ac}}. : declaration statement
+
+    momentum pe = {m1} setp {{m} v_after {po}}. : declaration statement
+
+    [x != y & u]{  
+        e coeff. : declaration statement
+        input: coeff. : input statement
+        {m1} collide {m2, coeff}. : standard-library
+        {m1} collide {m2}. : standard-library
+    }
+ 
+    { : conditional statementm1} ke_after {mag{r1}}. : standard-library
+    {m1} pe_after {function{a,b,c}}. : standard-library
+    {m1} te_after {tan(foo{})}. : standard-library
+
+    {m1} angle_after {t2}. : standard-library
+
+    {m1} s_after {{m3} r_after {sin(30)} -> second}. : standard-library
+    {m1} roc_after {{m2} p_after {{m3} r_after {mag {[12,67]}} -> second}}. : standard-library
+    {m1} p_after {[12,5]->first}. : standard-library
+    
+    loop[time_u != 0]{
+
+        {m1} time_to_collide {m2}. : standard-library
+        {m1} time_to_r {{m2} setr {[8,7]},ma->second}. : standard-library
+        output: "time to collision:" + time_u. : output statement
+
+    } : loop statement
+
+ }
+ 
+    
+    
