@@ -42,6 +42,8 @@ void yyerror(char *s);
 %token MCMT SCMT
 %token QUESTION
 %token NON_NEGATIVE_INT
+%token FIRST
+%token SECOND
 
 %start code
 %%
@@ -58,9 +60,7 @@ code_subpart: comments
 startfn : START OPENCU body CLOSECU
         ;
 
-body : 
-        /* decl_stmt body */
-     exp_stmt body
+body : exp_stmt body
      | call_stmt_with_dot body
      | conditional_stmt body
      | loop_stmt body
@@ -70,8 +70,23 @@ body :
      | output_stmt body
      | input_stmt body
      | {}
-     /* | inbuilt_functions body */
+     | inbuilt_functions body
      | decl_stmt_with_exp body
+     ;
+
+loop_body : exp_stmt loop_body
+     | call_stmt_with_dot loop_body
+     | conditional_stmt loop_body
+     | loop_stmt loop_body
+     | unary_operation_without_dot DOT loop_body
+     | return_stmt loop_body
+     | comments loop_body
+     | output_stmt loop_body
+     | input_stmt loop_body
+     | {}
+     | inbuilt_functions loop_body
+     | decl_stmt_with_exp loop_body
+     | BREAK DOT loop_body
      ;
 
 bi_op : ADD
@@ -89,9 +104,9 @@ relop : EQ
       | LEQ
       | LT
       ;
-/* 
-vectors : OPENCC rhs_exp COMMA rhs_exp CLOSECC
-        ; */
+
+vectors : OPENSQ rhs_exp COMMA rhs_exp CLOSESQ
+        ;
 
 primi_datatype: INT
               | DOUBLE
@@ -115,14 +130,8 @@ datatypes : primi_datatype
           | non_pri_datatype
           ; 
 
-/* DECLARATION STATEMENT */
+/* DECLARATION STATEMENT needed things */
 
-/* decl_stmt : datatypes variables DOT
-          ;
-
-variables : single_variable COMMA variables
-          | single_variable
-          ;   */
 
 single_variable : ID
                 | ID dimensions 
@@ -135,8 +144,11 @@ dimensions : OPENSQ rhs_exp CLOSESQ
 /* EXPRESSION STATEMENT */
 
 exp_stmt : single_variable ASSGN rhs_exp DOT
-         /* | ID OPENSQ rhs_exp CLOSESQ ASSGN rhs_exp DOT    */
          ;
+
+pos : FIRST
+    | SECOND
+    ;
 
 anything_with_value : single_variable
                     | NON_NEGATIVE_INT
@@ -146,6 +158,13 @@ anything_with_value : single_variable
                     | TRUE
                     | FALSE
                     | call_stmt_without_dot
+                    | vectors
+                    | call_stmt_without_dot ARROW pos
+                    | vectors ARROW pos
+                    | ID ARROW pos
+                    | SIN OPENCC anything_with_value CLOSECC
+                    | COS OPENCC anything_with_value CLOSECC
+                    | TAN OPENCC anything_with_value CLOSECC
                     ;
         
 operations : bi_op
@@ -178,13 +197,13 @@ funccallargs : rhs_exp
 /* CONDITIONAL STATEMENT  */
 
 
-conditional_stmt: OPENSQ rhs_exp CLOSESQ OPENCU body CLOSECU
-                | OPENSQ rhs_exp CLOSESQ OPENCU body CLOSECU OPENCU body CLOSECU
+conditional_stmt: OPENSQ rhs_exp CLOSESQ OPENCU loop_body CLOSECU
+                | OPENSQ rhs_exp CLOSESQ OPENCU loop_body CLOSECU OPENCU loop_body CLOSECU
                 ;
 
 /* LOOP STATEMENT */
       
-loop_stmt: LOOP OPENSQ rhs_exp CLOSESQ OPENCU body CLOSECU
+loop_stmt: LOOP OPENSQ rhs_exp CLOSESQ OPENCU loop_body CLOSECU
          ; 
 
 /* UNIRARY OPERATION WITHOUT DOT */
@@ -219,9 +238,61 @@ ids : single_variable COMMA ids
     ;
 
 /* INBUILT STATEMENT */
-/*      
-inbuilt_functions : 
-                  ; */
+     
+inbuilt_functions : rel_to_mag
+                  | rel_to_vel  
+                  | rel_to_pos
+                  | rel_to_acc
+                  | rel_to_energy
+                  | rel_to_angle
+                  | rel_to_collision
+                  | rel_to_momentum
+                  | miscellaneous 
+                  ;
+
+rel_to_mag : MAG OPENCC ID CLOSECC
+           | MAG OPENCC vectors CLOSECC
+           ;
+
+rel_to_pos : OPENCC ID CLOSECC SETR OPENCU rhs_exp CLOSECU
+           | OPENCC ID CLOSECC ADDR OPENCU rhs_exp CLOSECU
+           | OPENCC ID CLOSECC R_AFTER OPENCU rhs_exp CLOSECU
+           ;
+
+rel_to_vel : OPENCC ID CLOSECC SETV OPENCU rhs_exp CLOSECU
+           | OPENCC ID CLOSECC ADDV OPENCU rhs_exp CLOSECU
+           | OPENCC ID CLOSECC V_AFTER OPENCU rhs_exp CLOSECU
+           ; 
+
+rel_to_momentum : OPENCC ID CLOSECC SETP OPENCU rhs_exp CLOSECU
+                ;
+
+rel_to_acc : OPENCC ID CLOSECC SETA OPENCU rhs_exp CLOSECU
+           | OPENCC ID CLOSECC ADDA OPENCU rhs_exp CLOSECU
+           ;
+
+rel_to_energy: OPENCC ID CLOSECC KE_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCC ID CLOSECC PE_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCC ID CLOSECC TE_AFTER OPENCU rhs_exp CLOSECU
+             ;
+
+rel_to_angle: OPENCC ID CLOSECC ANGLE_AFTER OPENCU rhs_exp CLOSECU
+            ;
+
+rel_to_collision: OPENCC ID CLOSECC COLLIDE OPENCC ID COMMA E CLOSECC
+                | OPENCC ID CLOSECC COLLIDE OPENCC ID CLOSECC
+                | OPENCC ID CLOSECC TIME_TO_COLLIDE OPENCC ID CLOSECC
+                ;
+
+miscellaneous: OPENCC ID CLOSECC S_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCC ID CLOSECC ROC_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCC ID CLOSECC P_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCC ID CLOSECC TIME_TO OPENCU term_misc COMMA term_misc CLOSECU
+             ; 
+
+term_misc : rhs_exp
+          | QUESTION
+          ;
 
 /* DECLARATION OR DECLARATION WITH INITIALIZATION STATEMENT */
      
@@ -249,41 +320,6 @@ parameters: datatypes ID
 
 
 
-/* std_lib: rel_to_mag
-    | rel_to_pos
-    | rel_to_energy
-    | rel_to_angle
-    | rel_to_collision
-    | miscellaneous
-    ;
-
-rel_to_mag: MAG OPENCC ID CLOSECC
-    | MAG OPENCC vectors CLOSECC
-    ;
-
-rel_to_pos: OPENCC ID CLOSECC SETR OPENCC ID CLOSECC
-    | OPENCC ID CLOSECC ADDR OPENCC ID CLOSECC
-    | OPENCC ID CLOSECC R_AFTER OPENCC ID CLOSECC
-    ;
-
-rel_to_energy: OPENCC ID CLOSECC KE_AFTER OPENCC ID CLOSECC
-             | OPENCC ID CLOSECC PE_AFTER OPENCC ID CLOSECC
-             | OPENCC ID CLOSECC TE_AFTER OPENCC ID CLOSECC
-             ;
-
-rel_to_angle: OPENCC ID CLOSECC ANGLE_AFTER OPENCC ID CLOSECC
-            ;
-
-rel_to_collision: OPENCC ID CLOSECC COLLIDE OPENCC ID COMMA E CLOSECC
-                | OPENCC ID CLOSECC COLLIDE OPENCC ID CLOSECC
-                | OPENCC ID CLOSECC TIME_TO_COLLIDE OPENCC CLOSECC ID CLOSECC
-                ;
-
-miscellaneous: OPENCC ID CLOSECC S_AFTER OPENCC CLOSECC ID CLOSECC
-             | OPENCC ID CLOSECC ROC_AFTER OPENCC CLOSECC ID CLOSECC
-             | OPENCC ID CLOSECC P_AFTER OPENCC CLOSECC ID CLOSECC
-             | OPENCC ID CLOSECC TIME_TO OPENCC CLOSECC ID CLOSECC
-              ; */
 
 %%
 
