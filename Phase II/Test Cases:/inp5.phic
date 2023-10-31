@@ -1,45 +1,58 @@
+
 $
-    Q) 2 objects A,B are seperated by distance 36m, are
-    projected with equal velocities 10^(1/2) with angle 45
-    and 135 anticlock. Find out several properties of objects
-    before and after collision.   
-    
+Q) ( JEE ADVANCED 2022 P2 ) A projectile is fired from
+ground with velocity v at an angle theta from horizontal .
+If at the highest point the gravity changes from g to
+newg where newg = g /0.81 , If newd = n * d , where d is
+projectile range without change in gravity and newd is
+the range when above said thing is done , find the value
+of n .
 $
 
-    start{
-    
-    mass m1 = 10.
-    mass m2 = 15.
-    time t.
+time find_time = {double k,int vel} => {
+    => vel/k.
+}
 
-    double vel_val.
-    theta angle1,angle2.  $ user provides values in terminal -> 45,135 (Given) $
+time find_time_2 = {double a ,int h} => {
+    => (2*h/a)^(1/2). 
+}
 
-    input : angle1,angle2.
-    input : vel_val.        
-    $ Given, vel = 10^(1/2). $
-    {m1} setv {[vel_val * sin(angle), vel_val * cos(angle)]}.
-    {m2} setv {[-1*vel_val * sin(angle), vel_val * cos(angle)]}.
-    {m1} setp {[-18,0]}.
-    {m2} setp {[18,0]}.
-    
-    t = {m1} time_to_collide {m2}.
-    
-    [(t != 1)] {
-        {m1} setv {{m1} v_after {t}}.
-        {m1} setv {{m1} r_after {t}}.
-        
-        {m2} setv {{m2} v_after {t}}.
-        {m2} setv {{m2} r_after {t}}.
 
-        LE = {m1} collide {m2,e}.
-    }
+start {
+    y = !x.
+    mass m = 20.
+    theta t = 45.
+    position thi = [0,0]. 
+    acceleration g1 = [0,-10].
+    {m} seta {g}. 
+    {m} setv {10}. 
+
+    double temp = {m} v_after {0} -> first.
+    time max_point = find_time{10,temp}.
+
+    position tyu = {m} r_after {max_point}.
+    int distance_travelled = top->first. 
+ 
+    mass newm = 20.
+    {newm} setr {top}.
+    {newm} setv {{m} v_after {max_point}}.
     
-    output: "Time taken to collide" + t.
-    output: "Radius of curvature at 10s" + roc{10}.
-    output: "Distance travelled before collision" 
-            + {m1} r_after {t}.
-    output: "Angle at t = 10s" +  {m1} angle_after {10}.
-    output: "Energy loss during collision" + LE.
-      
-    }
+    $   g = g / 0.81. 
+    or this can be done
+    $
+
+    double a = gr -> second.
+    a = a / 0.81.
+    {m} seta {[0,a]}.
+    {newm} seta {g}.
+
+    int max_height_vertical = top->second.
+    max_point = find_time_2{a,max_height_vertical}.
+
+    position final = {newm} r_after {max_point}.
+
+    n = final->first / (2*distance_travelled).
+
+    output : "The value of n is " + n.
+
+}
