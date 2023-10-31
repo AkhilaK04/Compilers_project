@@ -1,5 +1,5 @@
  start {
-
+    
     mag{x}.
     mag{[0,9]}.
 
@@ -16,12 +16,12 @@
 
     momentum pe = {m1} setp {{m} v_after {po}}.
 
-[x != y & u]{  
-    e coeff.
-    input: coeff.
-    {m1} collide {m2, coeff}.
-    {m1} collide {m2}.
-}
+    [x != y & u]{  
+        e coeff.
+        input: coeff.
+        {m1} collide {m2, coeff}.
+        {m1} collide {m2}.
+    }
  
     {m1} ke_after {mag{r1}}.
     {m1} pe_after {function{a,b,c}}.
@@ -33,13 +33,13 @@
     {m1} roc_after {{m2} p_after {{m3} r_after {mag {[12,67]}} -> second}}.
     {m1} p_after {[12,5]->first}.
     
-loop[time_u != 0]{
+    loop[time_u != 0]{
 
-    {m1} time_to_collide {m2}.
-    {m1} time_to {{m2} setr {[8,7]},ma->second}.
-    output: "time to collision:" + time_u.
+        {m1} time_to_collide {m2}.
+        {m1} time_to_r {{m2} setr {[8,7]},ma->second}.
+        output: "time to collision:" + time_u.
 
-}
+    }
 
  }
  
