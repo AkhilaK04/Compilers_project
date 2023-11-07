@@ -55,28 +55,12 @@ void new_entry(string id_name,string data_type, string scope, string type ) {
   symbol_table.push_back(temp);
 }
 
-struct par_records{
-  string name;
-    string type;
-};
-typedef struct par_records par_records;
-
 
 struct var_records{
   string name;
   string type;
 };
 typedef struct var_records var_records;
-
-
-vector<par_records> create_par_list(string func,string name, string type){
-  vector<par_records> par_list;
-  for(i = 0; i < no.ofparams; i++){
-    par_list[i]->name = name;
-    par_list[i]->type = type;
-  }
-  return par_list;
-}
 
 
 void insert_type() {
