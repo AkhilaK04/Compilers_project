@@ -63,7 +63,7 @@ code_subpart: comments
             | function_decl 
             ;
 
-startfn : START OPENCU body CLOSECU
+startfn : START OPENCU {is_function = true;} body CLOSECU {is_function = false;}
         ;
 
 body : exp_stmt body
@@ -116,22 +116,22 @@ relop : EQ
 vectors : OPENSQ rhs_exp COMMA rhs_exp CLOSESQ
         ;
 
-primi_datatype: INT
-              | DOUBLE
-              | BOOL
-              | STRING
+primi_datatype: INT {insert_type();}
+              | DOUBLE {insert_type();}
+              | BOOL {insert_type();}
+              | STRING {insert_type();}
               ;
             
-non_pri_datatype: MASS
-                | TIME
-                | POSITION
-                | VELOCITY
-                | ACC
-                | ENERGY
-                | THETA
-                | E      
-                | DISTANCE
-                | MOMENTUM
+non_pri_datatype: MASS {insert_type();}
+                | TIME {insert_type();}
+                | POSITION {insert_type();}
+                | VELOCITY {insert_type();}
+                | ACC {insert_type();}
+                | ENERGY {insert_type();}
+                | THETA {insert_type();}
+                | E       {insert_type();}
+                | DISTANCE {insert_type();}
+                | MOMENTUM {insert_type();}
                 ;
             
 datatypes : primi_datatype
@@ -141,8 +141,8 @@ datatypes : primi_datatype
 /* DECLARATION STATEMENT needed things */
 
 
-single_variable : ID
-                | ID dimensions 
+single_variable : ID {add('V');}
+                | ID {add('V');} dimensions 
                 ;
 
 dimensions : OPENSQ rhs_exp CLOSESQ
@@ -172,7 +172,7 @@ anything_with_value : single_variable
                     | inbuilt_functions ARROW pos
                     | inbuilt_functions
                     | vectors ARROW pos
-                    | ID ARROW pos
+                    | ID {add('V');} ARROW pos
                     | SIN OPENCC anything_with_value CLOSECC
                     | COS OPENCC anything_with_value CLOSECC
                     | TAN OPENCC anything_with_value CLOSECC
@@ -205,8 +205,8 @@ closeccs : closeccs CLOSECC
 call_stmt_with_dot : call_stmt_without_dot DOT
                    ;
 
-call_stmt_without_dot : ID OPENCU CLOSECU
-	                  | ID OPENCU funccallargs CLOSECU
+call_stmt_without_dot : ID {add('V');} OPENCU CLOSECU
+	                  | ID {add('V');} OPENCU funccallargs CLOSECU
 	                  ;
 
 funccallargs : rhs_exp
@@ -275,48 +275,48 @@ inbuilt_functions : rel_to_mag
                   | miscellaneous 
                   ;
 
-rel_to_mag : MAG OPENCU ID CLOSECU
+rel_to_mag : MAG OPENCU ID {add('V');} CLOSECU
            | MAG OPENCU vectors CLOSECU
            ;
 
-rel_to_pos : OPENCU ID CLOSECU SETR OPENCU rhs_exp CLOSECU
-           | OPENCU ID CLOSECU ADDR OPENCU rhs_exp CLOSECU
-           | OPENCU ID CLOSECU R_AFTER OPENCU rhs_exp CLOSECU
-           | OPENCU ID CLOSECU GETR
+rel_to_pos : OPENCU ID {add('V');} CLOSECU SETR OPENCU rhs_exp CLOSECU
+           | OPENCU ID {add('V');} CLOSECU ADDR OPENCU rhs_exp CLOSECU
+           | OPENCU ID {add('V');} CLOSECU R_AFTER OPENCU rhs_exp CLOSECU
+           | OPENCU ID {add('V');} CLOSECU GETR
            ;
 
-rel_to_vel : OPENCU ID CLOSECU SETV OPENCU rhs_exp CLOSECU
-           | OPENCU ID CLOSECU ADDV OPENCU rhs_exp CLOSECU
-           | OPENCU ID CLOSECU V_AFTER OPENCU rhs_exp CLOSECU
-           | OPENCU ID CLOSECU GETV
+rel_to_vel : OPENCU ID {add('V');} CLOSECU SETV OPENCU rhs_exp CLOSECU
+           | OPENCU ID {add('V');} CLOSECU ADDV OPENCU rhs_exp CLOSECU
+           | OPENCU ID {add('V');} CLOSECU V_AFTER OPENCU rhs_exp CLOSECU
+           | OPENCU ID {add('V');} CLOSECU GETV
            ; 
 
-rel_to_momentum : OPENCU ID CLOSECU SETP OPENCU rhs_exp CLOSECU
+rel_to_momentum : OPENCU ID {add('V');} CLOSECU SETP OPENCU rhs_exp CLOSECU
                 ;
 
-rel_to_acc : OPENCU ID CLOSECU SETA OPENCU rhs_exp CLOSECU
-           | OPENCU ID CLOSECU ADDA OPENCU rhs_exp CLOSECU
-           | OPENCU ID CLOSECU GETA
+rel_to_acc : OPENCU ID {add('V');} CLOSECU SETA OPENCU rhs_exp CLOSECU
+           | OPENCU ID {add('V');} CLOSECU ADDA OPENCU rhs_exp CLOSECU
+           | OPENCU ID {add('V');} CLOSECU GETA
            ;
 
-rel_to_energy: OPENCU ID CLOSECU KE_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU ID CLOSECU PE_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU ID CLOSECU TE_AFTER OPENCU rhs_exp CLOSECU
+rel_to_energy: OPENCU ID {add('V');} CLOSECU KE_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCU ID {add('V');} CLOSECU PE_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCU ID {add('V');} CLOSECU TE_AFTER OPENCU rhs_exp CLOSECU
              ;
 
-rel_to_angle: OPENCU ID CLOSECU ANGLE_AFTER OPENCU rhs_exp CLOSECU
+rel_to_angle: OPENCU ID {add('V');} CLOSECU ANGLE_AFTER OPENCU rhs_exp CLOSECU
             ;
 
-rel_to_collision: OPENCU ID CLOSECU COLLIDE OPENCU ID COMMA ID CLOSECU
-                | OPENCU ID CLOSECU COLLIDE OPENCU ID CLOSECU
-                | OPENCU ID CLOSECU TIME_TO_COLLIDE OPENCU ID CLOSECU
+rel_to_collision: OPENCU ID {add('V');} CLOSECU COLLIDE OPENCU ID COMMA ID CLOSECU
+                | OPENCU ID {add('V');} CLOSECU COLLIDE OPENCU ID CLOSECU
+                | OPENCU ID {add('V');} CLOSECU TIME_TO_COLLIDE OPENCU ID CLOSECU
                 ;
 
-miscellaneous: OPENCU ID CLOSECU S_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU ID CLOSECU ROC_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU ID CLOSECU P_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU ID CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU
-             | OPENCU ID CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU
+miscellaneous: OPENCU ID {add('V');} CLOSECU S_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCU ID {add('V');} CLOSECU ROC_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCU ID {add('V');} CLOSECU P_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCU ID {add('V');} CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU
+             | OPENCU ID {add('V');} CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU
              ; 
 
 term_misc : rhs_exp
@@ -338,12 +338,16 @@ expression : single_variable ASSGN rhs_exp
 
 /* FUNCTION DECLARATION */
 
-function_decl : datatypes ID ASSGN OPENCU parameters CLOSECU DARR OPENCU body CLOSECU
-              | datatypes ID ASSGN OPENCU CLOSECU DARR OPENCU body CLOSECU  
+function_decl : datatypes ID {
+                    is_function = true;
+                    add('F');
+                } 
+                ASSGN OPENCU parameters CLOSECU DARR OPENCU body {new_func_entry( $2, $1, par_list.size(), par_list, var_list); var_list.clear(); par_list.clear();} CLOSECU {is_function = false;}
+              | datatypes ID {add('F'); is_function = true;} ASSGN OPENCU CLOSECU DARR OPENCU body {new_func_entry( $2, $1, par_list.size(), par_list, var_list); var_list.clear(); par_list.clear();} CLOSECU {is_function = false;}
               ;
 
-parameters: datatypes ID
-          | datatypes ID COMMA parameters
+parameters: datatypes ID {par_list.push_back({$2, $1};)}
+          | datatypes ID {par_list.push_back({$2, $1};)} COMMA parameters
           ;
 
 /*  */
@@ -364,6 +368,8 @@ int main(int argc ,char * argv[]){
 
 
 	int i = yyparse();
+
+    print_table();
 
 	if(i) printf("Failure\n");
 	else printf("Success\n");

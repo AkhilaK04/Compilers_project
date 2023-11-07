@@ -7,10 +7,11 @@ extern char* yytext;
 extern int line_no;
 string scope;
 int q;
-extern int countn;
 string type;
 string result_type;
 int num_of_param;
+
+bool is_function = false;
 
 
 struct sym_tab_entries {
@@ -32,17 +33,29 @@ struct function_records{
 };
 vector <struct function_records*> function_sym_table;
 
+struct var_records{
+  string name;
+  string type;
+};
+
+vector <struct var_records*> var_list;
+
+struct par_records{
+  string name;
+  string type;
+};
+
+vector <struct par_records*> par_list;
+
 
 void new_func_entry(string name, string result_type,int num_of_param, string scope, vector<par_records> par_list){
-
   struct function_records* temp = new function_records;
-  temp->name=name;
-  temp->result_type=result_type;
-  temp->num_of_param= num_of_param;
-  temp->par_list = create_par_list(name,par_list);
+  temp->name = name;
+  temp->result_type = result_type;
+  temp->num_of_param = num_of_param;
+  temp->par_list = par_list;
   temp->scope = scope;
   function_sym_table.push_back(temp);
-
 }
 
 void new_entry(string id_name,string data_type, string scope, string type ) {
@@ -60,57 +73,73 @@ struct par_records{
 };
 typedef struct par_records par_records;
 
-
-struct var_records{
-  string name;
-  string type;  
-  int scope;
-};
-typedef struct var_records var_records;
-
-vector<par_records> create_par_list(string func,string name, string type,vector<par_records> par_list){
-  for(i = 0; i < no.ofparams; i++){
-    par_list[i]->name = name;
-    par_list[i]->type = type;
-  }
-  return par_list;
-}
-
-
 void insert_type() {
 	type = yytext;
 }
 
 void add(char c) {
   q = search(yytext);
-  if(!q) {
-    if(c == 'H') {
-      new_entry(yytext,type,scope,"Header");
-    }  
-    else if(c == 'K') {
-      new_entry(yytext,"N/A",scope,"Keyword"); 
-    }  
-    else if(c == 'V') {
-      new_entry(yytext,type,scope,"Variable"); 
-    }  
-    else if(c == 'C') {
-      new_entry(yytext,"CONST",scope,"Constant"); 
-    }  
-    else if(c == 'F') {
-      new_entry(yytext,type,scope,"Function");
-      new_func_entry(yytext,result_type,num_of_param,scope,par_list);
-    }
-}
-}
+  if(q) {
+    if(c == 'V') {
+      if(is_function) {
 
-int search(string name) { 
-    for(int i = 0; i < symbol_table.size(); i++) {
-      if(symbol_table[i].id_name == name) {   
-        return -1;
-        break;  
+      }
+      else {
+        new_entry(yytext,type,scope,"Variable");
       }
     } 
-    return 0;
+    // else if(c == 'K') {
+    //   new_entry(yytext,"N/A",scope,"Keyword");
+    //   count++;  
+    // }    
+    // else if(c == 'H') {
+    //   new_entry(yytext,type,scope,"Header");
+    //   count++;  
+    // }  
+    // else if(c == 'C') {
+    //   new_entry(yytext,"CONST",scope,"Constant");
+    //   count++;  
+    // }  
+    else if(c == 'F') {
+      new_entry(yytext,type,scope,"Function");
+    }
+  }
 }
+
+bool search_in_symtab(string name) { 
+  int i; 
+  if(is_function == true){
+    for(i = O; i < par_list.size(); i++) {
+      if(par_list[i].id_name == name) {   
+        return false;
+      }
+    }
+    for(i = O; i < var_list.size(); i++) {
+      if(var_list[i].id_name == name) {   
+        return false;
+      }
+   }
+  }
+  else {
+    for(i = O; i < symbol_table.size(); i++) {
+      if(symbol_table[i].id_name == name) {   
+        return false;
+      }
+    }
+  } 
+  return true;
+}
+
+
+void print_table(){
+  printf("\n\n");
+	printf("\nNAME   DATATYPE   TYPE   SCOPE \n");
+	printf("_______________________________________\n\n");
+	for(int i = 0; i< symbol_table.size(); i++) {
+		printf("%s\t%s\t%s\t%d\t\n", symbol_table[i].id_name, symbol_table[i].data_type, symbol_table[i].type, symbol_table[i].scope);
+	}
+	free(symbol_table);
+}
+
 
 
