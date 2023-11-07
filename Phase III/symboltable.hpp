@@ -10,7 +10,6 @@ int q;
 string type;
 string result_type;
 int num_of_param;
-
 bool is_function = false;
 
 
@@ -20,7 +19,8 @@ struct sym_tab_entries {
   string type;
   string scope;
 };
-vector<struct sym_tab_entries*> symbol_table;
+vector<sym_tab_entries*> symbol_table;
+
 
 struct function_records{
   string name;
@@ -31,21 +31,23 @@ struct function_records{
   vector<par_records> par_list; 
   vector<var_records> var_list;
 };
-vector <struct function_records*> function_sym_table;
+vector <function_records*> function_sym_table;
+
 
 struct var_records{
   string name;
   string type;
 };
 
-vector <struct var_records*> var_list;
+vector <var_records*> var_list;
+
 
 struct par_records{
   string name;
   string type;
 };
 
-vector <struct par_records*> par_list;
+vector <par_records*> par_list;
 
 
 void new_func_entry(string name, string result_type,int num_of_param, string scope, vector<par_records> par_list){
@@ -67,24 +69,15 @@ void new_entry(string id_name,string data_type, string scope, string type ) {
   symbol_table.push_back(temp);
 }
 
-struct par_records{
-  string name;
-    string type;
-};
-typedef struct par_records par_records;
-
 void insert_type() {
 	type = yytext;
 }
 
 void add(char c) {
-  q = search(yytext);
+  q = search_in_symtab(yytext);
   if(q) {
     if(c == 'V') {
-      if(is_function) {
-
-      }
-      else {
+      if(!is_function) {
         new_entry(yytext,type,scope,"Variable");
       }
     } 
@@ -108,21 +101,21 @@ void add(char c) {
 
 bool search_in_symtab(string name) { 
   int i; 
-  if(is_function == true){
-    for(i = O; i < par_list.size(); i++) {
-      if(par_list[i].id_name == name) {   
+  if(is_function){
+    for(int i = 0; i < par_list.size(); i++) {
+      if(par_list[i]->name == name) {   
         return false;
       }
     }
-    for(i = O; i < var_list.size(); i++) {
-      if(var_list[i].id_name == name) {   
+    for(i = 0; i < var_list.size(); i++) {
+      if(var_list[i]->name == name) {   
         return false;
       }
    }
   }
   else {
-    for(i = O; i < symbol_table.size(); i++) {
-      if(symbol_table[i].id_name == name) {   
+    for(i = 0; i < symbol_table.size(); i++) {
+      if(symbol_table[i]->id_name == name) {   
         return false;
       }
     }
@@ -136,9 +129,9 @@ void print_table(){
 	printf("\nNAME   DATATYPE   TYPE   SCOPE \n");
 	printf("_______________________________________\n\n");
 	for(int i = 0; i< symbol_table.size(); i++) {
-		printf("%s\t%s\t%s\t%d\t\n", symbol_table[i].id_name, symbol_table[i].data_type, symbol_table[i].type, symbol_table[i].scope);
+		printf("%s\t%s\t%s\t%d\t\n", symbol_table[i]->id_name, symbol_table[i]->data_type, symbol_table[i]->type, symbol_table[i]->scope);
 	}
-	free(symbol_table);
+
 }
 
 
