@@ -1,15 +1,12 @@
 #include <bits/stdc++.h>
-#include <string.h>
+
 
 using namespace std;
 
 extern char* yytext;
-extern int line_no;
 string scope;
-int q;
+bool q;
 string type;
-string result_type;
-int num_of_param;
 bool is_function = false;
 
 
@@ -83,15 +80,12 @@ void add(char c) {
     } 
     // else if(c == 'K') {
     //   new_entry(yytext,"N/A",scope,"Keyword");
-    //   count++;  
     // }    
     // else if(c == 'H') {
     //   new_entry(yytext,type,scope,"Header");
-    //   count++;  
     // }  
     // else if(c == 'C') {
     //   new_entry(yytext,"CONST",scope,"Constant");
-    //   count++;  
     // }  
     else if(c == 'F') {
       new_entry(yytext,type,scope,"Function");

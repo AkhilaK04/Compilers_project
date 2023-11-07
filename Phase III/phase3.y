@@ -1,8 +1,5 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
+#include <bits/stdc++.h>
 #include <symboltable.hpp>
 
 extern FILE *yyin, *tokfile, *parsefile ;
