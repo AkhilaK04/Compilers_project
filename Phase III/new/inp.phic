@@ -1,11 +1,30 @@
 bool nextfn = {acceleration a, velocity v, time t} => {
 
-    int a,b.
-   $ double _a1 , _b1 = 0.1.
+    int a,b,c.
+    double _a1 , _b1 = 0.1.
     velocity new_v = [5 ,10.7], u_old1.
+    return_val = nextfn{ u_old1 , fn2{a,b,c} }.
 
-    x = 10.4.
-    u_old1 = [0.3 ,-0.99].
-    valid = true .
-    return_val = nextfn_2{ u_old1 , fn2{a,b,c} }. $
+}
+
+
+
+bool nextfn_2 = {acceleration a, velocity v, time t} => {
+
+    int a,b.
+    double _a1 , _b1 = 0.1.
+    velocity new_v = [5 ,10.7], u_old1.
+    SCOPEOPEN {
+        int a.
+        SCOPEOPEN {
+            SCOPEOPEN {
+            int b.
+            SCOPECLOSE }
+        SCOPECLOSE }
+        SCOPEOPEN {
+            int c.
+        SCOPECLOSE }
+    SCOPECLOSE }
+
+
 }

@@ -7,12 +7,40 @@ bool q;
 string type;
 bool is_func_bool = false;
 
+stack<string> curr;
+
+vector<int> curr_scopes(100000,0);
+
+int current_pointer = 0;
+
+void construct_stack(){
+  curr.push("1");
+  curr_scopes[0] = 1;
+}
+
+string convert_scope_to_string(){
+  string ans = to_string(curr_scopes[0]);
+
+  for(int i=1;i<=current_pointer;i++){
+    if(curr_scopes[i] == 0){
+      break;
+    }
+    else{
+      ans.push_back('_');
+      ans = ans + to_string(curr_scopes[i]);
+    }
+  }
+
+  return ans;
+} 
+
 
 struct sym_tab_entries {
   string id_name;
   string data_type;
   string type;
-  // string scope;
+  string scope;
+  int num_of_scopes = 0;
 };
 typedef sym_tab_entries sym_tab_entries;
 vector<sym_tab_entries*> symbol_table;
@@ -20,6 +48,7 @@ vector<sym_tab_entries*> symbol_table;
 struct var_records{
   string name;
   string type;
+  string scope;
 };
 typedef var_records var_records;
 vector <var_records*> var_list;
@@ -35,10 +64,11 @@ struct function_records{
   string name;
   string result_type;
   int num_of_param;
-  // string scope;
+  string scope;
   int ret_counter;
   vector<par_records*> par_list; 
   vector<var_records*> var_list;
+  int num_of_scopes = 0;
 };
 typedef function_records function_records;
 vector <function_records*> function_sym_table;
@@ -51,7 +81,7 @@ void new_func_entry(string name, string result_type,int num_of_param, vector<par
   temp->num_of_param = num_of_param;
   temp->par_list = par_list;
   temp->var_list = var_list;
-  // temp->scope = scope;
+  temp->scope = convert_scope_to_string();
   // function_sym_table.push_back({name,result_type,num_of_param,par_list,var_list});
   function_sym_table.push_back(temp);
 }
@@ -62,7 +92,8 @@ void new_entry(string id_name,string data_type, string type) {
   temp->id_name = id_name;
 	temp->data_type = data_type;
 	temp->type = type;
-	// temp->scope = scope;
+	temp->scope = convert_scope_to_string();
+
   // symbol_table.push_back({id_name,data_type,type});
   symbol_table.push_back(temp);
 }
@@ -121,11 +152,39 @@ void print_table(){
 	printf("\nNAME   DATATYPE   TYPE   SCOPE \n");
 	printf("_______________________________________\n\n");
 	for(int i = 0; i< symbol_table.size(); i++) {
-    cout<< symbol_table[i]->id_name<<" "<<symbol_table[i]->data_type<<" "<<symbol_table[i]->type<<endl;
+    cout<< symbol_table[i]->id_name<<" "<<symbol_table[i]->data_type<<" "<<symbol_table[i]->type<<" "<<symbol_table[i]->scope<<endl;
 		// printf("%s\t%s\t%s\t%d\t\n", symbol_table[i]->id_name, symbol_table[i]->data_type, symbol_table[i]->type);
 	}
 
 }
 
 
-
+void print_function_table() {
+    printf("\n\n");
+    printf("NAME   RETURNTYPE   NO_OF_PARAM  PAR_LIST   VAR_LIST  SCOPE \n");
+    printf("_____________\n\n");
+    
+    for (int i = 0; i < function_sym_table.size(); i++) {
+        cout << function_sym_table[i]->name << "   " << function_sym_table[i]->result_type << "   " << function_sym_table[i]->num_of_param << "   ";
+        
+        // Print the parameter list
+        cout << "[";
+        for (int j = 0; j < function_sym_table[i]->par_list.size(); j++) {
+            cout << "(" << function_sym_table[i]->par_list[j]->name << ", " << function_sym_table[i]->par_list[j]->type << ")";
+            if (j < function_sym_table[i]->par_list.size() - 1) {
+                cout << ", ";
+            }
+        }
+        cout << "]   ";
+        
+        // Print the variable list
+        cout << "[";
+        for (int j = 0; j < function_sym_table[i]->var_list.size(); j++) {
+            cout << "(" << function_sym_table[i]->var_list[j]->name << ", " << function_sym_table[i]->var_list[j]->type << ", " << function_sym_table[i]->var_list[j]->scope << ")\n";
+            if (j < function_sym_table[i]->var_list.size() - 1) {
+                cout << ", ";
+            }
+        }
+        cout << "]   " << /* Add scope information here */ endl;
+    }
+}

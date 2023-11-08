@@ -8,45 +8,47 @@ int yylex();
 void yyerror(char *s);
 %}
 
-/* %union {
-    int val;
-    char* sval;
-} */
+%union {
+  char * string;
+}
 
-%token INTEGER_CONSTANT STRING_CONSTANT FLOAT_CONSTANT TRUE FALSE
-%token INT DOUBLE STRING  BOOL
-%token MASS TIME POSITION VELOCITY ACC ENERGY THETA E DISTANCE MOMENTUM
-%token ID 
-%token INPUT OUTPUT
-%token SETR ADDR SETV ADDV SETA ADDA SETP GETR GETA GETV
-%token KE_AFTER PE_AFTER TE_AFTER ANGLE_AFTER V_AFTER R_AFTER
-%token GET_TRAJ COLLIDE TIME_TO_COLLIDE ROC_AFTER
-%token P_AFTER S_AFTER TIME_TO_R TIME_TO_V
-%token LOOP
-%token BREAK
-%token START
-%token SIN COS TAN
-%token MAG
-%token OPENCC CLOSECC OPENSQ CLOSESQ OPENCU CLOSECU
-%token DOLLAR
-%token DOT
-%token DOUBLE_QUOTE SINGLE_QUOTE
-%token COMMA
-%token COLON
-%token ARROW
-%token ADD SUB MUL DIV MOD EXP
-%token EQ NEQ GEQ LEQ GT LT
-%token LOGICOP UNIOP UNINEG
-%token ASSGN
-%token DARR
-%token CMT
-%token QUESTION
-%token NON_NEGATIVE_INT
-%token FIRST
-%token SECOND
-%token OTHERWISE
-%token SCOPEOPEN
-%token SCOPECLOSE
+%token <string> INTEGER_CONSTANT STRING_CONSTANT FLOAT_CONSTANT TRUE FALSE
+%token <string> INT DOUBLE STRING  BOOL
+%token <string> MASS TIME POSITION VELOCITY ACC ENERGY THETA E DISTANCE MOMENTUM
+%token <string> ID 
+%token <string> INPUT OUTPUT
+%token <string> SETR ADDR SETV ADDV SETA ADDA SETP GETR GETA GETV
+%token <string> KE_AFTER PE_AFTER TE_AFTER ANGLE_AFTER V_AFTER R_AFTER
+%token <string> GET_TRAJ COLLIDE TIME_TO_COLLIDE ROC_AFTER
+%token <string> P_AFTER S_AFTER TIME_TO_R TIME_TO_V
+%token <string> LOOP
+%token <string> BREAK
+%token <string> START
+%token <string> SIN COS TAN
+%token <string> MAG
+%token <string> OPENCC CLOSECC OPENSQ CLOSESQ OPENCU CLOSECU
+%token <string> DOLLAR
+%token <string> DOT
+%token <string> DOUBLE_QUOTE SINGLE_QUOTE
+%token <string> COMMA
+%token <string> COLON
+%token <string> ARROW
+%token <string> ADD SUB MUL DIV MOD EXP
+%token <string> EQ NEQ GEQ LEQ GT LT
+%token <string> LOGICOP UNIOP UNINEG
+%token <string> ASSGN
+%token <string> DARR
+%token <string> CMT
+%token <string> QUESTION
+%token <string> NON_NEGATIVE_INT
+%token <string> FIRST
+%token <string> SECOND
+%token <string> OTHERWISE
+%token <string> SCOPEOPEN
+%token <string> SCOPECLOSE
+
+
+%type <string> code code_subpart comments startfn function_decl loop_body body exp_stmt call_stmt_with_dot conditional_stmt loop_stmt unary_operation_without_dot return_stmt output_stmt input_stmt inbuilt_functions_with_dot decl_stmt_with_exp bi_op relop vectors primi_datatype non_pri_datatype datatypes ID_singlevar single_variable dimensions pos idadd idadd2 anything_with_value operations rhs_exp rhs_term openccs closeccs call_stmt_without_dot funccallargs conditional_stmt_start ids  rel_to_mag rel_to_vel rel_to_pos rel_to_acc rel_to_energy rel_to_angle  rel_to_collision rel_to_momentum miscellaneous term_misc expression expressions  parameters inbuilt_functions
 
 %start code
 %%
@@ -60,7 +62,7 @@ code_subpart: comments
             | function_decl 
             ;
 
-startfn : START OPENCU {is_func_bool = true;} body CLOSECU {is_func_bool = false;}
+startfn : START OPENCU {is_func_bool = true; current_pointer++;  curr_scopes[current_pointer]++;} body CLOSECU {is_func_bool = false;current_pointer--;}
         ;
 
 body : exp_stmt body
@@ -73,7 +75,7 @@ body : exp_stmt body
      | output_stmt body
      | input_stmt body
      | {}
-     | SCOPEOPEN OPENCU body SCOPECLOSE CLOSECU body 
+     | SCOPEOPEN { current_pointer++;  curr_scopes[current_pointer]++; }OPENCU body SCOPECLOSE {current_pointer--; }CLOSECU body 
      | inbuilt_functions_with_dot body
      | decl_stmt_with_exp body 
      ;
@@ -88,7 +90,7 @@ loop_body : exp_stmt loop_body
      | output_stmt loop_body
      | input_stmt loop_body
      | {}
-     | SCOPEOPEN OPENCU loop_body SCOPECLOSE CLOSECU body 
+     | SCOPEOPEN { current_pointer++;  curr_scopes[current_pointer]++; } OPENCU loop_body SCOPECLOSE {current_pointer--; } CLOSECU body 
      | inbuilt_functions_with_dot loop_body
      | decl_stmt_with_exp loop_body 
      | BREAK DOT loop_body
@@ -140,7 +142,7 @@ datatypes : primi_datatype
 ID_singlevar: ID { 
                        if(is_func_bool){
                         
-                        var_records* rec = new var_records{to_string($1), type};
+                        var_records* rec = new var_records{$1, type,convert_scope_to_string()};
                         var_list.push_back(rec);
                         }
                        else{
@@ -164,7 +166,9 @@ exp_stmt : single_variable ASSGN rhs_exp DOT
 pos : FIRST
     | SECOND
     ;
+
 idadd: ID {add('V');} ;
+
 anything_with_value : single_variable
                     | NON_NEGATIVE_INT
                     | INTEGER_CONSTANT
@@ -222,17 +226,19 @@ funccallargs : rhs_exp
 
 /* CONDITIONAL STATEMENT  */
 
+conditional_stmt_start : OPENSQ rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; }
+                       | OPENSQ single_variable UNIOP CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; }
+                      ;
 
-conditional_stmt: OPENSQ rhs_exp CLOSESQ OPENCU loop_body CLOSECU
-                | OPENSQ rhs_exp CLOSESQ OPENCU loop_body CLOSECU OTHERWISE OPENCU loop_body CLOSECU
-                | OPENSQ single_variable UNIOP CLOSESQ OPENCU loop_body CLOSECU
-                | OPENSQ single_variable UNIOP CLOSESQ OPENCU loop_body CLOSECU OTHERWISE OPENCU loop_body CLOSECU
+
+conditional_stmt: conditional_stmt_start loop_body CLOSECU {current_pointer--; }
+                | conditional_stmt_start loop_body CLOSECU {current_pointer--; } OTHERWISE OPENCU { current_pointer++;  curr_scopes[current_pointer]++; } loop_body  CLOSECU {current_pointer--; }
                 ;
 
 /* LOOP STATEMENT */
       
-loop_stmt: LOOP OPENSQ rhs_exp CLOSESQ OPENCU loop_body CLOSECU
-         | LOOP OPENSQ single_variable UNIOP CLOSESQ OPENCU loop_body CLOSECU
+loop_stmt: LOOP OPENSQ rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; } loop_body CLOSECU {current_pointer--; }
+         | LOOP OPENSQ single_variable UNIOP CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; } loop_body CLOSECU {current_pointer--; }
          ; 
 
 /* UNIRARY OPERATION WITHOUT DOT */
@@ -347,29 +353,29 @@ expression : single_variable ASSGN rhs_exp
 
 idadd2: ID {add('F'); is_func_bool = true;};
 
-function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU body
-                {   new_func_entry( to_string($2), to_string($1), par_list.size(), par_list, var_list);
+function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU {current_pointer++;  curr_scopes[current_pointer]++; }body
+                {   new_func_entry( $2, $1, par_list.size(), par_list, var_list);
                 var_list.clear(); 
                 par_list.clear();
                 }
-                CLOSECU {is_func_bool = false;}
-              | datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU body 
+                CLOSECU {is_func_bool = false;current_pointer--; }
+              | datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU {current_pointer++;  curr_scopes[current_pointer]++;}body 
                 {
-                    new_func_entry( to_string($2), to_string($1), par_list.size(), par_list, var_list); 
+                    new_func_entry( $2, $1, par_list.size(), par_list, var_list); 
                     var_list.clear(); 
                     par_list.clear();
                 }
-                CLOSECU {is_func_bool = false;}
+                CLOSECU {is_func_bool = false;current_pointer--; }
               ;
 
 parameters: datatypes ID
         {
-            par_records* rec = new par_records{to_string($2), to_string($1)};
+            par_records* rec = new par_records{$2, $1};
             par_list.push_back(rec);
         }
           | datatypes ID 
           {
-            par_records* rec = new par_records{to_string($2), to_string($1)};
+            par_records* rec = new par_records{$2, $1};
             par_list.push_back(rec);
           }
           COMMA parameters
@@ -391,10 +397,11 @@ int main(int argc ,char * argv[]){
 
     yyin = fopen(inp_file,"r");
 
-
+  construct_stack();
 	int i = yyparse();
 
     print_table();
+    print_function_table();
 
 	if(i) printf("Failure\n");
 	else printf("Success\n");
