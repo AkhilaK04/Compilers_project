@@ -52,7 +52,7 @@ void yyerror(char *s);
 %%
 
 code: code_subpart
-    | code_subpart code
+    | code code_subpart
 	;
 
 code_subpart: comments 
@@ -60,7 +60,7 @@ code_subpart: comments
             | function_decl 
             ;
 
-startfn : START OPENCU {is_function = true;} body CLOSECU {is_function = false;}
+startfn : START OPENCU {is_func_bool = true;} body CLOSECU {is_func_bool = false;}
         ;
 
 body : exp_stmt body
@@ -137,15 +137,19 @@ datatypes : primi_datatype
 
 /* DECLARATION STATEMENT needed things */
 
-
-single_variable : ID { 
-                       if(is_function){var_list.push_back({$1, type};)}
-                       else add('V');
+ID_singlevar: ID { 
+                       if(is_func_bool){
+                        
+                        var_records* rec = new var_records{to_string($1), type};
+                        var_list.push_back(rec);
+                        }
+                       else{
+                         add('V');
+                       }
                      }
-                | ID {
-                      if(is_function){var_list.push_back({$1, type};)}
-                      else add('V');
-                      } dimensions 
+            ;
+single_variable : ID_singlevar
+                | ID_singlevar dimensions 
                 ;
 
 dimensions : OPENSQ rhs_exp CLOSESQ
@@ -160,7 +164,7 @@ exp_stmt : single_variable ASSGN rhs_exp DOT
 pos : FIRST
     | SECOND
     ;
-idadd: ID {add('V')} ;
+idadd: ID {add('V');} ;
 anything_with_value : single_variable
                     | NON_NEGATIVE_INT
                     | INTEGER_CONSTANT
@@ -341,14 +345,34 @@ expression : single_variable ASSGN rhs_exp
 
 /* FUNCTION DECLARATION */
 
-idadd2: ID {add('F'); is_function = true;};
+idadd2: ID {add('F'); is_func_bool = true;};
 
-function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU body {new_func_entry( $2, $1, par_list.size(), par_list, var_list); var_list.clear(); par_list.clear();} CLOSECU {is_function = false;}
-              | datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU body {new_func_entry( $2, $1, par_list.size(), par_list, var_list); var_list.clear(); par_list.clear();} CLOSECU {is_function = false;}
+function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU body
+                {   new_func_entry( to_string($2), to_string($1), par_list.size(), par_list, var_list);
+                var_list.clear(); 
+                par_list.clear();
+                }
+                CLOSECU {is_func_bool = false;}
+              | datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU body 
+                {
+                    new_func_entry( to_string($2), to_string($1), par_list.size(), par_list, var_list); 
+                    var_list.clear(); 
+                    par_list.clear();
+                }
+                CLOSECU {is_func_bool = false;}
               ;
 
-parameters: datatypes ID {par_list.push_back({$2, $1});}
-          | datatypes ID {par_list.push_back({$2, $1});} COMMA parameters
+parameters: datatypes ID
+        {
+            par_records* rec = new par_records{to_string($2), to_string($1)};
+            par_list.push_back(rec);
+        }
+          | datatypes ID 
+          {
+            par_records* rec = new par_records{to_string($2), to_string($1)};
+            par_list.push_back(rec);
+          }
+          COMMA parameters
           ;
 
 /*  */
