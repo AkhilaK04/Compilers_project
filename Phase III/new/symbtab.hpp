@@ -2,21 +2,19 @@
 using namespace std;
 
 extern char* yytext;
-// string scope;
 bool q;
 string type;
 bool is_func_bool = false;
-
 stack<string> curr;
-
 vector<int> curr_scopes(100000,0);
-
 int current_pointer = 0;
+
 
 void construct_stack(){
   curr.push("1");
   curr_scopes[0] = 1;
 }
+
 
 string convert_scope_to_string(){
   string ans = to_string(curr_scopes[0]);
@@ -73,6 +71,15 @@ struct function_records{
 typedef function_records function_records;
 vector <function_records*> function_sym_table;
 
+
+void undeclared_check(string name, string scope){
+
+}
+
+void redeclaration_check(string name, string scope){
+
+}
+
 bool bool_fn_var_entry(var_records* rec){
   string check = rec->name;
 
@@ -83,7 +90,6 @@ bool bool_fn_var_entry(var_records* rec){
     }
 return true;
 }
-
 
 void fn_var_entry(var_records* rec){
   if(bool_fn_var_entry(rec)) var_list.push_back(rec);
@@ -176,7 +182,7 @@ void print_table(){
 void print_function_table() {
     printf("\n\n");
     printf("NAME   RETURNTYPE   NO_OF_PARAM  PAR_LIST   VAR_LIST  SCOPE \n");
-    printf("_____________\n\n");
+    printf("______________________________________________________________\n\n");
     
     for (int i = 0; i < function_sym_table.size(); i++) {
         cout << function_sym_table[i]->name << "   " << function_sym_table[i]->result_type << "   " << function_sym_table[i]->num_of_param << "   ";
