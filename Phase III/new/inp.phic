@@ -1,6 +1,7 @@
 bool nextfn = {acceleration a, velocity v, time t} => {
 
     int a,b,c.
+    int a.
     double _a1 , _b1 = 0.1.
     velocity new_v = [5 ,10.7], u_old1.
     return_val = nextfn{ u_old1 , fn2{a,b,c} }.

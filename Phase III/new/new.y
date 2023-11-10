@@ -141,9 +141,8 @@ datatypes : primi_datatype
 
 ID_singlevar: ID { 
                        if(is_func_bool){
-                        
                         var_records* rec = new var_records{$1, type,convert_scope_to_string()};
-                        var_list.push_back(rec);
+                        fn_var_entry(rec);
                         }
                        else{
                          add('V');
