@@ -153,5 +153,111 @@ bool std_lib_semantics (vector<string> ID2 = {}, string name,string ID1){
         }
     }
 
+cout<<"Errors! no std library found"<<endl;
+return false;
+}
 
+
+//function for checking undeclared varibles whenever ID is used excpet incase of declaration statements and function
+bool undeclare_check(string name, string scope){
+
+  if(is_func_bool){
+
+    for(int i = 0; i < par_list.size(); i++) {
+      if(par_list[i]->name == name) {   
+        return true;
+      }
+    }
+    for(int i = 0; i < var_list.size(); i++) {
+      if(var_list[i]->name == name && var_list[i]->scope == scope) {   
+        return true;
+      }
+      else {
+        int cnt = 0;
+        for(int i = 0; i <curr_scopes.size(); i++) if(curr_scopes[i] != 0) cnt = cnt+1; break;
+        bool x;
+        while(cnt !=0 && !x){
+            string newscope = convert_scope_to_string(cnt);
+            x = undeclare_check(name,newscope);
+            cnt --;
+        }
+      }
+   }
+  }
+  if(scope=="1"){
+    for(int i = 0; i < symbol_table.size(); i++) {
+      if(symbol_table[i]->id_name == name) {   
+        return true;
+      }
+    }
+  } 
+  return false;
+}
+
+// redeclaration check for variables within same scope
+bool redeclaration_check(string name, string scope){
+
+  if(is_func_bool){
+
+    for(int i = 0; i < par_list.size(); i++) {
+      if(par_list[i]->name == name) {   
+        return false;
+      }
+    }
+    for(int i = 0; i < var_list.size(); i++) {
+      if(var_list[i]->name == name && var_list[i]->scope == scope) {   
+        return false;
+      }
+    }
+  }
+  else{
+    for(int i = 0; i < symbol_table.size(); i++) {
+      if(symbol_table[i]->id_name == name) {   
+        return false;
+      }
+    }
+  }
+  return true;
+
+}
+
+
+// bool undeclared_function(string name){
+
+// if(is_func_bool){
+//     for(int i = 0; i < symbol_table.size(); i++) {
+//       if(symbol_table[i]->id_name == name) {   
+//         return true;
+//       }
+//     }
+//   } 
+//   return false;
+// }
+
+// Function name should not be same as globally declared variables
+bool func_red_var(string name){
+
+      for(int i = 0; i < symbol_table.size(); i++) {
+      if(symbol_table[i]->id_name == name && symbol_table[i]->type == "Variable") {   
+        return false;
+      }
+    }
+    return true;
+}
+//checking the redeclaration of parameters within the function parameters
+bool within_func_parameters_redeclaration(string name){
+  for(int i = 0; i < par_list.size(); i++) {
+      if(par_list[i]->name == name) {   
+        return false;
+      }
+  }
+  return true;
+}
+
+//Type checking for assigning variables
+bool type_checking_assign(string type1, string type2){
+    if(type1 == type2){
+        return true;
+    }
+return false;
 }

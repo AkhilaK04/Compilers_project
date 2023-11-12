@@ -17,17 +17,21 @@ void construct_stack(){
 }
 
 
-string convert_scope_to_string(){
-  string ans = to_string(curr_scopes[0]);
-
-  for(int i=1;i<=current_pointer;i++){
-    if(curr_scopes[i] == 0){
-      break;
-    }
-    else{
+string convert_scope_to_string(int x){
+  string ans;
+  for(int i=0; i<x; i++){
       ans.push_back('_');
       ans = ans + to_string(curr_scopes[i]);
-    }
+  }
+  return ans;
+} 
+
+int find_curr_scopes_len(vector<int> cur_scope){
+  int ans = 0;
+
+  for(int i=0; i<cur_scope.size(); i++){
+    if(curr_scopes[i] == 0) break;
+    else ans++;
   }
 
   return ans;
@@ -84,13 +88,6 @@ typedef struct function_records function_records;
 vector <function_records*> function_sym_table;
 
 
-void undeclared_check(string name, string scope){
-
-}
-
-void redeclaration_check(string name, string scope){
-
-}
 
 bool bool_fn_var_entry(var_records* rec){
   string check = rec->name;
@@ -119,7 +116,7 @@ bool  new_func_entry(string name, string result_type,int num_of_param, vector<pa
     temp->num_of_param = num_of_param;
     temp->par_list = par_list;
     temp->var_list = var_list;
-    temp->scope = convert_scope_to_string();
+    temp->scope = convert_scope_to_string(find_curr_scopes_len(curr_scopes));
     function_sym_table.push_back(temp);
 
     return true;
@@ -135,7 +132,7 @@ void new_entry(string id_name,string data_type, string type) {
   temp->id_name = id_name;
 	temp->data_type = data_type;
 	temp->type = type;
-	temp->scope = convert_scope_to_string();
+	temp->scope = convert_scope_to_string(find_curr_scopes_len(curr_scopes));
   symbol_table.push_back(temp);
 }
 
