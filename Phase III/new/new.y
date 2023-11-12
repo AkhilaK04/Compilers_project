@@ -1,6 +1,6 @@
 %{
 #include <bits/stdc++.h>
-#include "symbtab.hpp"
+#include "semantics.hpp"
 
 extern FILE *yyin, *tokfile, *parsefile ;
 extern int yylineno;
@@ -9,46 +9,49 @@ void yyerror(char *s);
 %}
 
 %union {
-  char * string;
+	struct variable {
+		char* value;
+		char* type;
+	} object;
 }
 
-%token <string> INTEGER_CONSTANT STRING_CONSTANT FLOAT_CONSTANT TRUE FALSE
-%token <string> INT DOUBLE STRING  BOOL
-%token <string> MASS TIME POSITION VELOCITY ACC ENERGY THETA E DISTANCE MOMENTUM
-%token <string> ID 
-%token <string> INPUT OUTPUT
-%token <string> SETR ADDR SETV ADDV SETA ADDA SETP GETR GETA GETV
-%token <string> KE_AFTER PE_AFTER TE_AFTER ANGLE_AFTER V_AFTER R_AFTER
-%token <string> GET_TRAJ COLLIDE TIME_TO_COLLIDE ROC_AFTER
-%token <string> P_AFTER S_AFTER TIME_TO_R TIME_TO_V
-%token <string> LOOP
-%token <string> BREAK
-%token <string> START
-%token <string> SIN COS TAN
-%token <string> MAG
-%token <string> OPENCC CLOSECC OPENSQ CLOSESQ OPENCU CLOSECU
-%token <string> DOLLAR
-%token <string> DOT
-%token <string> DOUBLE_QUOTE SINGLE_QUOTE
-%token <string> COMMA
-%token <string> COLON
-%token <string> ARROW
-%token <string> ADD SUB MUL DIV MOD EXP
-%token <string> EQ NEQ GEQ LEQ GT LT
-%token <string> LOGICOP UNIOP UNINEG
-%token <string> ASSGN
-%token <string> DARR
-%token <string> CMT
-%token <string> QUESTION
-%token <string> NON_NEGATIVE_INT
-%token <string> FIRST
-%token <string> SECOND
-%token <string> OTHERWISE
-%token <string> SCOPEOPEN
-%token <string> SCOPECLOSE
+%token <object> INTEGER_CONSTANT STRING_CONSTANT FLOAT_CONSTANT TRUE FALSE
+%token <object> INT DOUBLE STRING  BOOL
+%token <object> MASS TIME POSITION VELOCITY ACC ENERGY THETA E DISTANCE MOMENTUM
+%token <object> ID 
+%token <object> INPUT OUTPUT
+%token <object> SETR ADDR SETV ADDV SETA ADDA SETP GETR GETA GETV
+%token <object> KE_AFTER PE_AFTER TE_AFTER ANGLE_AFTER V_AFTER R_AFTER
+%token <object> GET_TRAJ COLLIDE TIME_TO_COLLIDE ROC_AFTER
+%token <object> P_AFTER S_AFTER TIME_TO_R TIME_TO_V
+%token <object> LOOP
+%token <object> BREAK
+%token <object> START
+%token <object> SIN COS TAN
+%token <object> MAG
+%token <object> OPENCC CLOSECC OPENSQ CLOSESQ OPENCU CLOSECU
+%token <object> DOLLAR
+%token <object> DOT
+%token <object> DOUBLE_QUOTE SINGLE_QUOTE
+%token <object> COMMA
+%token <object> COLON
+%token <object> ARROW
+%token <object> ADD SUB MUL DIV MOD EXP
+%token <object> EQ NEQ GEQ LEQ GT LT
+%token <object> LOGICOP UNIOP UNINEG
+%token <object> ASSGN
+%token <object> DARR
+%token <object> CMT
+%token <object> QUESTION
+%token <object> NON_NEGATIVE_INT
+%token <object> FIRST
+%token <object> SECOND
+%token <object> OTHERWISE
+%token <object> SCOPEOPEN
+%token <object> SCOPECLOSE
 
 
-%type <string> single_variable_2 code code_subpart comments startfn function_decl loop_body body exp_stmt call_stmt_with_dot conditional_stmt loop_stmt unary_operation_without_dot return_stmt output_stmt input_stmt inbuilt_functions_with_dot decl_stmt_with_exp bi_op relop vectors primi_datatype non_pri_datatype datatypes ID_singlevar single_variable dimensions pos idadd idadd2 anything_with_value operations rhs_exp rhs_term openccs closeccs call_stmt_without_dot funccallargs conditional_stmt_start ids  rel_to_mag rel_to_vel rel_to_pos rel_to_acc rel_to_energy rel_to_angle  rel_to_collision rel_to_momentum miscellaneous term_misc expression expressions  parameters inbuilt_functions
+%type <object> single_variable_for_exp_stmt single_variable_declare code code_subpart comments startfn function_decl loop_body body exp_stmt call_stmt_with_dot conditional_stmt loop_stmt unary_operation_without_dot return_stmt output_stmt input_stmt inbuilt_functions_with_dot decl_stmt_with_exp bi_op relop vectors primi_datatype non_pri_datatype datatypes ID_singlevar single_variable dimensions pos idadd2 anything_with_value operations rhs_exp rhs_term openccs closeccs call_stmt_without_dot funccallargs conditional_stmt_start ids  rel_to_mag rel_to_vel rel_to_pos rel_to_acc rel_to_energy rel_to_angle  rel_to_collision rel_to_momentum miscellaneous term_misc expression expressions  parameters inbuilt_functions
 
 %start code
 %%
@@ -141,6 +144,7 @@ datatypes : primi_datatype
 
 ID_singlevar: ID 
             ;
+
 single_variable : ID_singlevar 
                 | ID_singlevar dimensions 
                 ;
@@ -151,14 +155,21 @@ dimensions : OPENSQ rhs_exp CLOSESQ
 
 /* EXPRESSION STATEMENT */
 
-exp_stmt : single_variable ASSGN rhs_exp DOT
+single_variable_for_exp_stmt : single_variable {
+	var_records* rec = new var_records;
+	rec->name = $1.value;
+	rec->type = type;
+	rec->scope = convert_scope_to_string();
+	fn_var_entry(rec)
+}
+;
+
+exp_stmt : single_variable_for_exp_stmt ASSGN rhs_exp DOT
          ;
 
 pos : FIRST
     | SECOND
     ;
-
-idadd: ID {add('V');printf("%s\n%s\n",yytext,$1)} ;
 
 anything_with_value : single_variable
                     | NON_NEGATIVE_INT
@@ -174,7 +185,7 @@ anything_with_value : single_variable
                     | inbuilt_functions ARROW pos
                     | inbuilt_functions
                     | vectors ARROW pos
-                    | idadd ARROW pos
+                    | ID ARROW pos
                     | SIN OPENCC anything_with_value CLOSECC
                     | COS OPENCC anything_with_value CLOSECC
                     | TAN OPENCC anything_with_value CLOSECC
@@ -209,23 +220,23 @@ call_stmt_with_dot : call_stmt_without_dot DOT
 
 call_stmt_without_dot : ID OPENCU CLOSECU 
                       {
-                        check_func_args($1.name, func_args_list);
+                        check_func_args($1.value, func_args_list);
                         func_args_list.clear();
                       }
 	                  | ID OPENCU funccallargs CLOSECU 
                       {
-                          check_func_args($1.name, func_args_list);
+                          check_func_args($1.value, func_args_list);
                           func_args_list.clear();
                       }
 	                  ;
 
 funccallargs : rhs_exp 
                 {
-                    // func_args_list.push_back(rhs_exp.type);
+                    func_args_list.push_back(rhs_exp.type);
                 }
              | rhs_exp 
                 {
-                    // func_args_list.push_back(rhs_exp.type);
+                    func_args_list.push_back(rhs_exp.type);
                 }
               COMMA funccallargs
              ;
@@ -294,48 +305,48 @@ inbuilt_functions : rel_to_mag
                   | miscellaneous 
                   ;
 
-rel_to_mag : MAG OPENCU idadd CLOSECU
+rel_to_mag : MAG OPENCU ID CLOSECU
            | MAG OPENCU vectors CLOSECU
            ;
 
-rel_to_pos : OPENCU idadd CLOSECU SETR OPENCU rhs_exp CLOSECU
-           | OPENCU idadd CLOSECU ADDR OPENCU rhs_exp CLOSECU
-           | OPENCU idadd CLOSECU R_AFTER OPENCU rhs_exp CLOSECU
-           | OPENCU idadd CLOSECU GETR
+rel_to_pos : OPENCU ID CLOSECU SETR OPENCU rhs_exp CLOSECU
+           | OPENCU ID CLOSECU ADDR OPENCU rhs_exp CLOSECU
+           | OPENCU ID CLOSECU R_AFTER OPENCU rhs_exp CLOSECU
+           | OPENCU ID CLOSECU GETR
            ;
 
-rel_to_vel : OPENCU idadd CLOSECU SETV OPENCU rhs_exp CLOSECU
-           | OPENCU idadd CLOSECU ADDV OPENCU rhs_exp CLOSECU
-           | OPENCU idadd CLOSECU V_AFTER OPENCU rhs_exp CLOSECU
-           | OPENCU idadd CLOSECU GETV
+rel_to_vel : OPENCU ID CLOSECU SETV OPENCU rhs_exp CLOSECU
+           | OPENCU ID CLOSECU ADDV OPENCU rhs_exp CLOSECU
+           | OPENCU ID CLOSECU V_AFTER OPENCU rhs_exp CLOSECU
+           | OPENCU ID CLOSECU GETV
            ; 
 
-rel_to_momentum : OPENCU idadd CLOSECU SETP OPENCU rhs_exp CLOSECU
+rel_to_momentum : OPENCU ID CLOSECU SETP OPENCU rhs_exp CLOSECU
                 ;
 
-rel_to_acc : OPENCU idadd CLOSECU SETA OPENCU rhs_exp CLOSECU
-           | OPENCU idadd CLOSECU ADDA OPENCU rhs_exp CLOSECU
-           | OPENCU idadd CLOSECU GETA
+rel_to_acc : OPENCU ID CLOSECU SETA OPENCU rhs_exp CLOSECU
+           | OPENCU ID CLOSECU ADDA OPENCU rhs_exp CLOSECU
+           | OPENCU ID CLOSECU GETA
            ;
 
-rel_to_energy: OPENCU idadd CLOSECU KE_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU idadd CLOSECU PE_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU idadd CLOSECU TE_AFTER OPENCU rhs_exp CLOSECU
+rel_to_energy: OPENCU ID CLOSECU KE_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCU ID CLOSECU PE_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCU ID CLOSECU TE_AFTER OPENCU rhs_exp CLOSECU
              ;
 
-rel_to_angle: OPENCU idadd CLOSECU ANGLE_AFTER OPENCU rhs_exp CLOSECU
+rel_to_angle: OPENCU ID CLOSECU ANGLE_AFTER OPENCU rhs_exp CLOSECU
             ;
 
-rel_to_collision: OPENCU idadd CLOSECU COLLIDE OPENCU ID COMMA ID CLOSECU
-                | OPENCU idadd CLOSECU COLLIDE OPENCU ID CLOSECU
-                | OPENCU idadd CLOSECU TIME_TO_COLLIDE OPENCU ID CLOSECU
+rel_to_collision: OPENCU ID CLOSECU COLLIDE OPENCU ID COMMA ID CLOSECU
+                | OPENCU ID CLOSECU COLLIDE OPENCU ID CLOSECU
+                | OPENCU ID CLOSECU TIME_TO_COLLIDE OPENCU ID CLOSECU
                 ;
 
-miscellaneous: OPENCU idadd CLOSECU S_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU idadd CLOSECU ROC_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU idadd CLOSECU P_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU idadd CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU
-             | OPENCU idadd CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU
+miscellaneous: OPENCU ID CLOSECU S_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCU ID CLOSECU ROC_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCU ID CLOSECU P_AFTER OPENCU rhs_exp CLOSECU
+             | OPENCU ID CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU
+             | OPENCU ID CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU
              ; 
 
 term_misc : rhs_exp
@@ -351,38 +362,51 @@ expressions : expression COMMA expressions
             | expression
             ;
 
-single_variable_2 : single_variable {
-  
+single_variable_declare : single_variable {
+
                           if(is_func_bool){
-                          var_records* rec = new var_records{$1, type,convert_scope_to_string()};
+                          var_records* rec = new var_records;
+													rec->name = $1.value;
+													rec->type = type;
+													rec->scope = convert_scope_to_string();
                           fn_var_entry(rec);
                           }
                         else{
                           add('V');
                         }
 }
-expression : single_variable_2 ASSGN rhs_exp
-           | single_variable_2 
+
+expression : single_variable_declare ASSGN rhs_exp
+           | single_variable_declare 
             ;
 
 /* FUNCTION DECLARATION */
 
-idadd2: ID {is_func_bool = true;};
+idadd2 : ID {is_func_bool = true;}
+	   ;
 
 function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU {current_pointer++;  curr_scopes[current_pointer]++; }body
                 {   
-                  bool valid = new_func_entry( $2, $1, par_list.size(), par_list, var_list);
-                  if(valid) add('F'); // if(valid): add to SymTab. 
+                  if (valid_func_entry($2.value , par_list)){
+                    new_func_entry( $2.value, $1.value, par_list.size(), par_list, var_list);
+                    add('F');
+                  }
                   else{
-                    cout<< "Function re-def, ERROR!"<<endl;
-                  } 
+                     cout<< "Function re-def, ERROR!"<<endl;
+                  }
                   var_list.clear(); 
                   par_list.clear();
                 }
                 CLOSECU {is_func_bool = false;current_pointer--; }
               | datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU {current_pointer++;  curr_scopes[current_pointer]++;}body 
                 {
-                    new_func_entry( $2, $1, par_list.size(), par_list, var_list); 
+                    if (valid_func_entry($2.value , par_list)){
+                      new_func_entry( $2.value, $1.value, par_list.size(), par_list, var_list);
+                      add('F');
+                    }
+                    else{
+                      cout<< "Function re-def, ERROR!"<<endl;
+                  }
                     var_list.clear(); 
                     par_list.clear();
                 }
@@ -391,12 +415,16 @@ function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU {cu
 
 parameters: datatypes ID
         {
-            par_records* rec = new par_records{$2, $1};
+            par_records* rec = new par_records;
+						rec->name = $1.value;
+						rec->type = type;
             par_list.push_back(rec);
         }
           | datatypes ID 
           {
-            par_records* rec = new par_records{$2, $1};
+            par_records* rec = new par_records;
+						rec->name = $1.value;
+						rec->type = type;
             par_list.push_back(rec);
           }
           COMMA parameters
