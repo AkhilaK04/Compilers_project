@@ -117,3 +117,15 @@ bool redeclaration_check(string name, string scope){
   return true;
 
 }
+
+bool undeclared_function(string name){
+
+if(is_func_bool){
+    for(int i = 0; i < symbol_table.size(); i++) {
+      if(symbol_table[i]->id_name == name) {   
+        return true;
+      }
+    }
+  } 
+  return false;
+}
