@@ -129,3 +129,13 @@ if(is_func_bool){
   } 
   return false;
 }
+
+bool func_red_var(string name){
+
+      for(int i = 0; i < symbol_table.size(); i++) {
+      if(symbol_table[i]->id_name == name) {   
+        return false;
+      }
+    }
+    return true;
+}
