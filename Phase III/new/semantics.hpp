@@ -56,6 +56,8 @@ bool std_lib_semantics (string name,string ID1,vector<string> ID2){
     }
 }
 
+
+//function for checking undeclared varibles whenever ID is used excpet incase of declaration statements and function
 bool undeclare_check(string name, string scope){
 
   if(is_func_bool){
@@ -91,7 +93,7 @@ bool undeclare_check(string name, string scope){
   return false;
 }
 
-
+// redeclaration check for variables within same scope
 bool redeclaration_check(string name, string scope){
 
   if(is_func_bool){
@@ -118,28 +120,30 @@ bool redeclaration_check(string name, string scope){
 
 }
 
-bool undeclared_function(string name){
 
-if(is_func_bool){
-    for(int i = 0; i < symbol_table.size(); i++) {
-      if(symbol_table[i]->id_name == name) {   
-        return true;
-      }
-    }
-  } 
-  return false;
-}
+// bool undeclared_function(string name){
 
+// if(is_func_bool){
+//     for(int i = 0; i < symbol_table.size(); i++) {
+//       if(symbol_table[i]->id_name == name) {   
+//         return true;
+//       }
+//     }
+//   } 
+//   return false;
+// }
+
+// Function name should not be same as globally declared variables
 bool func_red_var(string name){
 
       for(int i = 0; i < symbol_table.size(); i++) {
-      if(symbol_table[i]->id_name == name) {   
+      if(symbol_table[i]->id_name == name && symbol_table[i]->type == "Variable") {   
         return false;
       }
     }
     return true;
 }
-
+//checking the redeclaration of parameters within the function parameters
 bool within_func_parameters_redeclaration(string name){
   for(int i = 0; i < par_list.size(); i++) {
       if(par_list[i]->name == name) {   
@@ -149,6 +153,7 @@ bool within_func_parameters_redeclaration(string name){
   return true;
 }
 
+//Type checking for assigning variables
 bool type_checking_assign(string type1, string type2){
     if(type1 == type2){
         return true;
