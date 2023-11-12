@@ -112,7 +112,7 @@ void fn_var_entry(var_records* rec){
 
 bool  new_func_entry(string name, string result_type,int num_of_param, vector<par_records*> par_list,vector<var_records*>var_list){
 
-  if(valid_func_entry(function_sym_table,name,par_list)){
+  if(valid_func_entry(name,par_list)){
     function_records* temp = new function_records;
     temp->name = name;
     temp->result_type = result_type;
