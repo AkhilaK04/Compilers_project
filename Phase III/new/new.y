@@ -48,7 +48,7 @@ void yyerror(char *s);
 %token <string> SCOPECLOSE
 
 
-%type <string> code code_subpart comments startfn function_decl loop_body body exp_stmt call_stmt_with_dot conditional_stmt loop_stmt unary_operation_without_dot return_stmt output_stmt input_stmt inbuilt_functions_with_dot decl_stmt_with_exp bi_op relop vectors primi_datatype non_pri_datatype datatypes ID_singlevar single_variable dimensions pos idadd idadd2 anything_with_value operations rhs_exp rhs_term openccs closeccs call_stmt_without_dot funccallargs conditional_stmt_start ids  rel_to_mag rel_to_vel rel_to_pos rel_to_acc rel_to_energy rel_to_angle  rel_to_collision rel_to_momentum miscellaneous term_misc expression expressions  parameters inbuilt_functions
+%type <string> single_variable_2 code code_subpart comments startfn function_decl loop_body body exp_stmt call_stmt_with_dot conditional_stmt loop_stmt unary_operation_without_dot return_stmt output_stmt input_stmt inbuilt_functions_with_dot decl_stmt_with_exp bi_op relop vectors primi_datatype non_pri_datatype datatypes ID_singlevar single_variable dimensions pos idadd idadd2 anything_with_value operations rhs_exp rhs_term openccs closeccs call_stmt_without_dot funccallargs conditional_stmt_start ids  rel_to_mag rel_to_vel rel_to_pos rel_to_acc rel_to_energy rel_to_angle  rel_to_collision rel_to_momentum miscellaneous term_misc expression expressions  parameters inbuilt_functions
 
 %start code
 %%
@@ -139,17 +139,9 @@ datatypes : primi_datatype
 
 /* DECLARATION STATEMENT needed things */
 
-ID_singlevar: ID { 
-                       if(is_func_bool){
-                        var_records* rec = new var_records{$1, type,convert_scope_to_string()};
-                        fn_var_entry(rec);
-                        }
-                       else{
-                         add('V');
-                       }
-                     }
+ID_singlevar: ID 
             ;
-single_variable : ID_singlevar
+single_variable : ID_singlevar 
                 | ID_singlevar dimensions 
                 ;
 
@@ -166,7 +158,7 @@ pos : FIRST
     | SECOND
     ;
 
-idadd: ID {add('V');} ;
+idadd: ID {add('V');printf("%s\n%s\n",yytext,$1)} ;
 
 anything_with_value : single_variable
                     | NON_NEGATIVE_INT
@@ -215,12 +207,27 @@ closeccs : closeccs CLOSECC
 call_stmt_with_dot : call_stmt_without_dot DOT
                    ;
 
-call_stmt_without_dot : idadd OPENCU CLOSECU
-	                  | idadd OPENCU funccallargs CLOSECU
+call_stmt_without_dot : ID OPENCU CLOSECU 
+                      {
+                        check_func_args($1.name, func_args_list);
+                        func_args_list.clear();
+                      }
+	                  | ID OPENCU funccallargs CLOSECU 
+                      {
+                          check_func_args($1.name, func_args_list);
+                          func_args_list.clear();
+                      }
 	                  ;
 
-funccallargs : rhs_exp
-             | rhs_exp COMMA funccallargs
+funccallargs : rhs_exp 
+                {
+                    // func_args_list.push_back(rhs_exp.type);
+                }
+             | rhs_exp 
+                {
+                    // func_args_list.push_back(rhs_exp.type);
+                }
+              COMMA funccallargs
              ;
 
 /* CONDITIONAL STATEMENT  */
@@ -344,18 +351,33 @@ expressions : expression COMMA expressions
             | expression
             ;
 
-expression : single_variable ASSGN rhs_exp
-           | single_variable 
-           ;
+single_variable_2 : single_variable {
+  
+                          if(is_func_bool){
+                          var_records* rec = new var_records{$1, type,convert_scope_to_string()};
+                          fn_var_entry(rec);
+                          }
+                        else{
+                          add('V');
+                        }
+}
+expression : single_variable_2 ASSGN rhs_exp
+           | single_variable_2 
+            ;
 
 /* FUNCTION DECLARATION */
 
-idadd2: ID {add('F'); is_func_bool = true;};
+idadd2: ID {is_func_bool = true;};
 
 function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU {current_pointer++;  curr_scopes[current_pointer]++; }body
-                {   new_func_entry( $2, $1, par_list.size(), par_list, var_list);
-                var_list.clear(); 
-                par_list.clear();
+                {   
+                  bool valid = new_func_entry( $2, $1, par_list.size(), par_list, var_list);
+                  if(valid) add('F'); // if(valid): add to SymTab. 
+                  else{
+                    cout<< "Function re-def, ERROR!"<<endl;
+                  } 
+                  var_list.clear(); 
+                  par_list.clear();
                 }
                 CLOSECU {is_func_bool = false;current_pointer--; }
               | datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU {current_pointer++;  curr_scopes[current_pointer]++;}body 

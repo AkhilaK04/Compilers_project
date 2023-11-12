@@ -5,10 +5,11 @@ extern char* yytext;
 bool q;
 string type;
 bool is_func_bool = false;
+int count_opencc = 0;
+int count_closecc = 0;
 stack<string> curr;
 vector<int> curr_scopes(100000,0);
 int current_pointer = 0;
-
 
 void construct_stack(){
   curr.push("1");
@@ -40,7 +41,7 @@ struct sym_tab_entries {
   string scope;
   int num_of_scopes = 0;
 };
-typedef sym_tab_entries sym_tab_entries;
+typedef struct sym_tab_entries sym_tab_entries;
 vector<sym_tab_entries*> symbol_table;
 
 struct var_records{
@@ -48,15 +49,26 @@ struct var_records{
   string type;
   string scope;
 };
-typedef var_records var_records;
+typedef struct var_records var_records;
 vector <var_records*> var_list;
-
+vector<string> func_args_list;
 struct par_records{
   string name;
   string type;
 };
-typedef par_records par_records;
+
+typedef struct par_records par_records;
 vector <par_records*> par_list;
+
+// bool compare_par_records(par_records A,par_records B){
+
+//   if(A.name != B.type){
+//     return A.name > B.name;
+//   }
+
+// return A.type >= B.type;
+// }
+
 
 struct function_records{
   string name;
@@ -68,7 +80,7 @@ struct function_records{
   vector<var_records*> var_list;
   int num_of_scopes = 0;
 };
-typedef function_records function_records;
+typedef struct function_records function_records;
 vector <function_records*> function_sym_table;
 
 
@@ -98,19 +110,27 @@ void fn_var_entry(var_records* rec){
   }
 }
 
-void new_func_entry(string name, string result_type,int num_of_param, vector<par_records*> par_list,vector<var_records*>var_list){
-  function_records* temp = new function_records;
-  temp->name = name;
-  temp->result_type = result_type;
-  temp->num_of_param = num_of_param;
-  temp->par_list = par_list;
-  temp->var_list = var_list;
-  temp->scope = convert_scope_to_string();
-  function_sym_table.push_back(temp);
+bool  new_func_entry(string name, string result_type,int num_of_param, vector<par_records*> par_list,vector<var_records*>var_list){
+
+  if(valid_func_entry(function_sym_table,name,par_list)){
+    function_records* temp = new function_records;
+    temp->name = name;
+    temp->result_type = result_type;
+    temp->num_of_param = num_of_param;
+    temp->par_list = par_list;
+    temp->var_list = var_list;
+    temp->scope = convert_scope_to_string();
+    function_sym_table.push_back(temp);
+
+    return true;
+  }else{
+    return false;
+  }
+  
 }
 
 void new_entry(string id_name,string data_type, string type) {
-	struct sym_tab_entries* temp = new sym_tab_entries;
+	sym_tab_entries* temp = new sym_tab_entries;
   cout<<"id: "<<id_name<<endl;
   temp->id_name = id_name;
 	temp->data_type = data_type;
@@ -151,7 +171,14 @@ void add(char c) {
   // q = search_in_symtab(yytext);
   // if(q) {
     if(c == 'V') {
+
+      q = search_in_symtab(yytext);
+      if(q){
         new_entry(yytext,type,"Variable");
+      }else{
+        cout<<"Error re defining variable"<<endl;
+        //WRITE ERROR IN ERROR FN.
+      }
     } 
     // else if(c == 'K') {
     //   new_entry(yytext,"N/A",scope,"Keyword");
