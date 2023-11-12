@@ -139,3 +139,12 @@ bool func_red_var(string name){
     }
     return true;
 }
+
+bool within_func_parameters_redeclaration(string name){
+  for(int i = 0; i < par_list.size(); i++) {
+      if(par_list[i]->name == name) {   
+        return false;
+      }
+  }
+  return true;
+}
