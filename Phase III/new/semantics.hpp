@@ -90,3 +90,30 @@ bool undeclare_check(string name, string scope){
   } 
   return false;
 }
+
+
+bool redeclaration_check(string name, string scope){
+
+  if(is_func_bool){
+
+    for(int i = 0; i < par_list.size(); i++) {
+      if(par_list[i]->name == name) {   
+        return false;
+      }
+    }
+    for(int i = 0; i < var_list.size(); i++) {
+      if(var_list[i]->name == name && var_list[i]->scope == scope) {   
+        return false;
+      }
+    }
+  }
+  else{
+    for(int i = 0; i < symbol_table.size(); i++) {
+      if(symbol_table[i]->id_name == name) {   
+        return false;
+      }
+    }
+  }
+  return true;
+
+}
