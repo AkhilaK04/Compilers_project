@@ -148,3 +148,10 @@ bool within_func_parameters_redeclaration(string name){
   }
   return true;
 }
+
+bool type_checking_assign(string type1, string type2){
+    if(type1 == type2){
+        return true;
+    }
+return false;
+}
