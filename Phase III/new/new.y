@@ -151,7 +151,7 @@ dimensions : OPENSQ rhs_exp CLOSESQ
 
 /* EXPRESSION STATEMENT */
 
-exp_stmt : single_variable ASSGN rhs_exp DOT
+exp_stmt : single_variable ASSGN rhs_exp DOT // { if(!type_checking_assign($1.type,$3.type)){cout<<"error"} }
          ;
 
 pos : FIRST
@@ -207,7 +207,7 @@ closeccs : closeccs CLOSECC
 call_stmt_with_dot : call_stmt_without_dot DOT
                    ;
 
-call_stmt_without_dot : ID OPENCU CLOSECU 
+call_stmt_without_dot : ID OPENCU CLOSECU //$1.name , $1.type if(!undeclared_function(name,type)) {error}
                       {
                         check_func_args($1.name, func_args_list);
                         func_args_list.clear();
@@ -249,7 +249,7 @@ loop_stmt: LOOP OPENSQ rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[
 
 /* UNIRARY OPERATION WITHOUT DOT */
      
-unary_operation_without_dot: single_variable UNIOP
+unary_operation_without_dot: single_variable UNIOP //{ $1.type == int or double}
                            | UNINEG rhs_exp
                            ;
 
@@ -361,7 +361,7 @@ single_variable_2 : single_variable {
                           add('V');
                         }
 }
-expression : single_variable_2 ASSGN rhs_exp
+expression : single_variable_2 ASSGN rhs_exp // { if(!type_checking_assign($1.type,$3.type)){cout<<"error"} }
            | single_variable_2 
             ;
 
@@ -429,3 +429,4 @@ int main(int argc ,char * argv[]){
 
 	return 0;
 }
+                
