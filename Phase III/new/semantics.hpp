@@ -55,3 +55,38 @@ bool std_lib_semantics (string name,string ID1,vector<string> ID2){
         if(ID1 == "mass" && )
     }
 }
+
+bool undeclare_check(string name, string scope){
+
+  if(is_func_bool){
+
+    for(int i = 0; i < par_list.size(); i++) {
+      if(par_list[i]->name == name) {   
+        return true;
+      }
+    }
+    for(int i = 0; i < var_list.size(); i++) {
+      if(var_list[i]->name == name && var_list[i]->scope == scope) {   
+        return true;
+      }
+      else {
+        int cnt = 0;
+        for(int i = 0; i <curr_scopes.size(); i++) if(curr_scopes[i] != 0) cnt = cnt+1; break;
+        bool x;
+        while(cnt !=0 && !x){
+            string newscope = convert_scope_to_string(cnt);
+            x = undeclare_check(name,newscope);
+            cnt --;
+        }
+      }
+   }
+  }
+  if(scope=="1"){
+    for(int i = 0; i < symbol_table.size(); i++) {
+      if(symbol_table[i]->id_name == name) {   
+        return true;
+      }
+    }
+  } 
+  return false;
+}
