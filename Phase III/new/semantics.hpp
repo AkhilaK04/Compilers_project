@@ -1,5 +1,37 @@
 #include "symbtab.hpp"
 
+bool coercion(string type1, string type2){
+
+  if(type1 == "int" && (type2 == "double" || type2 == "bool" || type2 == "int")) return true;
+  else if(type1 == "double" && (type2 == "double" || type2 == "bool" || type2 == "double")) return true;
+  else if(type1 == "string" && type2 == "string") return true;
+  else if(type1 == "bool" && (type2 == "double" || type2 == "int" || type2 == "bool")) return true;
+  else if(type1 == "velocity" && (type2 == "velocity" || type2 == "vector")) return true;
+  else if(type1 == "position" && (type2 == "position" || type2 == "vector")) return true;
+  else if(type1 == "acceleration" && (type2 == "acceleration" || type2 == "vector")) return true;
+  else if(type1 == "distance" && (type2 == "distance" || type2 == "vector")) return true;
+  else if(type1 == "momentum" && (type2 == "momentum" || type2 == "vector")) return true;
+  else if(type1 == "mass" && (type2 == "mass")) return true;
+  else if(type1 == "time" && (type2 == "time" || type2 == "int" || type2 == "double")) return true;
+  else if(type1 == "energy" && (type2 == "energy" || type2 == "vector")) return true;
+  else if(type1 == "theta" && (type2 == "int" || type2 == "double" || type2 == "theta")) return true;
+  else if(type1 == "e" && (type2 == "e" || type2 == "int" || type2 == "double")) return true;
+  else return false;
+
+//     unordered_map<string,int> mp_valid;
+//     unordered_map<string,int> mp_invalid;
+    
+//     mp_valid["int"] = 1;
+//     mp_valid["float"] = 1;
+//     mp_valid["bool"] = 1;
+    
+//     mp_invalid["string"] = 1;
+    
+//     if((mp_valid[type1] == 1 && mp_valid[type2] == 1) 
+//     || (mp_invalid[type1] == 1 && mp_invalid[type2] == 1) ) return true;
+return false;
+}
+
 int give_type_index(string type){
   if(type == "int"){
     return 1;
@@ -30,6 +62,21 @@ int give_type_index(string type){
   }
   else if (type == "vector"){
     return 10;
+  }
+  else if(type == "mass"){
+    return 11;
+  }
+  else if(type == "time"){
+    return 12;
+  }
+  else if(type == "energy"){
+    return 13;
+  }
+  else if(type == "theta"){
+    return 14;
+  }
+  else if(type == "e"){
+    return 15;
   }
   else{
     cout << "dont_know" << endl;
@@ -67,6 +114,21 @@ string get_string_type(int type){
   }
   else if (type == 10){
     return "vector";
+  }
+  else if(type == 11){
+    return "mass";
+  }
+  else if(type == 12){
+    return "time";
+  }
+  else if(type == 13){
+    return "energy";
+  }
+  else if(type == 14){
+    return "theta";
+  }
+  else if(type == 15){
+    return "e";
   }
   else{
     cout << "dontknow" << endl;
@@ -143,124 +205,128 @@ bool check_func_args(string name,char** func_args_list,int present){ //fn name, 
 return false;
 }
 
-// bool std_lib_semantics (vector<string> ID2 = {}, string name,string ID1){
+bool std_lib_semantics (string name,string ID1,vector<string> ID2){
 
-//     //int_const,float_const,vec_const
-//     // note.  IN MISC LAST: vec_const can have ? as input arg.!!
+    //int_const,float_const,vec_const
+    // note.  IN MISC LAST: vec_const can have ? as input arg.!!
 
-//     if(ID2.size() == 2){
-//         // collide function.
-//         bool rhs1;
-//         if(ID2[1] == "e" || ID2[1] == "int" ) rhs1 = true; // || ID2 == "int_const" 
-//         if(name == "collide" || ID1 == "mass" && ID2[1] == "mass" && rhs1){
-//             return true;
-//         }
-//         cout<<"ERROR in type check of Function args in collide!!"<<endl;
-//     return false;
-//     }else if(ID2.size() == 0){
-//         //GET R
-//         if(name == "getr" && ID1 == "mass"){
-//             return true;
-//         }
-//         // GET V
-//         else if(name == "getv" && ID1 == "mass"){
-//             return true;
-//         }
+    if(ID2.size() == 2){
+        // collide function.
+        bool rhs1;
+        if(ID2[1] == "e" || ID2[1] == "int" ) rhs1 = true; 
+        if(name == "collide" || ID1 == "mass" && ID2[1] == "mass" && rhs1){
+            return true;
+        }
+        cout<<"ERROR in type check of Function args in collide!!"<<endl;
+    return false;
+    }else if(ID2.size() == 0){
+        //GET R
+        if(name == "getr" && ID1 == "mass"){
+            return true;
+        }
+        // GET V
+        else if(name == "getv" && ID1 == "mass"){
+            return true;
+        }
 
-//         //GET A
-//         else if(name == "geta" && ID1 == "mass"){
-//             return true;
-//         }
+        //GET A
+        else if(name == "geta" && ID1 == "mass"){
+            return true;
+        }
 
-//     return false;
-//     }else{
-//         //MAG
+    return false;
+    }else{
+        //MAG
 
-//         if(name == "mag" && ID1 == "mass" && (ID2[0] == "velocity" || ID2[0] == "position" || ID2[0] == "acceleration" || ID2[0] == "momentum" || ID2[0] == "distance")){
-//             return true;
-//         }
+        if(name == "mag" && ID1 == "mass" && (ID2[0] == "velocity" || ID2[0] == "position" || ID2[0] == "acceleration" || ID2[0] == "momentum" || ID2[0] == "distance")){
+            return true;
+        }
 
-//         //SET_R ADD_R
-//         else if((name == "addr"|| name == "setr") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vec_const")){
-//             return true;
-//         }
+        //SET_R ADD_R
+        else if((name == "addr"|| name == "setr") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vector")){
+            return true;
+        }
 
-//         //GET R
-//         else if((name == "addr"|| name == "setr") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vec_const")){
-//             return true;
-//         }
+        //GET R
+        else if((name == "addr"|| name == "setr") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vector")){
+            return true;
+        }
 
-//         //R_AFTER.
-//         else if(name == "r_after" && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "int_const" || ID2[0] == "float" || ID2[0] == "float_const")){
-//             return true;
-//         }
+        //R_AFTER.
+        else if(name == "r_after" && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double" )){
+            return true;
+        }
 
-//         //SET_V ADD_V
-//         else if((name == "setv" || name == "addv") && ID1 == "mass" && (ID2[0] == "velocity" || ID2[0] == "vec_const") ){
-//             return true;
-//         }
+        //SET_V ADD_V
+        else if((name == "setv" || name == "addv") && ID1 == "mass" && (ID2[0] == "velocity" || ID2[0] == "vector") ){
+            return true;
+        }
 
-//         //V_AFTER (time)
-//         else if((name == "v_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "int_const" || ID2[0] == "float" || ID2[0] == "float_const") ){
-//             return true;
-//         }
+        //V_AFTER (time)
+        else if((name == "v_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double") ){
+            return true;
+        }
 
-//         //V_AFTER (distance)
-//         else if((name == "v_after") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vec_const") ){
-//             return true;
-//         }
+        //V_AFTER (distance)
+        else if((name == "v_after") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vector") ){
+            return true;
+        }
 
-//         //SET_A ADD_A
-//         else if((name == "seta" || name == "adda") && ID1 == "mass" && (ID2[0] == "acceleration" || ID2[0] == "vec_const")){
-//             return true;
-//         }
+        //SET_A ADD_A
+        else if((name == "seta" || name == "adda") && ID1 == "mass" && (ID2[0] == "acceleration" || ID2[0] == "vector")){
+            return true;
+        }
 
-//         // ENERGY KE,PE,TE
-//         else if((name == "ke_after" || name == "pe_after" || name == "te_after")  && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "int_const" || ID2[0] == "float" || ID2[0] == "float_const")){
-//         return true;
-//         }
+        // ENERGY KE,PE,TE
+        else if((name == "ke_after" || name == "pe_after" || name == "te_after")  && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double" )){
+        return true;
+        }
 
-//         //angle (time)
-//         else if((name == "angle_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "int_const" || ID2[0] == "float" || ID2[0] == "float_const") ){
-//             return true;
-//         }
+        //angle (time)
+        else if((name == "angle_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double" ) ){
+            return true;
+        }
 
-//         //angle (distance)
-//         else if((name == "angle_after") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vec_const") ){
-//             return true;
-//         }
+        //angle (distance)
+        else if((name == "angle_after") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vector") ){
+            return true;
+        }
 
-//         //collision
-//         else if((name == "collide" || name == "time_to_collide") && ID1 == "mass" && ID2[0] == "mass"){
-//             return true;
-//         }
+        //collision
+        else if((name == "collide" || name == "time_to_collide") && ID1 == "mass" && ID2[0] == "mass"){
+            return true;
+        }
 
-//         // Misc Time:
-//         else if((name == "s_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "int_const" || ID2[0] == "float" || ID2[0] == "float_const") ){
-//             return true;
-//         }
+        // Misc Time:
+        else if((name == "s_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double" ) ){
+            return true;
+        }
 
-//         else if((name == "roc_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "int_const" || ID2[0] == "float" || ID2[0] == "float_const") ){
-//             return true;
-//         }
+        else if((name == "roc_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double") ){
+            return true;
+        }
 
-//         else if((name == "p_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "int_const" || ID2[0] == "float" || ID2[0] == "float_const") ){
-//             return true;
-//         }
+        else if((name == "p_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double" ) ){
+            return true;
+        }
 
-//         //Misc time_to
-//          else if((name == "time_to_r") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vec_const")){
-//             return true;
-//         }
+        //Misc time_to 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////  NEED TO CHECK ON ADDING '?' //////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////
 
-//         else if((name == "time_to_v") && ID1 == "mass" && (ID2[0] == "velocity" || ID2[0] == "vec_const")){
-//             return true;
-//         }
-//     }
+         else if((name == "time_to_r") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vector")){
+            return true;
+        }
 
-// cout<<"Errors! no std library found"<<endl;
-// return false;
-// }
+        else if((name == "time_to_v") && ID1 == "mass" && (ID2[0] == "velocity" || ID2[0] == "vector")){
+            return true;
+        }
+    }
+
+cout<<"Errors! no std library found"<<endl;
+return false;
+}
 
 int undeclare_check(string name, string scope){
   
