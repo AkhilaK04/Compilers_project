@@ -13,7 +13,12 @@ void yyerror(char *s);
 		char* value;
 		int type;
 	} object;
+  struct for_args {
+    char* list[100];
+    int present;
+  } arg_object ;
 }
+
 
 %token <object> INTEGER_CONSTANT STRING_CONSTANT FLOAT_CONSTANT TRUE FALSE
 %token <object> INT DOUBLE STRING  BOOL
@@ -51,8 +56,8 @@ void yyerror(char *s);
 %token <object> SCOPECLOSE
 
 
-%type <object> check_rhs_exp stand_id single_variable_for_exp_stmt single_variable_declare code code_subpart comments startfn function_decl loop_body body exp_stmt call_stmt_with_dot conditional_stmt loop_stmt unary_operation_without_dot return_stmt output_stmt input_stmt inbuilt_functions_with_dot decl_stmt_with_exp bi_op relop vectors primi_datatype non_pri_datatype datatypes single_variable dimensions pos idadd2 anything_with_value operations rhs_exp rhs_term openccs closeccs call_stmt_without_dot funccallargs conditional_stmt_start ids  rel_to_mag rel_to_vel rel_to_pos rel_to_acc rel_to_energy rel_to_angle  rel_to_collision rel_to_momentum miscellaneous term_misc expression expressions  parameters inbuilt_functions
-
+%type <object> check_rhs_exp stand_id single_variable_for_exp_stmt single_variable_declare code code_subpart comments startfn function_decl loop_body body exp_stmt call_stmt_with_dot conditional_stmt loop_stmt unary_operation_without_dot return_stmt output_stmt input_stmt inbuilt_functions_with_dot decl_stmt_with_exp bi_op relop vectors primi_datatype non_pri_datatype datatypes single_variable dimensions pos idadd2 anything_with_value operations rhs_exp rhs_term openccs closeccs call_stmt_without_dot conditional_stmt_start ids  rel_to_mag rel_to_vel rel_to_pos rel_to_acc rel_to_energy rel_to_angle  rel_to_collision rel_to_momentum miscellaneous term_misc expression expressions  parameters inbuilt_functions
+%type <arg_object> funccallargs
 %start code
 %%
 
@@ -65,15 +70,20 @@ code_subpart: comments
             | function_decl 
             ;
 
-startfn : START OPENCU {is_func_bool = true; current_pointer++;  curr_scopes[current_pointer]++;} body {if (valid_func_entry($1.value , par_list)){
-                    new_func_entry( $1.value, "null", par_list.size(), par_list, var_list);
-                    add('F',$1.value);
-                  }
-                  else{
-                     cout<< "Function re-def, ERROR!"<<endl;
-                  }
-                  var_list.clear(); 
-                  par_list.clear();}CLOSECU {is_func_bool = false;current_pointer--;}
+startfn : START OPENCU 
+          {is_func_bool = true; current_pointer++;  curr_scopes[current_pointer]++;} 
+          body 
+          {
+            if (valid_func_entry($1.value , par_list)){
+              new_func_entry( $1.value, "null", par_list.size(), par_list, var_list);
+              add('F',$1.value,"null");
+            }
+            else{
+              cout<< "From startfn Function re-def, ERROR! at " << yylineno <<endl;
+            }
+            var_list.clear(); 
+            par_list.clear();}CLOSECU {is_func_bool = false;current_pointer--;
+          }
         ;
 
 body : exp_stmt body
@@ -123,25 +133,31 @@ relop : EQ
       | LT
       ;
 
-vectors : OPENSQ check_rhs_exp COMMA check_rhs_exp CLOSESQ
+vectors : OPENSQ check_rhs_exp COMMA check_rhs_exp CLOSESQ {
+              if(($2.type == 1 || $2.type == 4 || $2.type == 2) && ($2.type == 1 || $2.type == 4 || $2.type == 2)){
+                $$.type = 10;
+              }
+              else{
+                cout << "Invalid vector in line " << yylineno << endl;
+              }}
         ;
 
-primi_datatype: INT {insert_type();}
-              | DOUBLE {insert_type();}
-              | BOOL {insert_type();}
-              | STRING {insert_type();}
+primi_datatype: INT {insert_type($1.value);}
+              | DOUBLE {insert_type($1.value);}
+              | BOOL {insert_type($1.value);}
+              | STRING {insert_type($1.value);}
               ;
             
-non_pri_datatype: MASS {insert_type();}
-                | TIME {insert_type();}
-                | POSITION {insert_type();}
-                | VELOCITY {insert_type();}
-                | ACC {insert_type();}
-                | ENERGY {insert_type();}
-                | THETA {insert_type();}
-                | E       {insert_type();}
-                | DISTANCE {insert_type();}
-                | MOMENTUM {insert_type();}
+non_pri_datatype: MASS {insert_type($1.value);}
+                | TIME {insert_type($1.value);}
+                | POSITION {insert_type($1.value);}
+                | VELOCITY {insert_type($1.value);}
+                | ACC {insert_type($1.value);}
+                | ENERGY {insert_type($1.value);}
+                | THETA {insert_type($1.value);}
+                | E       {insert_type($1.value);}
+                | DISTANCE {insert_type($1.value);}
+                | MOMENTUM {insert_type($1.value);}
                 ;
             
 datatypes : primi_datatype
@@ -154,22 +170,37 @@ single_variable : ID
                 | ID dimensions 
                 ;
 
-dimensions : OPENSQ check_rhs_exp CLOSESQ
-           | OPENSQ check_rhs_exp CLOSESQ dimensions
+dimensions : OPENSQ check_rhs_exp CLOSESQ {
+              if($2.type == 1){
+                $$.type = 10;
+              }
+              else{
+                cout << "Invalid dimension in line " << yylineno << endl;
+              }
+              }
+           | OPENSQ check_rhs_exp CLOSESQ dimensions{
+              if($2.type == 1){
+                $$.type = 10;
+              }
+              else{
+                cout << "Invalid dimension in line " << yylineno << endl;
+              }
+           }
            ;
 
 /* EXPRESSION STATEMENT */
 
-single_variable_for_exp_stmt : single_variable {
-	if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
-    cout << "Undeclared variable used" << $1.value << endl;
-  }
-}
-;
+single_variable_for_exp_stmt :  single_variable 
+                                {
+                                  if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
+                                    cout << "From single_variable_for_exp_stmt Undeclared variable used " << $1.value << " at " << yylineno << endl;
+                                  }
+                                }
+                                ;
 
 exp_stmt : single_variable_for_exp_stmt ASSGN check_rhs_exp DOT
           {if(!type_checking_assign($1.type,$3.type)){
-            cout << "Expression statement types not compatible" << endl;
+            cout << "From exp_stmt Expression statement types not compatible " << $1.type << ' ' << $3.type << ' ' <<" at " << yylineno << endl;
           }}
          ;
 
@@ -178,7 +209,7 @@ pos : FIRST
     ;
 
 anything_with_value : single_variable {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
-    cout << "Undeclared variable used " << $1.value << convert_scope_to_string() << endl;
+    cout << "From anything_with_value Undeclared variable used " << $1.value << " at " << yylineno<< endl;
   }}
                     | NON_NEGATIVE_INT
                     | INTEGER_CONSTANT
@@ -187,33 +218,33 @@ anything_with_value : single_variable {if(($$.type = undeclare_check($1.value,co
                     | TRUE 
                     | FALSE 
                     | call_stmt_without_dot
-                    | vectors
-                    | UNINEG anything_with_value
+                    | vectors {$$.type = 10;}
+                    | UNINEG anything_with_value {$$.type = ;}
                     | call_stmt_without_dot ARROW pos
                     | inbuilt_functions ARROW pos
                     | inbuilt_functions
                     | vectors ARROW pos
                     | ID ARROW pos
                     | single_variable {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
-    cout << "Undeclared variable used " << $1.value << convert_scope_to_string() << endl;
+    cout << "From anything_with_value Undeclared variable used " << $1.value << " at " << yylineno<< endl;
   }} UNIOP
-                    | SIN OPENCC anything_with_value CLOSECC
-                    | COS OPENCC anything_with_value CLOSECC
-                    | TAN OPENCC anything_with_value CLOSECC
+                    | SIN OPENCC anything_with_value CLOSECC {$$.type = 2;}
+                    | COS OPENCC anything_with_value CLOSECC {$$.type = 2;}
+                    | TAN OPENCC anything_with_value CLOSECC {$$.type = 2;}
                     ;
         
-operations : bi_op
+operations : bi_op 
            | LOGICOP
            | relop
            ;
 
-rhs_term : openccs anything_with_value
-         | openccs anything_with_value closeccs
-         | anything_with_value closeccs
+rhs_term : openccs anything_with_value {$$.type = $2.type;}
+         | openccs anything_with_value closeccs {$$.type = $2.type;}
+         | anything_with_value closeccs {$$.type = $1.type;}
          ;
 
-rhs_exp : rhs_term operations rhs_exp
-        | anything_with_value operations rhs_exp
+rhs_exp : rhs_term operations rhs_exp {$$.type = give_result_type($1.type,$2.value,$3.type);}
+        | anything_with_value operations rhs_exp {$$.type = give_result_type($1.type,$2.value,$3.type);}
         | rhs_term
         | anything_with_value
         ;
@@ -233,29 +264,38 @@ call_stmt_with_dot : call_stmt_without_dot DOT
 
 call_stmt_without_dot : ID OPENCU CLOSECU 
                       {
-                        if(!check_func_args($1.value, func_args_list)){
-                          cout << "Undeclared function" << $1.value << endl;
+                        char* templist[100];
+                        int temp = 0;
+                        if(!check_func_args($1.value,templist,temp )){
+                          cout << "From call_stmt_without_dot Undeclared function " << $1.value <<" at " << yylineno  << endl;
                         }
                         func_args_list.clear();
+                        $$.type = find_return_type($1.value,templist,temp);
                       }
 	                  | ID OPENCU funccallargs CLOSECU 
                       {
-                          if(!check_func_args($1.value, func_args_list)){
-                            cout << "Undeclared function" << $1.value << endl;
+                          if(!check_func_args($1.value, $3.list,$3.present)){
+                            cout << "From call_stmt_without_dot Undeclared function " << $1.value <<" at " << yylineno  << endl;
                           }
                           func_args_list.clear();
+                          $$.type = find_return_type($1.value,$3.list,$3.present);
                       }
+                      
 	                  ;
 
 funccallargs : check_rhs_exp 
                 {
-                    func_args_list.push_back(rhs_exp.type);
+                  $$.list[0] = &(get_string_type($1.type)[0]);
+                  $$.present = 1;
                 }
-             | check_rhs_exp 
-                {
-                    func_args_list.push_back(rhs_exp.type);
+             | check_rhs_exp COMMA funccallargs
+              {
+                for(int i=0;i<$3.present;i++){
+                  $$.list[i+1] = $3.list[i];
                 }
-              COMMA funccallargs
+                $$.present = $3.present + 1;
+                $$.list[0] = &(get_string_type($1.type)[0]);
+              }
              ;
 
 /* CONDITIONAL STATEMENT  */
@@ -275,7 +315,7 @@ loop_stmt: LOOP OPENSQ check_rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_s
 
 /* UNIRARY OPERATION WITHOUT DOT */
 
-unary_operation_without_dot: single_variable {if (($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0) cout << "undeclaration error " << $1.value << endl;} UNIOP // { $1.type == int or double }
+unary_operation_without_dot: single_variable {if (($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0) cout << "undeclaration error at " << yylineno << $1.value << endl;} UNIOP // { $1.type == int or double }
                            | UNINEG check_rhs_exp
                            ;
 
@@ -301,10 +341,10 @@ input_stmt : INPUT COLON ids DOT
            ;
 
 ids : single_variable {if(undeclare_check($1.value,convert_scope_to_string()) == 0){
-                          cout << "Undeclared variable used" << $1.value << endl;
+                          cout << "Undeclared variable used at " << yylineno << $1.value << endl;
                         }}COMMA ids
     | single_variable {if(undeclare_check($1.value,convert_scope_to_string()) == 0){
-                          cout << "Undeclared variable used" << $1.value << endl;
+                          cout << "Undeclared variable used at " << yylineno << $1.value << endl;
                         }}
     ;
 
@@ -325,7 +365,7 @@ inbuilt_functions : rel_to_mag
                   ;
 
 stand_id : ID {if(undeclare_check($1.value,convert_scope_to_string()) == 0){
-                          cout << "Undeclared variable used" << $1.value << endl;
+                          cout << "Undeclared variable used at " << yylineno << $1.value << endl;
                         }}
 
 rel_to_mag : MAG OPENCU stand_id CLOSECU
@@ -386,7 +426,7 @@ expressions : expression COMMA expressions
             ;
 
 single_variable_declare : single_variable {
-                          $$.type = $1.type;
+                          $$.type = give_type_index(type);
                           if(is_func_bool){
                           var_records* rec = new var_records;
 													rec->name = $1.value;
@@ -395,30 +435,30 @@ single_variable_declare : single_variable {
                           fn_var_entry(rec);
                           }
                         else{
-                          add('V',$1.value);
+                          add('V',$1.value,type);
                         }
 }
 
-check_rhs_exp : {open_brackets = 0;close_brackets = 0;} rhs_exp {if(open_brackets != close_brackets){cout << "Incorrect RHS expression" << endl;}open_brackets = 0;close_brackets = 0;}
+check_rhs_exp : {open_brackets = 0;close_brackets = 0;} rhs_exp {if(open_brackets != close_brackets){cout << "Incorrect RHS expression at " << yylineno << endl;}open_brackets = 0;close_brackets = 0;$$.type = $2.type;$$.value = $2.value;}
 
-expression : single_variable_declare ASSGN check_rhs_exp { if(!type_checking_assign($1.type,$3.type)){cout << "Declaration with expression type error";}}
+expression : single_variable_declare ASSGN check_rhs_exp { if(!type_checking_assign($1.type,$3.type)){cout << "Declaration with expression type error " <<  $1.type <<  ' ' << $3.type << " at " << yylineno << endl;}}
            | single_variable_declare 
             ;
 
 /* FUNCTION DECLARATION */
 
 idadd2 : ID {is_func_bool = true;
-        if(!func_red_var($1.value)){cout << "Redeclaration error : Function is redeclared as variable name" << endl;}}
+        if(!func_red_var($1.value)){cout << "Redeclaration error : Function is redeclared as variable nameat " << yylineno << endl;}}
 	   ;
 
 function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU {current_pointer++;  curr_scopes[current_pointer]++; }body
                 {   
                   if (valid_func_entry($2.value , par_list)){
                     new_func_entry( $2.value, $1.value, par_list.size(), par_list, var_list);
-                    add('F',$2.value);
+                    add('F',$2.value,$1.value);
                   }
                   else{
-                     cout<< "Function re-def, ERROR!"<<endl;
+                     cout<< "Function re-def, ERROR!at " << yylineno<<endl;
                   }
                   var_list.clear(); 
                   par_list.clear();
@@ -428,10 +468,10 @@ function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU {cu
                 {
                     if (valid_func_entry($2.value , par_list)){
                       new_func_entry( $2.value, $1.value, par_list.size(), par_list, var_list);
-                      add('F',$2.value);
+                      add('F',$2.value,$1.value);
                     }
                     else{
-                      cout<< "Function re-def, ERROR!"<<endl;
+                      cout<< "Function re-def, ERROR!at " << yylineno<<endl;
                   }
                     var_list.clear(); 
                     par_list.clear();
@@ -441,7 +481,7 @@ function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU {cu
 
 parameters: datatypes ID
         {
-          if(!within_func_parameters_redeclaration($2.value)) cout << "Redeclaration of parameters in the function" << endl;
+          if(!within_func_parameters_redeclaration($2.value)) cout << "Redeclaration of parameters in the functionat " << yylineno << endl;
             par_records* rec = new par_records;
 						rec->name = $2.value;
 						rec->type = type;
@@ -449,7 +489,7 @@ parameters: datatypes ID
         }
           | datatypes ID 
           {
-          if(!within_func_parameters_redeclaration($2.value)) cout << "Redeclaration of parameters in the function" << endl;
+          if(!within_func_parameters_redeclaration($2.value)) cout << "Redeclaration of parameters in the functionat " << yylineno << endl;
             par_records* rec = new par_records;
 						rec->name = $2.value;
 						rec->type = type;

@@ -1,9 +1,11 @@
 #include <bits/stdc++.h>
+#include <string>
 using namespace std;
 
 extern char* yytext;
 bool q;
 string type = "null";
+string function_type = "null";
 bool is_func_bool = false;
 int count_opencc = 0;
 int count_closecc = 0;
@@ -97,6 +99,12 @@ bool bool_fn_var_entry(var_records* rec){
         return false;
       }
     }
+
+    for(int i=0;i<par_list.size();i++){
+      if(check == par_list[i]->name){
+        return false;
+      }
+    }
 return true;
 }
 
@@ -128,7 +136,6 @@ bool  new_func_entry(string name, string result_type,int num_of_param, vector<pa
 
 void new_entry(string id_name,string data_type, string type) {
 	sym_tab_entries* temp = new sym_tab_entries;
-  cout<<"id: "<<id_name<<endl;
   temp->id_name = id_name;
 	temp->data_type = data_type;
 	temp->type = type;
@@ -136,8 +143,9 @@ void new_entry(string id_name,string data_type, string type) {
   symbol_table.push_back(temp);
 }
 
-void insert_type() {
-	type = yytext;
+void insert_type(string input) {
+	function_type = input;
+  type = input;
 }
 
 bool search_in_symtab(string name) { 
@@ -164,10 +172,9 @@ bool search_in_symtab(string name) {
   return true;
 }
 
-void add(char c,string id) {
+void add(char c,string id,string type) {
     if(c == 'V') {
       q = search_in_symtab(id);
-      cout << id << "23"<< endl;
       if(q){
         new_entry(id,type,"Variable");
       }else{
@@ -176,6 +183,9 @@ void add(char c,string id) {
       }
     } 
     else if(c == 'F') {
+      if(id == "start"){
+        type = "null";
+      }
       new_entry(id,type,"Function");
     }
   // }

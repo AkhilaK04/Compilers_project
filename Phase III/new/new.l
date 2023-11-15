@@ -66,33 +66,37 @@ SCOPECLOSE {
 {primi_datatype} {
     if(strcmp(yytext,"int") == 0){
         yylval.object.value = strdup(yytext);
+        yylval.object.type = 1;
         return INT;
     }
     if(strcmp(yytext,"double") == 0){
         yylval.object.value = strdup(yytext);
+        yylval.object.type = 2;
         return DOUBLE;
     }
     if(strcmp(yytext,"string") == 0){
         yylval.object.value = strdup(yytext);
+        yylval.object.type = 3;
         return STRING;
     }
     if(strcmp(yytext,"bool") == 0){
         yylval.object.value = strdup(yytext);
+        yylval.object.type = 4;
         return BOOL;
     }
 }
 
 {non_pri_datatype} {
-    if(strcmp(yytext,"mass") == 0) {yylval.object.value = strdup(yytext); return MASS;}
-    else if(strcmp(yytext,"time") == 0) {yylval.object.value = strdup(yytext); return TIME;}
-    else if(strcmp(yytext,"position") == 0) {yylval.object.value = strdup(yytext); return POSITION;}
-    else if(strcmp(yytext,"velocity") == 0) {yylval.object.value = strdup(yytext); return VELOCITY;}
-    else if(strcmp(yytext,"acceleration") == 0) {yylval.object.value = strdup(yytext); return ACC;}
-    else if(strcmp(yytext,"energy") == 0) {yylval.object.value = strdup(yytext); return ENERGY;}
-    else if(strcmp(yytext,"theta") == 0) {yylval.object.value = strdup(yytext); return THETA;}
-    else if(strcmp(yytext,"e") == 0) {yylval.object.value = strdup(yytext); return E;}
-    else if(strcmp(yytext,"distance") == 0) {yylval.object.value = strdup(yytext); return DISTANCE;}
-    else if(strcmp(yytext,"momentum") == 0) {yylval.object.value = strdup(yytext); return MOMENTUM;}
+    if(strcmp(yytext,"mass") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 10; return MASS;}
+    else if(strcmp(yytext,"time") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 11; return TIME;}
+    else if(strcmp(yytext,"position") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 6; return POSITION;}
+    else if(strcmp(yytext,"velocity") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 5; return VELOCITY;}
+    else if(strcmp(yytext,"acceleration") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 7; return ACC;}
+    else if(strcmp(yytext,"energy") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 12; return ENERGY;}
+    else if(strcmp(yytext,"theta") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 13; return THETA;}
+    else if(strcmp(yytext,"e") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 14; return E;}
+    else if(strcmp(yytext,"distance") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 8; return DISTANCE;}
+    else if(strcmp(yytext,"momentum") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 9; return MOMENTUM;}
 }
 
 {reserved_keywords} {
@@ -207,16 +211,19 @@ SCOPECLOSE {
 
 [1-9][0-9]* {
     yylval.object.value = strdup(yytext); 
+    yylval.object.type = 1;
     return NON_NEGATIVE_INT; 
 }
 
 [-]?[1-9][0-9]*|0 {
     yylval.object.value = strdup(yytext); 
+    yylval.object.type = 1;
     return INTEGER_CONSTANT; 
 }
 
 [-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? {
     yylval.object.value = strdup(yytext); 
+    yylval.object.type = 2;
     return FLOAT_CONSTANT;
 }
 
@@ -228,10 +235,15 @@ SCOPECLOSE {
 
 \"([^"]*)\" {
     yylval.object.value = strdup(yytext); 
+    yylval.object.type = 3;
     return STRING_CONSTANT;
 }
 
-[ \n\t]  { /* ignore whitespace */ }
+[ \t] {
+
+}
+
+[\n]  { yylineno++;}
 
 . {
 	fprintf(tokfile,"ERROR! Invalid token");
