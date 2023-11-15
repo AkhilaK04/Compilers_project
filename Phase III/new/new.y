@@ -11,7 +11,7 @@ void yyerror(char *s);
 %union {
 	struct variable {
 		char* value;
-		char* type;
+		int type;
 	} object;
 }
 
@@ -51,7 +51,7 @@ void yyerror(char *s);
 %token <object> SCOPECLOSE
 
 
-%type <object> single_variable_for_exp_stmt single_variable_2 code code_subpart comments startfn function_decl loop_body body exp_stmt call_stmt_with_dot conditional_stmt loop_stmt unary_operation_without_dot return_stmt output_stmt input_stmt inbuilt_functions_with_dot decl_stmt_with_exp bi_op relop vectors primi_datatype non_pri_datatype datatypes ID_singlevar single_variable dimensions pos idadd2 anything_with_value operations rhs_exp rhs_term openccs closeccs call_stmt_without_dot funccallargs conditional_stmt_start ids  rel_to_mag rel_to_vel rel_to_pos rel_to_acc rel_to_energy rel_to_angle  rel_to_collision rel_to_momentum miscellaneous term_misc expression expressions  parameters inbuilt_functions
+%type <object> check_rhs_exp stand_id single_variable_for_exp_stmt single_variable_declare code code_subpart comments startfn function_decl loop_body body exp_stmt call_stmt_with_dot conditional_stmt loop_stmt unary_operation_without_dot return_stmt output_stmt input_stmt inbuilt_functions_with_dot decl_stmt_with_exp bi_op relop vectors primi_datatype non_pri_datatype datatypes single_variable dimensions pos idadd2 anything_with_value operations rhs_exp rhs_term openccs closeccs call_stmt_without_dot funccallargs conditional_stmt_start ids  rel_to_mag rel_to_vel rel_to_pos rel_to_acc rel_to_energy rel_to_angle  rel_to_collision rel_to_momentum miscellaneous term_misc expression expressions  parameters inbuilt_functions
 
 %start code
 %%
@@ -65,7 +65,15 @@ code_subpart: comments
             | function_decl 
             ;
 
-startfn : START OPENCU {is_func_bool = true; current_pointer++;  curr_scopes[current_pointer]++;} body CLOSECU {is_func_bool = false;current_pointer--;}
+startfn : START OPENCU {is_func_bool = true; current_pointer++;  curr_scopes[current_pointer]++;} body {if (valid_func_entry($1.value , par_list)){
+                    new_func_entry( $1.value, "null", par_list.size(), par_list, var_list);
+                    add('F',$1.value);
+                  }
+                  else{
+                     cout<< "Function re-def, ERROR!"<<endl;
+                  }
+                  var_list.clear(); 
+                  par_list.clear();}CLOSECU {is_func_bool = false;current_pointer--;}
         ;
 
 body : exp_stmt body
@@ -115,7 +123,7 @@ relop : EQ
       | LT
       ;
 
-vectors : OPENSQ rhs_exp COMMA rhs_exp CLOSESQ
+vectors : OPENSQ check_rhs_exp COMMA check_rhs_exp CLOSESQ
         ;
 
 primi_datatype: INT {insert_type();}
@@ -142,44 +150,42 @@ datatypes : primi_datatype
 
 /* DECLARATION STATEMENT needed things */
 
-ID_singlevar: ID 
-            ;
-
-single_variable : ID_singlevar 
-                | ID_singlevar dimensions 
+single_variable : ID 
+                | ID dimensions 
                 ;
 
-dimensions : OPENSQ rhs_exp CLOSESQ
-           | OPENSQ rhs_exp CLOSESQ dimensions
+dimensions : OPENSQ check_rhs_exp CLOSESQ
+           | OPENSQ check_rhs_exp CLOSESQ dimensions
            ;
 
 /* EXPRESSION STATEMENT */
 
 single_variable_for_exp_stmt : single_variable {
-	var_records* rec = new var_records;
-	rec->name = $1.value;
-	rec->type = type;
-	rec->scope = convert_scope_to_string();
-	fn_var_entry(rec)
+	if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
+    cout << "Undeclared variable used" << $1.value << endl;
+  }
 }
 ;
 
-exp_stmt : single_variable_for_exp_stmt // if(!undeclare_check($1,curr_scope)) cout<< undeclaration error<<endl;
-          ASSGN rhs_exp DOT // { if(!type_checking_assign($1.type,$3.type)){cout<<"error"} }
+exp_stmt : single_variable_for_exp_stmt ASSGN check_rhs_exp DOT
+          {if(!type_checking_assign($1.type,$3.type)){
+            cout << "Expression statement types not compatible" << endl;
+          }}
          ;
 
 pos : FIRST
     | SECOND
     ;
 
-
-anything_with_value : single_variable // if(!undeclare_check($1,curr_scope)) cout<< undeclaration error<<endl;
+anything_with_value : single_variable {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
+    cout << "Undeclared variable used " << $1.value << convert_scope_to_string() << endl;
+  }}
                     | NON_NEGATIVE_INT
                     | INTEGER_CONSTANT
                     | FLOAT_CONSTANT
                     | STRING_CONSTANT
-                    | TRUE
-                    | FALSE
+                    | TRUE 
+                    | FALSE 
                     | call_stmt_without_dot
                     | vectors
                     | UNINEG anything_with_value
@@ -187,7 +193,10 @@ anything_with_value : single_variable // if(!undeclare_check($1,curr_scope)) cou
                     | inbuilt_functions ARROW pos
                     | inbuilt_functions
                     | vectors ARROW pos
-                    | stand_id ARROW pos
+                    | ID ARROW pos
+                    | single_variable {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
+    cout << "Undeclared variable used " << $1.value << convert_scope_to_string() << endl;
+  }} UNIOP
                     | SIN OPENCC anything_with_value CLOSECC
                     | COS OPENCC anything_with_value CLOSECC
                     | TAN OPENCC anything_with_value CLOSECC
@@ -199,7 +208,9 @@ operations : bi_op
            ;
 
 rhs_term : openccs anything_with_value
+         | openccs anything_with_value closeccs
          | anything_with_value closeccs
+         ;
 
 rhs_exp : rhs_term operations rhs_exp
         | anything_with_value operations rhs_exp
@@ -207,12 +218,12 @@ rhs_exp : rhs_term operations rhs_exp
         | anything_with_value
         ;
 
-openccs : openccs OPENCC
-        | OPENCC
+openccs : openccs OPENCC {open_brackets = open_brackets + 1;}
+        | OPENCC {open_brackets = open_brackets + 1;}
         ;
 
-closeccs : closeccs CLOSECC
-         | CLOSECC
+closeccs : closeccs CLOSECC {close_brackets = close_brackets + 1;}
+         | CLOSECC {close_brackets = close_brackets + 1;}
          ;
 
 /* CALL STATEMENT WITH DOT */
@@ -220,23 +231,27 @@ closeccs : closeccs CLOSECC
 call_stmt_with_dot : call_stmt_without_dot DOT
                    ;
 
-call_stmt_without_dot : ID OPENCU CLOSECU //$1.name , $1.type if(!undeclared_function(name,type)) {error}
+call_stmt_without_dot : ID OPENCU CLOSECU 
                       {
-                        check_func_args($1.value, func_args_list);
+                        if(!check_func_args($1.value, func_args_list)){
+                          cout << "Undeclared function" << $1.value << endl;
+                        }
                         func_args_list.clear();
                       }
 	                  | ID OPENCU funccallargs CLOSECU 
                       {
-                          check_func_args($1.value, func_args_list);
+                          if(!check_func_args($1.value, func_args_list)){
+                            cout << "Undeclared function" << $1.value << endl;
+                          }
                           func_args_list.clear();
                       }
 	                  ;
 
-funccallargs : rhs_exp 
+funccallargs : check_rhs_exp 
                 {
                     func_args_list.push_back(rhs_exp.type);
                 }
-             | rhs_exp 
+             | check_rhs_exp 
                 {
                     func_args_list.push_back(rhs_exp.type);
                 }
@@ -245,9 +260,7 @@ funccallargs : rhs_exp
 
 /* CONDITIONAL STATEMENT  */
 
-conditional_stmt_start : OPENSQ rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; }
-                       | OPENSQ single_variable // if(!undeclare_check($1,curr_scope)) cout<< undeclaration error<<endl;
-                        UNIOP CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; }
+conditional_stmt_start : OPENSQ check_rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; }
                       ;
 
 
@@ -257,21 +270,18 @@ conditional_stmt: conditional_stmt_start loop_body CLOSECU {current_pointer--; }
 
 /* LOOP STATEMENT */
       
-loop_stmt: LOOP OPENSQ rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; } loop_body CLOSECU {current_pointer--; }
-         | LOOP OPENSQ single_variable // if(!undeclare_check($1,curr_scope)) cout<< undeclaration error<<endl;
-          UNIOP CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; } loop_body CLOSECU {current_pointer--; }
+loop_stmt: LOOP OPENSQ check_rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; } loop_body CLOSECU {current_pointer--; }
          ; 
 
 /* UNIRARY OPERATION WITHOUT DOT */
-     
-unary_operation_without_dot: single_variable // if(!undeclare_check($1,curr_scope)) cout<< undeclaration error<<endl;
-                           UNIOP //{ $1.type == int or double}
-                           | UNINEG rhs_exp
+
+unary_operation_without_dot: single_variable {if (($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0) cout << "undeclaration error " << $1.value << endl;} UNIOP // { $1.type == int or double }
+                           | UNINEG check_rhs_exp
                            ;
 
 /* RETURN STATEMENT */
     
-return_stmt: DARR rhs_exp DOT
+return_stmt: DARR check_rhs_exp DOT
            | DARR DOT
            ;
 
@@ -282,7 +292,7 @@ comments : CMT
 
 /* OUTPUT STATEMENT */
      
-output_stmt : OUTPUT COLON rhs_exp DOT
+output_stmt : OUTPUT COLON check_rhs_exp DOT
             ;
 
 /* INPUT STATEMENT */
@@ -290,9 +300,12 @@ output_stmt : OUTPUT COLON rhs_exp DOT
 input_stmt : INPUT COLON ids DOT
            ;
 
-ids : single_variable // if(!undeclare_check($1,curr_scope)) cout<< undeclaration error<<endl;
-       COMMA ids
-    | single_variable // if(!undeclare_check($1,curr_scope)) cout<< undeclaration error<<endl;
+ids : single_variable {if(undeclare_check($1.value,convert_scope_to_string()) == 0){
+                          cout << "Undeclared variable used" << $1.value << endl;
+                        }}COMMA ids
+    | single_variable {if(undeclare_check($1.value,convert_scope_to_string()) == 0){
+                          cout << "Undeclared variable used" << $1.value << endl;
+                        }}
     ;
 
 /* INBUILT STATEMENT */
@@ -311,52 +324,55 @@ inbuilt_functions : rel_to_mag
                   | miscellaneous 
                   ;
 
-stand_id: ID //  if(!undeclare_check($1,curr_scope)) cout<< undeclaration error<<endl;
+stand_id : ID {if(undeclare_check($1.value,convert_scope_to_string()) == 0){
+                          cout << "Undeclared variable used" << $1.value << endl;
+                        }}
+
 rel_to_mag : MAG OPENCU stand_id CLOSECU
            | MAG OPENCU vectors CLOSECU
            ;
 
-rel_to_pos : OPENCU stand_id CLOSECU SETR OPENCU rhs_exp CLOSECU
-           | OPENCU stand_id CLOSECU ADDR OPENCU rhs_exp CLOSECU
-           | OPENCU stand_id CLOSECU R_AFTER OPENCU rhs_exp CLOSECU
+rel_to_pos : OPENCU stand_id CLOSECU SETR OPENCU check_rhs_exp CLOSECU
+           | OPENCU stand_id CLOSECU ADDR OPENCU check_rhs_exp CLOSECU
+           | OPENCU stand_id CLOSECU R_AFTER OPENCU check_rhs_exp CLOSECU
            | OPENCU stand_id CLOSECU GETR
            ;
 
-rel_to_vel : OPENCU stand_id CLOSECU SETV OPENCU rhs_exp CLOSECU
-           | OPENCU stand_id CLOSECU ADDV OPENCU rhs_exp CLOSECU
-           | OPENCU stand_id CLOSECU V_AFTER OPENCU rhs_exp CLOSECU
+rel_to_vel : OPENCU stand_id CLOSECU SETV OPENCU check_rhs_exp CLOSECU
+           | OPENCU stand_id CLOSECU ADDV OPENCU check_rhs_exp CLOSECU
+           | OPENCU stand_id CLOSECU V_AFTER OPENCU check_rhs_exp CLOSECU
            | OPENCU stand_id CLOSECU GETV
            ; 
 
-rel_to_momentum : OPENCU stand_id CLOSECU SETP OPENCU rhs_exp CLOSECU
+rel_to_momentum : OPENCU stand_id CLOSECU SETP OPENCU check_rhs_exp CLOSECU
                 ;
 
-rel_to_acc : OPENCU stand_id CLOSECU SETA OPENCU rhs_exp CLOSECU
-           | OPENCU stand_id CLOSECU ADDA OPENCU rhs_exp CLOSECU
+rel_to_acc : OPENCU stand_id CLOSECU SETA OPENCU check_rhs_exp CLOSECU
+           | OPENCU stand_id CLOSECU ADDA OPENCU check_rhs_exp CLOSECU
            | OPENCU stand_id CLOSECU GETA
            ;
 
-rel_to_energy: OPENCU stand_id CLOSECU KE_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU stand_id CLOSECU PE_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU stand_id CLOSECU TE_AFTER OPENCU rhs_exp CLOSECU
+rel_to_energy: OPENCU stand_id CLOSECU KE_AFTER OPENCU check_rhs_exp CLOSECU
+             | OPENCU stand_id CLOSECU PE_AFTER OPENCU check_rhs_exp CLOSECU
+             | OPENCU stand_id CLOSECU TE_AFTER OPENCU check_rhs_exp CLOSECU
              ;
 
-rel_to_angle: OPENCU stand_id CLOSECU ANGLE_AFTER OPENCU rhs_exp CLOSECU
+rel_to_angle: OPENCU stand_id CLOSECU ANGLE_AFTER OPENCU check_rhs_exp CLOSECU
             ;
 
-rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU ID COMMA ID CLOSECU
-                | OPENCU stand_id CLOSECU COLLIDE OPENCU ID CLOSECU
-                | OPENCU stand_id CLOSECU TIME_TO_COLLIDE OPENCU ID CLOSECU
+rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id COMMA stand_id CLOSECU
+                | OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id CLOSECU
+                | OPENCU stand_id CLOSECU TIME_TO_COLLIDE OPENCU stand_id CLOSECU
                 ;
 
-miscellaneous: OPENCU stand_id CLOSECU S_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU stand_id CLOSECU ROC_AFTER OPENCU rhs_exp CLOSECU
-             | OPENCU stand_id CLOSECU P_AFTER OPENCU rhs_exp CLOSECU
+miscellaneous: OPENCU stand_id CLOSECU S_AFTER OPENCU check_rhs_exp CLOSECU
+             | OPENCU stand_id CLOSECU ROC_AFTER OPENCU check_rhs_exp CLOSECU
+             | OPENCU stand_id CLOSECU P_AFTER OPENCU check_rhs_exp CLOSECU
              | OPENCU stand_id CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU
              | OPENCU stand_id CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU
              ; 
 
-term_misc : rhs_exp
+term_misc : check_rhs_exp
           | QUESTION
           ;
 
@@ -369,9 +385,8 @@ expressions : expression COMMA expressions
             | expression
             ;
 
-single_variable_2 : single_variable {
-                          // if(!redeclaration_check($1,curr_scope)) cout<< redeclaration error<<endl;
-
+single_variable_declare : single_variable {
+                          $$.type = $1.type;
                           if(is_func_bool){
                           var_records* rec = new var_records;
 													rec->name = $1.value;
@@ -380,24 +395,28 @@ single_variable_2 : single_variable {
                           fn_var_entry(rec);
                           }
                         else{
-                          add('V');
+                          add('V',$1.value);
                         }
 }
-expression : single_variable_2 ASSGN rhs_exp // { if(!type_checking_assign($1.type,$3.type)){cout<<"type checking error"} }
-           | single_variable_2 
+
+check_rhs_exp : {open_brackets = 0;close_brackets = 0;} rhs_exp {if(open_brackets != close_brackets){cout << "Incorrect RHS expression" << endl;}open_brackets = 0;close_brackets = 0;}
+
+expression : single_variable_declare ASSGN check_rhs_exp { if(!type_checking_assign($1.type,$3.type)){cout << "Declaration with expression type error";}}
+           | single_variable_declare 
             ;
 
 /* FUNCTION DECLARATION */
 
-idadd2: ID {is_func_bool = true; 
-           // if(!func_red_var) cout<< "Redeclaration error:Function is reclared as varibale name"<<endl;
-           };
+idadd2 : ID {is_func_bool = true;
+        if(!func_red_var($1.value)){cout << "Redeclaration error : Function is redeclared as variable name" << endl;}}
+	   ;
 
 function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU {current_pointer++;  curr_scopes[current_pointer]++; }body
                 {   
-
-                  bool valid = new_func_entry( $2, $1, par_list.size(), par_list, var_list);
-                  if(valid) add('F'); // if(valid): add to SymTab. 
+                  if (valid_func_entry($2.value , par_list)){
+                    new_func_entry( $2.value, $1.value, par_list.size(), par_list, var_list);
+                    add('F',$2.value);
+                  }
                   else{
                      cout<< "Function re-def, ERROR!"<<endl;
                   }
@@ -409,7 +428,7 @@ function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU {cu
                 {
                     if (valid_func_entry($2.value , par_list)){
                       new_func_entry( $2.value, $1.value, par_list.size(), par_list, var_list);
-                      add('F');
+                      add('F',$2.value);
                     }
                     else{
                       cout<< "Function re-def, ERROR!"<<endl;
@@ -422,17 +441,17 @@ function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU {cu
 
 parameters: datatypes ID
         {
-          // if(!within_func_parameters_redeclaration($2.name)) cout<<"Redeclaration of parameters in the function"<<endl;
+          if(!within_func_parameters_redeclaration($2.value)) cout << "Redeclaration of parameters in the function" << endl;
             par_records* rec = new par_records;
-						rec->name = $1.value;
+						rec->name = $2.value;
 						rec->type = type;
             par_list.push_back(rec);
         }
           | datatypes ID 
           {
-         // if(!within_func_parameters_redeclaration($2.name)) cout<<"Redeclaration of parameters in the function"<<endl;
+          if(!within_func_parameters_redeclaration($2.value)) cout << "Redeclaration of parameters in the function" << endl;
             par_records* rec = new par_records;
-						rec->name = $1.value;
+						rec->name = $2.value;
 						rec->type = type;
             par_list.push_back(rec);
           }
@@ -466,4 +485,3 @@ int main(int argc ,char * argv[]){
 
 	return 0;
 }
-                
