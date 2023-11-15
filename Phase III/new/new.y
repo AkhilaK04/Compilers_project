@@ -237,9 +237,9 @@ anything_with_value : single_variable {if(($$.type = undeclare_check($1.value,co
                         cout << "From anything_with_value " << $1.value << " is not a vector to access first or second" << endl;
                       }
                     }
-                    | single_variable {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
+                    | single_variable UNIOP {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
                         cout << "From anything_with_value Undeclared variable used " << $1.value << " at " << yylineno<< endl;
-                      }} UNIOP
+                      }}
                     | SIN OPENCC anything_with_value CLOSECC {$$.type = 2;
                     if($3.type != 1 && $3.type != 2){cout << "Sin input is out of range" << endl;}}
                     | COS OPENCC anything_with_value CLOSECC {$$.type = 2;
@@ -330,11 +330,11 @@ loop_stmt: LOOP OPENSQ check_rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_s
 
 /* UNIRARY OPERATION WITHOUT DOT */
 
-unary_operation_without_dot: single_variable {if (($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0) cout << "undeclaration error at " << yylineno << $1.value << endl;
+unary_operation_without_dot: single_variable UNIOP {if (($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0) cout << "undeclaration error at " << yylineno << $1.value << endl;
                               if($1.type != 1 && $1.type != 2){
                                 cout << "From unary_operation_without_dot cant perform operation" << endl;
                               }
-                              $$.type = $1.type;} UNIOP 
+                              $$.type = $1.type;}
                            | UNINEG check_rhs_exp {
                             $$.type = 4;
                             if ($2.type != 1 && $2.type !=2 && $2.type != 4){
