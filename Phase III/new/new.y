@@ -219,18 +219,33 @@ anything_with_value : single_variable {if(($$.type = undeclare_check($1.value,co
                     | FALSE 
                     | call_stmt_without_dot
                     | vectors {$$.type = 10;}
-                    | UNINEG anything_with_value {$$.type = ;}
-                    | call_stmt_without_dot ARROW pos
+                    | UNINEG anything_with_value {$$.type = 4;}
+                    | call_stmt_without_dot ARROW pos {if($1.type != 5 && $1.type != 6 && $1.type != 7 && $1.type != 8 && $1.type != 9 && $1.type != 10){
+                      cout << "From anything with value call statement return is not a vector" << endl;
+                    }}
                     | inbuilt_functions ARROW pos
                     | inbuilt_functions
                     | vectors ARROW pos
-                    | ID ARROW pos
+                    | ID ARROW pos {
+                      if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
+                        cout << "From anything_with_value Undeclared variable used " << $1.value << " at " << yylineno<< endl;
+                      }
+                      if($$.type == 5 || $$.type == 6 || $$.type == 7 || $$.type == 8 || $$.type == 9 || $$.type == 10){
+
+                      }
+                      else{
+                        cout << "From anything_with_value " << $1.value << " is not a vector to access first or second" << endl;
+                      }
+                    }
                     | single_variable {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
-    cout << "From anything_with_value Undeclared variable used " << $1.value << " at " << yylineno<< endl;
-  }} UNIOP
-                    | SIN OPENCC anything_with_value CLOSECC {$$.type = 2;}
-                    | COS OPENCC anything_with_value CLOSECC {$$.type = 2;}
-                    | TAN OPENCC anything_with_value CLOSECC {$$.type = 2;}
+                        cout << "From anything_with_value Undeclared variable used " << $1.value << " at " << yylineno<< endl;
+                      }} UNIOP
+                    | SIN OPENCC anything_with_value CLOSECC {$$.type = 2;
+                    if($3.type != 1 && $3.type != 2){cout << "Sin input is out of range" << endl;}}
+                    | COS OPENCC anything_with_value CLOSECC {$$.type = 2;
+                    if($3.type != 1 && $3.type != 2){cout << "Sin input is out of range" << endl;}}
+                    | TAN OPENCC anything_with_value CLOSECC {$$.type = 2;
+                    if($3.type != 1 && $3.type != 2){cout << "Sin input is out of range" << endl;}}
                     ;
         
 operations : bi_op 
@@ -315,8 +330,17 @@ loop_stmt: LOOP OPENSQ check_rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_s
 
 /* UNIRARY OPERATION WITHOUT DOT */
 
-unary_operation_without_dot: single_variable {if (($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0) cout << "undeclaration error at " << yylineno << $1.value << endl;} UNIOP // { $1.type == int or double }
-                           | UNINEG check_rhs_exp
+unary_operation_without_dot: single_variable {if (($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0) cout << "undeclaration error at " << yylineno << $1.value << endl;
+                              if($1.type != 1 && $1.type != 2){
+                                cout << "From unary_operation_without_dot cant perform operation" << endl;
+                              }
+                              $$.type = $1.type;} UNIOP 
+                           | UNINEG check_rhs_exp {
+                            $$.type = 4;
+                            if ($2.type != 1 && $2.type !=2 && $2.type != 4){
+                              cout << "From unary_operation_without_dot invalid negation operation" << endl;
+                            }
+                           }
                            ;
 
 /* RETURN STATEMENT */
@@ -364,55 +388,93 @@ inbuilt_functions : rel_to_mag
                   | miscellaneous 
                   ;
 
-stand_id : ID {if(undeclare_check($1.value,convert_scope_to_string()) == 0){
-                          cout << "Undeclared variable used at " << yylineno << $1.value << endl;
-                        }}
+stand_id : ID {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
+                          cout << "From stand_id Undeclared variable used at " << yylineno << $1.value << endl;
+                        };
+                if($$.type != 11){
+                  cout << "From stand_id indentifier is of not mass datatype at " << yylineno << endl; 
+                }
+              }
 
-rel_to_mag : MAG OPENCU stand_id CLOSECU
-           | MAG OPENCU vectors CLOSECU
+rel_to_mag : MAG OPENCU stand_id CLOSECU {$$.type = 2;}
+           | MAG OPENCU vectors CLOSECU {$$.type = 2;}
            ;
 
-rel_to_pos : OPENCU stand_id CLOSECU SETR OPENCU check_rhs_exp CLOSECU
-           | OPENCU stand_id CLOSECU ADDR OPENCU check_rhs_exp CLOSECU
-           | OPENCU stand_id CLOSECU R_AFTER OPENCU check_rhs_exp CLOSECU
-           | OPENCU stand_id CLOSECU GETR
+rel_to_pos : OPENCU stand_id CLOSECU SETR OPENCU check_rhs_exp CLOSECU {if($6.type != 6 && $6.type != 10){
+  cout << "From rel_to_pos invalid statement" << endl;
+}}
+           | OPENCU stand_id CLOSECU ADDR OPENCU check_rhs_exp CLOSECU {if($6.type != 6 && $6.type != 10){
+  cout << "From rel_to_pos invalid statement" << endl;
+}}
+           | OPENCU stand_id CLOSECU R_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 6; if($6.type != 12 && $6.type != 1 && $6.type != 2){
+  cout << "From rel_to_pos invalid statement" << endl;
+}}
+           | OPENCU stand_id CLOSECU GETR {$$.type = 6;}
            ;
 
-rel_to_vel : OPENCU stand_id CLOSECU SETV OPENCU check_rhs_exp CLOSECU
-           | OPENCU stand_id CLOSECU ADDV OPENCU check_rhs_exp CLOSECU
-           | OPENCU stand_id CLOSECU V_AFTER OPENCU check_rhs_exp CLOSECU
-           | OPENCU stand_id CLOSECU GETV
+rel_to_vel : OPENCU stand_id CLOSECU SETV OPENCU check_rhs_exp CLOSECU {if($6.type != 5 && $6.type != 10){
+  cout << "From rel_to_vel invalid statement" << endl;
+}}
+           | OPENCU stand_id CLOSECU ADDV OPENCU check_rhs_exp CLOSECU {if($6.type != 5 && $6.type != 10){
+  cout << "From rel_to_vel invalid statement" << endl;
+}}
+           | OPENCU stand_id CLOSECU V_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 5; if($6.type != 12 && $6.type != 1 && $6.type != 2){
+  cout << "From rel_to_vel invalid statement" << endl;
+}}
+           | OPENCU stand_id CLOSECU GETV {$$.type = 5;}
            ; 
 
-rel_to_momentum : OPENCU stand_id CLOSECU SETP OPENCU check_rhs_exp CLOSECU
+rel_to_momentum : OPENCU stand_id CLOSECU SETP OPENCU check_rhs_exp CLOSECU {if($6.type != 9 && $6.type != 10){
+  cout << "From rel_to_momentum invalid statement" << endl;
+}}
                 ;
 
-rel_to_acc : OPENCU stand_id CLOSECU SETA OPENCU check_rhs_exp CLOSECU
-           | OPENCU stand_id CLOSECU ADDA OPENCU check_rhs_exp CLOSECU
-           | OPENCU stand_id CLOSECU GETA
+rel_to_acc : OPENCU stand_id CLOSECU SETA OPENCU check_rhs_exp CLOSECU {if($6.type != 7 && $6.type != 10){
+  cout << "From rel_to_acc invalid statement" << endl;
+}}
+           | OPENCU stand_id CLOSECU ADDA OPENCU check_rhs_exp CLOSECU {if($6.type != 7 && $6.type != 10){
+  cout << "From rel_to_acc invalid statement" << endl;
+}}
+           | OPENCU stand_id CLOSECU GETA {$$.type = 7;}
            ;
 
-rel_to_energy: OPENCU stand_id CLOSECU KE_AFTER OPENCU check_rhs_exp CLOSECU
-             | OPENCU stand_id CLOSECU PE_AFTER OPENCU check_rhs_exp CLOSECU
-             | OPENCU stand_id CLOSECU TE_AFTER OPENCU check_rhs_exp CLOSECU
+rel_to_energy: OPENCU stand_id CLOSECU KE_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 13 ;if($6.type != 12 && $6.type != 1 && $6.type != 2){
+  cout << "From rel_to_energy invalid statement" << endl;
+}}
+             | OPENCU stand_id CLOSECU PE_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 13 ;if($6.type != 12 && $6.type != 1 && $6.type != 2){
+  cout << "From rel_to_energy invalid statement" << endl;
+}}
+             | OPENCU stand_id CLOSECU TE_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 13 ;if($6.type != 12 && $6.type != 1 && $6.type != 2){
+  cout << "From rel_to_energy invalid statement" << endl;
+}}
              ;
 
-rel_to_angle: OPENCU stand_id CLOSECU ANGLE_AFTER OPENCU check_rhs_exp CLOSECU
+rel_to_angle: OPENCU stand_id CLOSECU ANGLE_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 14 ;if($6.type != 12 && $6.type != 1 && $6.type != 2){
+  cout << "From rel_to_angle invalid statement" << endl;
+}}
             ;
 
-rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id COMMA stand_id CLOSECU
-                | OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id CLOSECU
-                | OPENCU stand_id CLOSECU TIME_TO_COLLIDE OPENCU stand_id CLOSECU
+rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id COMMA ID CLOSECU {$$.type = 13;}
+                | OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id CLOSECU {$$.type = 13;}
+                | OPENCU stand_id CLOSECU TIME_TO_COLLIDE OPENCU stand_id CLOSECU {$$.type = 12 ;}
                 ;
 
-miscellaneous: OPENCU stand_id CLOSECU S_AFTER OPENCU check_rhs_exp CLOSECU
-             | OPENCU stand_id CLOSECU ROC_AFTER OPENCU check_rhs_exp CLOSECU
-             | OPENCU stand_id CLOSECU P_AFTER OPENCU check_rhs_exp CLOSECU
-             | OPENCU stand_id CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU
-             | OPENCU stand_id CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU
+miscellaneous: OPENCU stand_id CLOSECU S_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 8; if($6.type != 12 && $6.type != 1 && $6.type != 2){
+  cout << "From miscellaneous invalid statement" << endl;
+}}
+             | OPENCU stand_id CLOSECU ROC_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 2; if($6.type != 12 && $6.type != 1 && $6.type != 2){
+  cout << "From miscellaneous invalid statement" << endl;
+}}
+             | OPENCU stand_id CLOSECU P_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 9; if($6.type != 12 && $6.type != 1 && $6.type != 2){
+  cout << "From miscellaneous invalid statement" << endl;
+}}
+             | OPENCU stand_id CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU {$$.type = 12;}
+             | OPENCU stand_id CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU {$$.type = 12;}
              ; 
 
-term_misc : check_rhs_exp
+term_misc : check_rhs_exp {if($1.type != 1 && $1.type != 2){
+  cout << "From term_misc invalid statement" << endl;
+}}
           | QUESTION
           ;
 

@@ -3,7 +3,7 @@
 bool coercion(string type1, string type2){
 
   if(type1 == "int" && (type2 == "double" || type2 == "bool" || type2 == "int")) return true;
-  else if(type1 == "double" && (type2 == "double" || type2 == "bool" || type2 == "double")) return true;
+  else if(type1 == "double" && (type2 == "double" || type2 == "bool" || type2 == "int")) return true;
   else if(type1 == "string" && type2 == "string") return true;
   else if(type1 == "bool" && (type2 == "double" || type2 == "int" || type2 == "bool")) return true;
   else if(type1 == "velocity" && (type2 == "velocity" || type2 == "vector")) return true;
@@ -418,8 +418,5 @@ bool within_func_parameters_redeclaration(string name){
 
 //Type checking for assigning variables
 bool type_checking_assign(int type1, int type2){
-    if(type1 == type2){
-        return true;
-    }
-return false;
+    return coercion(get_string_type(type1),get_string_type(type2));
 }
