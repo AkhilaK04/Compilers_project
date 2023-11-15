@@ -3,7 +3,7 @@ using namespace std;
 
 extern char* yytext;
 bool q;
-string type;
+string type = "null";
 bool is_func_bool = false;
 int count_opencc = 0;
 int count_closecc = 0;
@@ -11,27 +11,26 @@ stack<string> curr;
 vector<int> curr_scopes(100000,0);
 int current_pointer = 0;
 
+int open_brackets = 0;
+int close_brackets = 0;
+
 void construct_stack(){
   curr.push("1");
   curr_scopes[0] = 1;
 }
 
 
-string convert_scope_to_string(int x){
-  string ans;
-  for(int i=0; i<x; i++){
+string convert_scope_to_string(){
+  string ans = to_string(curr_scopes[0]);
+
+  for(int i=1;i<=current_pointer;i++){
+    if(curr_scopes[i] == 0){
+      break;
+    }
+    else{
       ans.push_back('_');
       ans = ans + to_string(curr_scopes[i]);
-  }
-  return ans;
-} 
-
-int find_curr_scopes_len(vector<int> cur_scope){
-  int ans = 0;
-
-  for(int i=0; i<cur_scope.size(); i++){
-    if(curr_scopes[i] == 0) break;
-    else ans++;
+    }
   }
 
   return ans;
@@ -91,9 +90,10 @@ vector <function_records*> function_sym_table;
 
 bool bool_fn_var_entry(var_records* rec){
   string check = rec->name;
+  string scope = rec->scope;
 
     for(int i=0;i<var_list.size();i++){
-      if(check == var_list[i]->name){
+      if(check == var_list[i]->name && scope == var_list[i]->scope){
         return false;
       }
     }
@@ -109,20 +109,20 @@ void fn_var_entry(var_records* rec){
 
 bool  new_func_entry(string name, string result_type,int num_of_param, vector<par_records*> par_list,vector<var_records*>var_list){
 
-  if(valid_func_entry(name,par_list)){
+  // if(valid_func_entry(function_sym_table,name,par_list)){
     function_records* temp = new function_records;
     temp->name = name;
     temp->result_type = result_type;
     temp->num_of_param = num_of_param;
     temp->par_list = par_list;
     temp->var_list = var_list;
-    temp->scope = convert_scope_to_string(find_curr_scopes_len(curr_scopes));
+    temp->scope = convert_scope_to_string();
     function_sym_table.push_back(temp);
 
     return true;
-  }else{
-    return false;
-  }
+  // }else{
+    // return false;
+  // }
   
 }
 
@@ -132,7 +132,7 @@ void new_entry(string id_name,string data_type, string type) {
   temp->id_name = id_name;
 	temp->data_type = data_type;
 	temp->type = type;
-	temp->scope = convert_scope_to_string(find_curr_scopes_len(curr_scopes));
+	temp->scope = convert_scope_to_string();
   symbol_table.push_back(temp);
 }
 
@@ -164,30 +164,19 @@ bool search_in_symtab(string name) {
   return true;
 }
 
-void add(char c) {
-  // q = search_in_symtab(yytext);
-  // if(q) {
+void add(char c,string id) {
     if(c == 'V') {
-
-      q = search_in_symtab(yytext);
+      q = search_in_symtab(id);
+      cout << id << "23"<< endl;
       if(q){
-        new_entry(yytext,type,"Variable");
+        new_entry(id,type,"Variable");
       }else{
         cout<<"Error re defining variable"<<endl;
         //WRITE ERROR IN ERROR FN.
       }
     } 
-    // else if(c == 'K') {
-    //   new_entry(yytext,"N/A",scope,"Keyword");
-    // }    
-    // else if(c == 'H') {
-    //   new_entry(yytext,type,scope,"Header");
-    // }  
-    // else if(c == 'C') {
-    //   new_entry(yytext,"CONST",scope,"Constant");
-    // }  
     else if(c == 'F') {
-      new_entry(yytext,type,"Function");
+      new_entry(id,type,"Function");
     }
   // }
 }
