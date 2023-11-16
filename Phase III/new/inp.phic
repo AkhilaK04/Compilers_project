@@ -8,8 +8,6 @@ bool nextfn = {acceleration a, velocity v, time t} => {
 
 }
 
-
-
 bool nextfn_2 = {acceleration a, velocity v, time t} => {
 
     int a,b.
@@ -28,4 +26,50 @@ bool nextfn_2 = {acceleration a, velocity v, time t} => {
     SCOPECLOSE }
 
 
+}
+
+int solve = {acceleration a, velocity v, time t} =>{
+
+
+    int c.
+
+    string str = "fgf".
+
+    c = 5 + str.
+
+    int loop_var1.
+                
+    c = loop_var1 - 12.
+
+=> loop_var1.
+}
+
+bool solve = {int x, int y} =>{
+
+
+    string str1 = "Hello".
+    string str2 = "world".
+
+    string str3 = str2 -  str1.
+    
+=> 1.
+
+}
+
+
+
+velocity func = { bool b, double x, int b} => {
+
+
+acceleration a.
+velocity v.
+time t.
+
+bool temp = solve{a,v,t}.
+
+    => [12,4].
+}
+start {
+    int a,c.
+    output: solve{a,c} + 67.
 }
