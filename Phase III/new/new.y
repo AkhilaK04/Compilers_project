@@ -258,8 +258,12 @@ rhs_term : openccs anything_with_value {$$.type = $2.type;}
          | anything_with_value closeccs {$$.type = $1.type;}
          ;
 
-rhs_exp : rhs_term operations rhs_exp {$$.type = give_result_type($1.type,$2.value,$3.type);}
-        | anything_with_value operations rhs_exp {$$.type = give_result_type($1.type,$2.value,$3.type);}
+rhs_exp : rhs_term operations rhs_exp {cout << $1.type << ' ' << $2.value << ' '<< $3.type << endl;
+$$.type = give_result_type($1.type,$2.value,$3.type); 
+if($$.type == -1){cout << "From rhs_exp Invalid operation in rhs side " << $1.type << " " << $2.value << " "  << $3.type << " at " << yylineno << endl;}}
+        | anything_with_value operations rhs_exp {cout << $1.type << ' ' << $2.value << ' '<< $3.type << endl; 
+$$.type = give_result_type($1.type,$2.value,$3.type); 
+if($$.type == -1){cout << "From rhs_exp Invalid operation in rhs side " << $1.type << " " << $2.value << " " << $3.type << " at " << yylineno  << endl;}}
         | rhs_term
         | anything_with_value
         ;

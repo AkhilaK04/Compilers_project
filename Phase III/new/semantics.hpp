@@ -164,7 +164,12 @@ int find_return_type(string name,char** func_args_list,int present){
 }
 
 int give_result_type(int t1,string operation,int t2){
-  return t1;
+  if(coercion(get_string_type(t1),get_string_type(t2)) == 1){
+    return t1;
+  }
+  else{
+    return -1;
+  }
 }
 
 bool valid_func_entry(string name,vector<par_records*> &new_par_list){
@@ -175,9 +180,20 @@ bool valid_func_entry(string name,vector<par_records*> &new_par_list){
             //check for par-list (overloading.)
             vector<par_records*> curr_par_list = function_sym_table[i]->par_list;
             // sort(curr_par_list.begin(),curr_par_list.end(),compare_par_records);
-            if(curr_par_list == new_par_list) return false;
+
+            if(curr_par_list.size() == new_par_list.size()){
+              int counter = 0;
+              for(int j=0;j<curr_par_list.size();j++){
+                if(curr_par_list[j]->type != new_par_list[j]->type){
+                  counter = 1;
+                } 
+              }
+              if(counter == 0){
+                return false;
+              }
+            }
+        }
         }   
-    }
 return true;
 }
 
