@@ -60,6 +60,7 @@ SCOPECLOSE {
 
 {question} {
     yylval.object.value = strdup(yytext);
+    yylval.object.type = 16;
     return QUESTION;
 }
 

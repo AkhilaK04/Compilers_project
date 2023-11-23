@@ -400,32 +400,62 @@ stand_id : ID {if(($$.type = undeclare_check($1.value,convert_scope_to_string())
                 }
               }
 
-rel_to_mag : MAG OPENCU stand_id CLOSECU {$$.type = 2;}
-           | MAG OPENCU vectors CLOSECU {$$.type = 2;}
+rel_to_mag : MAG OPENCU check_rhs_exp CLOSECU {
+              $$.type = 2;
+              if(!std_lib_semantics($1.value,0,{$3.type})){
+                cout<<"Invalid use of std-lib : mag"<<endl;
+              }
+            }
+          
            ;
 
-rel_to_pos : OPENCU stand_id CLOSECU SETR OPENCU check_rhs_exp CLOSECU {if($6.type != 6 && $6.type != 10){
-  cout << "From rel_to_pos invalid statement" << endl;
-}}
-           | OPENCU stand_id CLOSECU ADDR OPENCU check_rhs_exp CLOSECU {if($6.type != 6 && $6.type != 10){
-  cout << "From rel_to_pos invalid statement" << endl;
-}}
-           | OPENCU stand_id CLOSECU R_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 6; if($6.type != 12 && $6.type != 1 && $6.type != 2){
-  cout << "From rel_to_pos invalid statement" << endl;
-}}
-           | OPENCU stand_id CLOSECU GETR {$$.type = 6;}
+rel_to_pos : OPENCU stand_id CLOSECU SETR OPENCU check_rhs_exp CLOSECU {
+  
+              if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                cout<<"Invalid use of std-lib : setr"<<endl;
+              }
+            }
+           | OPENCU stand_id CLOSECU ADDR OPENCU check_rhs_exp CLOSECU {
+              if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                cout<<"Invalid use of std-lib : addr"<<endl;
+              }
+            }
+           | OPENCU stand_id CLOSECU R_AFTER OPENCU check_rhs_exp CLOSECU {
+              $$.type = 6; 
+              if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                cout<<"Invalid use of std-lib : r_after"<<endl;
+              }
+            }
+           | OPENCU stand_id CLOSECU GETR {
+              $$.type = 6;
+              if(!std_lib_semantics($4.value,$2.type,{})){
+                cout<<"Invalid use of std-lib : get_r"<<endl;
+              }
+            }
            ;
 
-rel_to_vel : OPENCU stand_id CLOSECU SETV OPENCU check_rhs_exp CLOSECU {if($6.type != 5 && $6.type != 10){
-  cout << "From rel_to_vel invalid statement" << endl;
-}}
-           | OPENCU stand_id CLOSECU ADDV OPENCU check_rhs_exp CLOSECU {if($6.type != 5 && $6.type != 10){
-  cout << "From rel_to_vel invalid statement" << endl;
-}}
-           | OPENCU stand_id CLOSECU V_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 5; if($6.type != 12 && $6.type != 1 && $6.type != 2){
-  cout << "From rel_to_vel invalid statement" << endl;
-}}
-           | OPENCU stand_id CLOSECU GETV {$$.type = 5;}
+rel_to_vel : OPENCU stand_id CLOSECU SETV OPENCU check_rhs_exp CLOSECU {
+            if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                cout<<"Invalid use of std-lib : setv"<<endl;
+            }
+          }
+           | OPENCU stand_id CLOSECU ADDV OPENCU check_rhs_exp CLOSECU {
+            if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                cout<<"Invalid use of std-lib : setv"<<endl;
+            }
+          }
+           | OPENCU stand_id CLOSECU V_AFTER OPENCU check_rhs_exp CLOSECU {
+            $$.type = 5; 
+            if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                cout<<"Invalid use of std-lib : v_after"<<endl;
+            }
+          }
+           | OPENCU stand_id CLOSECU GETV {
+            $$.type = 5;
+            if(!std_lib_semantics($4.value,$2.type,{})){
+                cout<<"Invalid use of std-lib : get_v"<<endl;
+            }
+          }
            ; 
 
 rel_to_momentum : OPENCU stand_id CLOSECU SETP OPENCU check_rhs_exp CLOSECU {if($6.type != 9 && $6.type != 10){
@@ -433,47 +463,119 @@ rel_to_momentum : OPENCU stand_id CLOSECU SETP OPENCU check_rhs_exp CLOSECU {if(
 }}
                 ;
 
-rel_to_acc : OPENCU stand_id CLOSECU SETA OPENCU check_rhs_exp CLOSECU {if($6.type != 7 && $6.type != 10){
-  cout << "From rel_to_acc invalid statement" << endl;
-}}
-           | OPENCU stand_id CLOSECU ADDA OPENCU check_rhs_exp CLOSECU {if($6.type != 7 && $6.type != 10){
-  cout << "From rel_to_acc invalid statement" << endl;
-}}
-           | OPENCU stand_id CLOSECU GETA {$$.type = 7;}
+rel_to_acc : OPENCU stand_id CLOSECU SETA OPENCU check_rhs_exp CLOSECU {
+            if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                cout<<"Invalid use of std-lib : seta"<<endl;
+            }
+          }
+           | OPENCU stand_id CLOSECU ADDA OPENCU check_rhs_exp CLOSECU {
+            if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                cout<<"Invalid use of std-lib : adda"<<endl;
+            }
+          }
+           | OPENCU stand_id CLOSECU GETA {
+            $$.type = 7;
+            if(!std_lib_semantics($4.value,$2.type,{})){
+                cout<<"Invalid use of std-lib : get_a"<<endl;
+            }
+          }
            ;
 
-rel_to_energy: OPENCU stand_id CLOSECU KE_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 13 ;if($6.type != 12 && $6.type != 1 && $6.type != 2){
-  cout << "From rel_to_energy invalid statement" << endl;
-}}
-             | OPENCU stand_id CLOSECU PE_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 13 ;if($6.type != 12 && $6.type != 1 && $6.type != 2){
-  cout << "From rel_to_energy invalid statement" << endl;
-}}
-             | OPENCU stand_id CLOSECU TE_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 13 ;if($6.type != 12 && $6.type != 1 && $6.type != 2){
-  cout << "From rel_to_energy invalid statement" << endl;
-}}
+rel_to_energy: OPENCU stand_id CLOSECU KE_AFTER OPENCU check_rhs_exp CLOSECU {
+              $$.type = 13 ;
+              if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                cout<<"Invalid use of std-lib : KE AFTER"<<endl;
+              }
+            }
+             | OPENCU stand_id CLOSECU PE_AFTER OPENCU check_rhs_exp CLOSECU {
+              $$.type = 13 ;
+              if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                cout<<"Invalid use of std-lib : KE AFTER"<<endl;
+              }
+            }
+             | OPENCU stand_id CLOSECU TE_AFTER OPENCU check_rhs_exp CLOSECU {
+              $$.type = 13 ;
+              if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                cout<<"Invalid use of std-lib : KE AFTER"<<endl;
+              }
+            }
              ;
 
-rel_to_angle: OPENCU stand_id CLOSECU ANGLE_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 14 ;if($6.type != 12 && $6.type != 1 && $6.type != 2){
-  cout << "From rel_to_angle invalid statement" << endl;
-}}
+rel_to_angle: OPENCU stand_id CLOSECU ANGLE_AFTER OPENCU check_rhs_exp CLOSECU {
+            $$.type = 14;
+            if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                cout<<"Invalid use of std-lib : angle()"<<endl;
+              }
+            }
             ;
 
-rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id COMMA ID CLOSECU {$$.type = 13;}
-                | OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id CLOSECU {$$.type = 13;}
-                | OPENCU stand_id CLOSECU TIME_TO_COLLIDE OPENCU stand_id CLOSECU {$$.type = 12 ;}
+rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id COMMA ID CLOSECU {
+                $$.type = 13;
+
+                  if(!std_lib_semantics($4.value,$2.type,{$6.type,$8.type})){
+                  cout<<"Invalid use of std-lib : collide with e"<<endl;
+                  }
+                }
+                | OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id CLOSECU {
+                  $$.type = 13;
+                  if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                  cout<<"Invalid use of std-lib : collide without e"<<endl;
+                  }
+                }
+                | OPENCU stand_id CLOSECU TIME_TO_COLLIDE OPENCU stand_id CLOSECU {
+                  $$.type = 12 ;
+                  if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                  cout<<"Invalid use of std-lib : time to collide."<<endl;
+                  }
+                }
                 ;
 
-miscellaneous: OPENCU stand_id CLOSECU S_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 8; if($6.type != 12 && $6.type != 1 && $6.type != 2){
-  cout << "From miscellaneous invalid statement" << endl;
-}}
-             | OPENCU stand_id CLOSECU ROC_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 2; if($6.type != 12 && $6.type != 1 && $6.type != 2){
-  cout << "From miscellaneous invalid statement" << endl;
-}}
-             | OPENCU stand_id CLOSECU P_AFTER OPENCU check_rhs_exp CLOSECU {$$.type = 9; if($6.type != 12 && $6.type != 1 && $6.type != 2){
-  cout << "From miscellaneous invalid statement" << endl;
-}}
-             | OPENCU stand_id CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU {$$.type = 12;}
-             | OPENCU stand_id CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU {$$.type = 12;}
+miscellaneous: OPENCU stand_id CLOSECU S_AFTER OPENCU check_rhs_exp CLOSECU {
+              $$.type = 8; 
+              if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                  cout<<"Invalid use of std-lib : s_after"<<endl;
+                }
+              }
+             | OPENCU stand_id CLOSECU ROC_AFTER OPENCU check_rhs_exp CLOSECU {
+              $$.type = 2; 
+              if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                  cout<<"Invalid use of std-lib : roc_after(time)."<<endl;
+                }
+              }
+             | OPENCU stand_id CLOSECU P_AFTER OPENCU check_rhs_exp CLOSECU {
+              $$.type = 9;
+              if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                  cout<<"Invalid use of std-lib : p_after(time)."<<endl;
+                }
+              }
+             | OPENCU stand_id CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU {
+              $$.type = 12;
+              if(!std_lib_semantics($4.value,$2.type,{$6.type,$8.type})){
+                  cout<<"Invalid use of std-lib : time_to_r()."<<endl;
+                }
+
+              }
+             | OPENCU stand_id CLOSECU TIME_TO_R OPENCU check_rhs_exp CLOSECU {
+              $$.type = 12;
+              if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                  cout<<"Invalid use of std-lib : time_to_r()."<<endl;
+                }
+
+              }
+
+             | OPENCU stand_id CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU {
+              $$.type = 12;
+              if(!std_lib_semantics($4.value,$2.type,{$6.type,$8.type})){
+                  cout<<"Invalid use of std-lib : time_to_v()."<<endl;
+                }
+              }
+
+             | OPENCU stand_id CLOSECU TIME_TO_V OPENCU check_rhs_exp CLOSECU {
+              $$.type = 12;
+              if(!std_lib_semantics($4.value,$2.type,{$6.type})){
+                  cout<<"Invalid use of std-lib : time_to_v()."<<endl;
+                }
+              }
              ; 
 
 term_misc : check_rhs_exp {if($1.type != 1 && $1.type != 2){
@@ -576,7 +678,7 @@ void yyerror(char* s){
 int main(int argc ,char * argv[]){
     char inp_file[100],tok[100],parse[100];
 
-    sprintf(inp_file,"inp.phic");
+    sprintf(inp_file,"inp_std_checks.phic");
 
     yyin = fopen(inp_file,"r");
 
