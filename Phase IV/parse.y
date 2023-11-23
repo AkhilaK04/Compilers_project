@@ -6,7 +6,7 @@ extern FILE *yyin, *tokfile, *parsefile, *outfile ;
 extern int yylineno;
 int yylex();
 void yyerror(char *s);
-bool arr_check=false;
+bool arr_check = false;
 int dim_count = 0;
 %}
 
@@ -175,29 +175,33 @@ datatypes : primi_datatype
 
 /* DECLARATION STATEMENT needed things */
 
-single_variable : ID 
-                | ID dimensions 
+single_variable : ID { fprintf(outfile,"%s", $1); arr_check = false;}
+                | ID { fprintf(outfile,"%s", $1); arr_check = true; } dimensions 
                 ;
 
-dimensions : OPENSQ check_rhs_exp CLOSESQ {
+dim_con : OPENSQ {fprintf(outfile, "[");} ;
+
+dimensions : dim_con check_rhs_exp CLOSESQ {
+              fprintf(outfile, "]");
               if($2.type == 1){
                 $$.type = 10;
-                dim_count++;
               }
               else{
                 cout << "Invalid dimension in line " << yylineno << endl;
               }
+              dim_count++;
               }
            | dim_con check_rhs_exp CLOSESQ {fprintf(outfile, "]");} dimensions{
               if($2.type == 1){
                 $$.type = 10;
-                dim_count++;
               }
               else{
                 cout << "Invalid dimension in line " << yylineno << endl;
               }
+              dim_count++;
            }
            ;
+
 
 /* EXPRESSION STATEMENT */
 
