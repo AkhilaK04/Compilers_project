@@ -78,6 +78,9 @@ int give_type_index(string type){
   else if(type == "e"){
     return 15;
   }
+  else if(type == "?"){
+    return 16;
+  }
   else{
     cout << "dont_know" << endl;
     return -1;
@@ -129,6 +132,9 @@ string get_string_type(int type){
   }
   else if(type == 15){
     return "e";
+  }
+  else if(type == 16){
+    return "?";
   }
   else{
     cout << "dontknow" << endl;
@@ -221,7 +227,7 @@ bool check_func_args(string name,char** func_args_list,int present){ //fn name, 
 return false;
 }
 
-bool std_lib_semantics (string name,string ID1,vector<string> ID2){
+bool std_lib_semantics (string name,int ID1,vector<int> ID2){
 
     //int_const,float_const,vec_const
     // note.  IN MISC LAST: vec_const can have ? as input arg.!!
@@ -229,100 +235,115 @@ bool std_lib_semantics (string name,string ID1,vector<string> ID2){
     if(ID2.size() == 2){
         // collide function.
         bool rhs1;
-        if(ID2[1] == "e" || ID2[1] == "int" ) rhs1 = true; 
-        if(name == "collide" || ID1 == "mass" && ID2[1] == "mass" && rhs1){
+        if(get_string_type(ID2[1]) == "e" || get_string_type(ID2[1]) == "int" ) rhs1 = true; 
+        if(name == "collide" || get_string_type(ID1) == "mass" && get_string_type(ID2[1]) == "mass" && rhs1){
+            return true;
+        }
+
+      //Misc time_to WITH '?'.
+
+        else if((name == "time_to_r") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "int" || get_string_type(ID2[0]) == "double" || get_string_type(ID2[0]) == "?") && (get_string_type(ID2[1]) == "int" || get_string_type(ID2[1]) == "double" || get_string_type(ID2[1]) == "?") && !(get_string_type(ID2[1]) == "?" && get_string_type(ID2[0]) == "?")){
+            return true;
+        }
+        else if((name == "time_to_v") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "int" || get_string_type(ID2[0]) == "double" || get_string_type(ID2[0]) == "?") && (get_string_type(ID2[1]) == "int" || get_string_type(ID2[1]) == "double" || get_string_type(ID2[1]) == "?") && !(get_string_type(ID2[1]) == "?" && get_string_type(ID2[0]) == "?")){
             return true;
         }
         cout<<"ERROR in type check of Function args in collide!!"<<endl;
     return false;
-    }else if(ID2.size() == 0){
+    }
+    // else if(ID2.size() == 0){
+
+    // return false;
+    // }
+    else{
+        //MAG
+
+        if(name == "mag" && (get_string_type(ID2[0]) == "velocity" || get_string_type(ID2[0]) == "position" || 
+                            get_string_type(ID2[0]) == "acceleration" || get_string_type(ID2[0]) == "momentum" || 
+                            get_string_type(ID2[0]) == "distance" || get_string_type(ID2[0]) == "vector" ||
+                            get_string_type(ID2[0]) == "energy" )){
+            return true;
+        }
+
         //GET R
-        if(name == "getr" && ID1 == "mass"){
+        else if(name == "getr" && get_string_type(ID1) == "mass"){
             return true;
         }
         // GET V
-        else if(name == "getv" && ID1 == "mass"){
+        else if(name == "getv" && get_string_type(ID1) == "mass"){
             return true;
         }
 
         //GET A
-        else if(name == "geta" && ID1 == "mass"){
-            return true;
-        }
-
-    return false;
-    }else{
-        //MAG
-
-        if(name == "mag" && ID1 == "mass" && (ID2[0] == "velocity" || ID2[0] == "position" || ID2[0] == "acceleration" || ID2[0] == "momentum" || ID2[0] == "distance")){
+        else if(name == "geta" && get_string_type(ID1) == "mass"){
             return true;
         }
 
         //SET_R ADD_R
-        else if((name == "addr"|| name == "setr") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vector")){
+        else if((name == "addr"|| name == "setr") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "position" || get_string_type(ID2[0]) == "vector")){
             return true;
         }
 
-        //GET R
-        else if((name == "addr"|| name == "setr") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vector")){
-            return true;
-        }
+        // //GET R
+        // else if((name == "addr"|| name == "setr") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "position" || get_string_type(ID2[0]) == "vector")){
+        //     return true;
+        // }
 
         //R_AFTER.
-        else if(name == "r_after" && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double" )){
+        else if(name == "r_after" && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "time" || get_string_type(ID2[0]) == "int" || get_string_type(ID2[0]) == "double" )){
             return true;
         }
 
         //SET_V ADD_V
-        else if((name == "setv" || name == "addv") && ID1 == "mass" && (ID2[0] == "velocity" || ID2[0] == "vector") ){
+        else if((name == "setv" || name == "addv") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "velocity" || get_string_type(ID2[0]) == "vector") ){
             return true;
         }
 
         //V_AFTER (time)
-        else if((name == "v_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double") ){
+        else if((name == "v_after") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "time" || get_string_type(ID2[0]) == "int" || get_string_type(ID2[0]) == "double") ){
             return true;
         }
 
         //V_AFTER (distance)
-        else if((name == "v_after") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vector") ){
+        else if((name == "v_after") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "position" || get_string_type(ID2[0]) == "vector") ){
             return true;
         }
 
         //SET_A ADD_A
-        else if((name == "seta" || name == "adda") && ID1 == "mass" && (ID2[0] == "acceleration" || ID2[0] == "vector")){
+        else if((name == "seta" || name == "adda") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "acceleration" || get_string_type(ID2[0]) == "vector")){
             return true;
         }
 
         // ENERGY KE,PE,TE
-        else if((name == "ke_after" || name == "pe_after" || name == "te_after")  && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double" )){
+        else if((name == "ke_after" || name == "pe_after" || name == "te_after")  && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "time" || get_string_type(ID2[0]) == "int" || get_string_type(ID2[0]) == "double" )){
         return true;
         }
 
         //angle (time)
-        else if((name == "angle_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double" ) ){
+        else if((name == "angle_after") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "time" || get_string_type(ID2[0]) == "int" || get_string_type(ID2[0]) == "double" ) ){
             return true;
         }
 
         //angle (distance)
-        else if((name == "angle_after") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vector") ){
+        else if((name == "angle_after") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "position" || get_string_type(ID2[0]) == "vector") ){
             return true;
         }
 
         //collision
-        else if((name == "collide" || name == "time_to_collide") && ID1 == "mass" && ID2[0] == "mass"){
+        else if((name == "collide" || name == "time_to_collide") && get_string_type(ID1) == "mass" && get_string_type(ID2[0]) == "mass"){
             return true;
         }
 
         // Misc Time:
-        else if((name == "s_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double" ) ){
+        else if((name == "s_after") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "time" || get_string_type(ID2[0]) == "int" || get_string_type(ID2[0]) == "double" ) ){
             return true;
         }
 
-        else if((name == "roc_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double") ){
+        else if((name == "roc_after") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "time" ||get_string_type(ID2[0]) == "int" || get_string_type(ID2[0]) == "double") ){
             return true;
         }
 
-        else if((name == "p_after") && ID1 == "mass" && (ID2[0] == "time" || ID2[0] == "int" || ID2[0] == "double" ) ){
+        else if((name == "p_after") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0])== "time" || get_string_type(ID2[0]) == "int" || get_string_type(ID2[0]) == "double" ) ){
             return true;
         }
 
@@ -331,16 +352,23 @@ bool std_lib_semantics (string name,string ID1,vector<string> ID2){
         //////////////  NEED TO CHECK ON ADDING '?' //////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////
 
-         else if((name == "time_to_r") && ID1 == "mass" && (ID2[0] == "position" || ID2[0] == "vector")){
+         else if((name == "time_to_r") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "position" || get_string_type(ID2[0]) == "vector")){
             return true;
         }
 
-        else if((name == "time_to_v") && ID1 == "mass" && (ID2[0] == "velocity" || ID2[0] == "vector")){
+        // else if((name == "time_to_r") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "int" || get_string_type(ID2[0]) == "double" || get_string_type(ID2[0]) == "?") && (get_string_type(ID2[1]) == "int" || get_string_type(ID2[1]) == "double" || get_string_type(ID2[1]) == "?") && !(get_string_type(ID2[1]) == "?" && get_string_type(ID2[0]) == "?")){
+        //     return true;
+        // }
+
+        else if((name == "time_to_v") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "velocity" || get_string_type(ID2[0]) == "vector")){
             return true;
         }
+
+        // else if((name == "time_to_v") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "int" || get_string_type(ID2[0]) == "double" || get_string_type(ID2[0]) == "?") && (get_string_type(ID2[1]) == "int" || get_string_type(ID2[1]) == "double" || get_string_type(ID2[1]) == "?") && !(get_string_type(ID2[1]) == "?" && get_string_type(ID2[0]) == "?")){
+        //     return true;
+        // }
     }
 
-cout<<"Errors! no std library found"<<endl;
 return false;
 }
 

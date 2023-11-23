@@ -1,0 +1,47 @@
+bool nextfn ={acceleration a, velocity v, time t} =>{
+
+    mass m1.
+    int xx.
+    velocity x.
+    position y.
+    acceleration z.
+    time w.
+
+    mag {[1,2]}. 
+    
+    mag {x}.
+
+    {m1} setr {x}.
+    {m1} setr {y}.
+    {m1} setr {z}.
+    {m1} setr {[1,2]}.
+
+    {m1} r_after {w}.
+
+    {m1} v_after {w}.
+    {m1} v_after {y}.
+
+    {m1} ke_after {w}.
+    {m1} pe_after {w}.
+    {m1} te_after {w}.
+
+    {m1} angle_after {w}.
+    {m1} angle_after {y}.
+    
+    {m1} collide {m1,xx}.
+    {m1} collide {m1}.
+
+    {m1} time_to_collide {m1}.
+
+    {m1} s_after {w}.
+
+    {m1} roc_after {w}.
+
+    {m1} p_after {w}.
+
+    {m1} time_to_r {y}.
+
+    {m1} time_to_v {x}.
+
+    {m1} getr.
+}

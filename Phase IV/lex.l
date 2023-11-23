@@ -41,7 +41,6 @@ question ("?")
 
 \$[ \t\n]*[^$]*[ \t\n]*\$ {
     yylval.object.value = strdup(yytext);
-    // fprintf(outfile, "%s", yytext);
     return CMT;
 }
 
@@ -62,6 +61,7 @@ SCOPECLOSE {
 
 {question} {
     yylval.object.value = strdup(yytext);
+    yylval.object.type = 16;
     return QUESTION;
 }
 
@@ -242,7 +242,7 @@ SCOPECLOSE {
 }
 
 [ \t] {
-    fprintf(outfile, "%s", yytext);
+	fprintf(outfile, "%s", yytext);
 }
 
 [\n]  { yylineno++; fprintf(outfile, "%s", yytext);}
