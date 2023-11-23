@@ -7,6 +7,11 @@ bool nextfn = {acceleration a, velocity v, time t} => {
     return_val = nextfn{ u_old1 , fn2{a,b,c} }.
 
 }
+$ SJFISHFRFJKF $
+
+$ bfrijfrfhrofjoer
+sdfsdifp
+gnirjore $
 
 bool nextfn_2 = {acceleration a, velocity v, time t} => {
 
@@ -65,7 +70,7 @@ acceleration a.
 velocity v.
 time t.
 
-bool temp = solve{a,v,t}.
+int temp = solve{a,v,t}.
 
     => [12,4].
 }

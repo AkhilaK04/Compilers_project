@@ -5,6 +5,7 @@
     int yylex();
     FILE* tokfile;
     FILE* parsefile;
+    FILE* outfile;
 %}
 
 arrow ("->")
@@ -40,6 +41,7 @@ question ("?")
 
 \$[ \t\n]*[^$]*[ \t\n]*\$ {
     yylval.object.value = strdup(yytext);
+    // fprintf(outfile, "%s", yytext);
     return CMT;
 }
 
@@ -240,10 +242,10 @@ SCOPECLOSE {
 }
 
 [ \t] {
-
+    fprintf(outfile, "%s", yytext);
 }
 
-[\n]  { yylineno++;}
+[\n]  { yylineno++; fprintf(outfile, "%s", yytext);}
 
 . {
 	fprintf(tokfile,"ERROR! Invalid token");
