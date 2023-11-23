@@ -249,7 +249,11 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
+<<<<<<< HEAD
 #line 11 "parse.y"
+=======
+#line 13 "parse.y"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 	struct variable {
 		char* value;

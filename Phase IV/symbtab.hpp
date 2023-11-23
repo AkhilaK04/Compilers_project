@@ -1,4 +1,8 @@
 #include <bits/stdc++.h>
+<<<<<<< HEAD
+=======
+
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 using namespace std;
 
 extern char* yytext;
@@ -52,7 +56,14 @@ struct var_records{
   string name;
   string type;
   string scope;
+<<<<<<< HEAD
 };
+=======
+  string arr_type;
+  int dim_countt;
+};
+
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 typedef struct var_records var_records;
 vector <var_records*> var_list;
 vector<string> func_args_list;
@@ -203,7 +214,11 @@ void print_table(){
 
 void print_function_table() {
     printf("\n\n");
+<<<<<<< HEAD
     printf("NAME   RETURNTYPE   NO_OF_PARAM  PAR_LIST   VAR_LIST  SCOPE \n");
+=======
+    printf("NAME   RETURNTYPE   NO_OF_PARAM  PAR_LIST   VAR_LIST  SCOPE  ARRAY_TYPE  DIMENSIONS\n");
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     printf("______________________________________________________________\n\n");
     
     for (int i = 0; i < function_sym_table.size(); i++) {
@@ -217,16 +232,29 @@ void print_function_table() {
                 cout << ", ";
             }
         }
+<<<<<<< HEAD
         cout << "]\n";
         
         // Print the variable list
         cout << "[\n";
         for (int j = 0; j < function_sym_table[i]->var_list.size(); j++) {
             cout << "(" << function_sym_table[i]->var_list[j]->name << ", " << function_sym_table[i]->var_list[j]->type << ", " << function_sym_table[i]->var_list[j]->scope << ")\n";
+=======
+        cout << "]   ";
+        
+        // Print the variable list
+        cout << "[";
+        for (int j = 0; j < function_sym_table[i]->var_list.size(); j++) {
+            cout << "(" << function_sym_table[i]->var_list[j]->name << ", " << function_sym_table[i]->var_list[j]->type << ", " << function_sym_table[i]->var_list[j]->scope << ", " << function_sym_table[i]->var_list[j]->dim_countt << " )\n";
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
             if (j < function_sym_table[i]->var_list.size() - 1) {
                 cout << ", ";
             }
         }
+<<<<<<< HEAD
         cout << "]\n   " << /* Add scope information here */ endl;
+=======
+        cout << "]   " << /* Add scope information here */ endl;
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     }
 }

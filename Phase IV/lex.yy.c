@@ -619,9 +619,14 @@ char *yytext;
     int yylex();
     FILE* tokfile;
     FILE* parsefile;
+<<<<<<< HEAD
     FILE* outfile;
 #line 624 "lex.yy.c"
 #line 625 "lex.yy.c"
+=======
+#line 623 "lex.yy.c"
+#line 624 "lex.yy.c"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 #define INITIAL 0
 
@@ -838,10 +843,17 @@ YY_DECL
 		}
 
 	{
+<<<<<<< HEAD
 #line 40 "lex.l"
 
 
 #line 845 "lex.yy.c"
+=======
+#line 39 "lex.l"
+
+
+#line 844 "lex.yy.c"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -901,16 +913,26 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 42 "lex.l"
 {
     yylval.object.value = strdup(yytext);
     // fprintf(outfile, "%s", yytext);
+=======
+#line 41 "lex.l"
+{
+    yylval.object.value = strdup(yytext);
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     return CMT;
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 48 "lex.l"
+=======
+#line 46 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext);
     return SCOPEOPEN;
@@ -918,7 +940,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 53 "lex.l"
+=======
+#line 51 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext);
     return SCOPECLOSE;
@@ -926,7 +952,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 58 "lex.l"
+=======
+#line 56 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext);
     return START;
@@ -934,7 +964,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 63 "lex.l"
+=======
+#line 61 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext);
     return QUESTION;
@@ -942,7 +976,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 68 "lex.l"
+=======
+#line 66 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     if(strcmp(yytext,"int") == 0){
         yylval.object.value = strdup(yytext);
@@ -968,7 +1006,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 91 "lex.l"
+=======
+#line 89 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     if(strcmp(yytext,"mass") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 11; return MASS;}
     else if(strcmp(yytext,"time") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 12; return TIME;}
@@ -984,7 +1026,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 104 "lex.l"
+=======
+#line 102 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     if(strcmp(yytext,"input") == 0) {yylval.object.value = strdup(yytext); return INPUT;}
     else if(strcmp(yytext,"output") == 0) {yylval.object.value = strdup(yytext); return OUTPUT;}
@@ -1029,7 +1075,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 148 "lex.l"
+=======
+#line 146 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     if(strcmp(yytext,"(") == 0) {yylval.object.value = strdup(yytext); return OPENCC;}
     else if(strcmp(yytext,")") == 0) {yylval.object.value = strdup(yytext); return CLOSECC;}
@@ -1042,7 +1092,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 158 "lex.l"
+=======
+#line 156 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     if(strcmp(yytext,"\"") == 0) {yylval.object.value = strdup(yytext); return DOUBLE_QUOTE;}
     else if(strcmp(yytext,"'") == 0) {yylval.object.value = strdup(yytext); return SINGLE_QUOTE;}
@@ -1053,7 +1107,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 166 "lex.l"
+=======
+#line 164 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext); 
     return ARROW;
@@ -1061,7 +1119,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 171 "lex.l"
+=======
+#line 169 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     if(strcmp(yytext,"+") == 0) {yylval.object.value = strdup(yytext); return ADD;}
     else if(strcmp(yytext,"-") == 0) {yylval.object.value = strdup(yytext); return SUB;}
@@ -1073,7 +1135,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 180 "lex.l"
+=======
+#line 178 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     if(strcmp(yytext,"==") == 0) {yylval.object.value = strdup(yytext); return EQ;}
     else if(strcmp(yytext,"!=") == 0) {yylval.object.value = strdup(yytext); return NEQ;}
@@ -1085,7 +1151,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 189 "lex.l"
+=======
+#line 187 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext); 
     return LOGICOP; 
@@ -1093,7 +1163,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 194 "lex.l"
+=======
+#line 192 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext); 
     return UNIOP; 
@@ -1101,7 +1175,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 199 "lex.l"
+=======
+#line 197 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext); 
     return UNINEG; 
@@ -1109,7 +1187,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 204 "lex.l"
+=======
+#line 202 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext); 
     return ASSGN; 
@@ -1117,7 +1199,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 209 "lex.l"
+=======
+#line 207 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext); 
     return DARR; 
@@ -1125,7 +1211,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 214 "lex.l"
+=======
+#line 212 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext); 
     yylval.object.type = 1;
@@ -1134,7 +1224,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 220 "lex.l"
+=======
+#line 218 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext); 
     yylval.object.type = 1;
@@ -1143,7 +1237,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 226 "lex.l"
+=======
+#line 224 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext); 
     yylval.object.type = 2;
@@ -1152,7 +1250,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 233 "lex.l"
+=======
+#line 231 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext); 
     return ID;
@@ -1161,7 +1263,11 @@ YY_RULE_SETUP
 case 23:
 /* rule 23 can match eol */
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 238 "lex.l"
+=======
+#line 236 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
     yylval.object.value = strdup(yytext); 
     yylval.object.type = 3;
@@ -1170,20 +1276,35 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 244 "lex.l"
 {
     fprintf(outfile, "%s", yytext);
+=======
+#line 242 "lex.l"
+{
+
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 }
 	YY_BREAK
 case 25:
 /* rule 25 can match eol */
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 248 "lex.l"
 { yylineno++; fprintf(outfile, "%s", yytext);}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 250 "lex.l"
+=======
+#line 246 "lex.l"
+{ yylineno++;}
+	YY_BREAK
+case 26:
+YY_RULE_SETUP
+#line 248 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 {
 	fprintf(tokfile,"ERROR! Invalid token");
     return 0; 
@@ -1191,10 +1312,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 254 "lex.l"
 ECHO;
 	YY_BREAK
 #line 1198 "lex.yy.c"
+=======
+#line 252 "lex.l"
+ECHO;
+	YY_BREAK
+#line 1196 "lex.yy.c"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2199,7 +2327,11 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
+<<<<<<< HEAD
 #line 254 "lex.l"
+=======
+#line 252 "lex.l"
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 int yywrap(){

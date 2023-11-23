@@ -27,7 +27,11 @@ Grammar
    10     | call_stmt_with_dot body
    11     | conditional_stmt body
    12     | loop_stmt body
+<<<<<<< HEAD
    13     | unary_operation_without_dot DOT
+=======
+   13     | unary_operation_without_dot DOT body
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
    14     | return_stmt body
    15     | comments body
    16     | output_stmt body
@@ -38,6 +42,7 @@ Grammar
 
    20 $@4: ε
 
+<<<<<<< HEAD
    21 $@5: ε
 
    22 $@6: ε
@@ -342,12 +347,250 @@ Grammar
   218 $@46: ε
 
   219 parameters: datatypes ID $@45 COMMA $@46 parameters
+=======
+   21 body: SCOPEOPEN $@3 OPENCU body SCOPECLOSE $@4 CLOSECU body
+   22     | inbuilt_functions_with_dot body
+   23     | decl_stmt_with_exp body
+
+   24 loop_body: exp_stmt loop_body
+   25          | call_stmt_with_dot loop_body
+   26          | conditional_stmt loop_body
+   27          | loop_stmt loop_body
+   28          | unary_operation_without_dot DOT loop_body
+   29          | return_stmt loop_body
+   30          | comments loop_body
+   31          | output_stmt loop_body
+   32          | input_stmt loop_body
+   33          | ε
+
+   34 $@5: ε
+
+   35 $@6: ε
+
+   36 loop_body: SCOPEOPEN $@5 OPENCU loop_body SCOPECLOSE $@6 CLOSECU body
+   37          | inbuilt_functions_with_dot loop_body
+   38          | decl_stmt_with_exp loop_body
+   39          | BREAK DOT loop_body
+
+   40 bi_op: ADD
+   41      | SUB
+   42      | MUL
+   43      | DIV
+   44      | MOD
+   45      | EXP
+
+   46 relop: EQ
+   47      | NEQ
+   48      | GEQ
+   49      | GT
+   50      | LEQ
+   51      | LT
+
+   52 vectors: OPENSQ check_rhs_exp COMMA check_rhs_exp CLOSESQ
+
+   53 primi_datatype: INT
+   54               | DOUBLE
+   55               | BOOL
+   56               | STRING
+
+   57 non_pri_datatype: MASS
+   58                 | TIME
+   59                 | POSITION
+   60                 | VELOCITY
+   61                 | ACC
+   62                 | ENERGY
+   63                 | THETA
+   64                 | E
+   65                 | DISTANCE
+   66                 | MOMENTUM
+
+   67 datatypes: primi_datatype
+   68          | non_pri_datatype
+
+   69 single_variable: ID
+   70                | ID dimensions
+
+   71 dimensions: OPENSQ check_rhs_exp CLOSESQ
+   72           | OPENSQ check_rhs_exp CLOSESQ dimensions
+
+   73 single_variable_for_exp_stmt: single_variable
+
+   74 exp_stmt: single_variable_for_exp_stmt ASSGN check_rhs_exp DOT
+
+   75 pos: FIRST
+   76    | SECOND
+
+   77 anything_with_value: single_variable
+   78                    | NON_NEGATIVE_INT
+   79                    | INTEGER_CONSTANT
+   80                    | FLOAT_CONSTANT
+   81                    | STRING_CONSTANT
+   82                    | TRUE
+   83                    | FALSE
+   84                    | call_stmt_without_dot
+   85                    | vectors
+   86                    | UNINEG anything_with_value
+   87                    | call_stmt_without_dot ARROW pos
+   88                    | inbuilt_functions ARROW pos
+   89                    | inbuilt_functions
+   90                    | vectors ARROW pos
+   91                    | ID ARROW pos
+   92                    | single_variable UNIOP
+   93                    | SIN OPENCC anything_with_value CLOSECC
+   94                    | COS OPENCC anything_with_value CLOSECC
+   95                    | TAN OPENCC anything_with_value CLOSECC
+
+   96 operations: bi_op
+   97           | LOGICOP
+   98           | relop
+
+   99 rhs_term: openccs anything_with_value
+  100         | openccs anything_with_value closeccs
+  101         | anything_with_value closeccs
+
+  102 rhs_exp: rhs_term operations rhs_exp
+  103        | anything_with_value operations rhs_exp
+  104        | rhs_term
+  105        | anything_with_value
+
+  106 openccs: openccs OPENCC
+  107        | OPENCC
+
+  108 closeccs: closeccs CLOSECC
+  109         | CLOSECC
+
+  110 call_stmt_with_dot: call_stmt_without_dot DOT
+
+  111 call_stmt_without_dot: ID OPENCU CLOSECU
+  112                      | ID OPENCU funccallargs CLOSECU
+
+  113 funccallargs: check_rhs_exp
+  114             | check_rhs_exp COMMA funccallargs
+
+  115 conditional_stmt_start: OPENSQ check_rhs_exp CLOSESQ OPENCU
+
+  116 conditional_stmt: conditional_stmt_start loop_body CLOSECU
+
+  117 $@7: ε
+
+  118 $@8: ε
+
+  119 conditional_stmt: conditional_stmt_start loop_body CLOSECU $@7 OTHERWISE OPENCU $@8 loop_body CLOSECU
+
+  120 $@9: ε
+
+  121 loop_stmt: LOOP OPENSQ check_rhs_exp CLOSESQ OPENCU $@9 loop_body CLOSECU
+
+  122 unary_operation_without_dot: single_variable UNIOP
+  123                            | UNINEG check_rhs_exp
+
+  124 return_stmt: DARR check_rhs_exp DOT
+  125            | DARR DOT
+
+  126 comments: CMT
+
+  127 output_stmt: OUTPUT COLON check_rhs_exp DOT
+
+  128 input_stmt: INPUT COLON ids DOT
+
+  129 $@10: ε
+
+  130 ids: single_variable $@10 COMMA ids
+  131    | single_variable
+
+  132 inbuilt_functions_with_dot: inbuilt_functions DOT
+
+  133 inbuilt_functions: rel_to_mag
+  134                  | rel_to_vel
+  135                  | rel_to_pos
+  136                  | rel_to_acc
+  137                  | rel_to_energy
+  138                  | rel_to_angle
+  139                  | rel_to_collision
+  140                  | rel_to_momentum
+  141                  | miscellaneous
+
+  142 stand_id: ID
+
+  143 rel_to_mag: MAG OPENCU stand_id CLOSECU
+  144           | MAG OPENCU vectors CLOSECU
+
+  145 rel_to_pos: OPENCU stand_id CLOSECU SETR OPENCU check_rhs_exp CLOSECU
+  146           | OPENCU stand_id CLOSECU ADDR OPENCU check_rhs_exp CLOSECU
+  147           | OPENCU stand_id CLOSECU R_AFTER OPENCU check_rhs_exp CLOSECU
+  148           | OPENCU stand_id CLOSECU GETR
+
+  149 rel_to_vel: OPENCU stand_id CLOSECU SETV OPENCU check_rhs_exp CLOSECU
+  150           | OPENCU stand_id CLOSECU ADDV OPENCU check_rhs_exp CLOSECU
+  151           | OPENCU stand_id CLOSECU V_AFTER OPENCU check_rhs_exp CLOSECU
+  152           | OPENCU stand_id CLOSECU GETV
+
+  153 rel_to_momentum: OPENCU stand_id CLOSECU SETP OPENCU check_rhs_exp CLOSECU
+
+  154 rel_to_acc: OPENCU stand_id CLOSECU SETA OPENCU check_rhs_exp CLOSECU
+  155           | OPENCU stand_id CLOSECU ADDA OPENCU check_rhs_exp CLOSECU
+  156           | OPENCU stand_id CLOSECU GETA
+
+  157 rel_to_energy: OPENCU stand_id CLOSECU KE_AFTER OPENCU check_rhs_exp CLOSECU
+  158              | OPENCU stand_id CLOSECU PE_AFTER OPENCU check_rhs_exp CLOSECU
+  159              | OPENCU stand_id CLOSECU TE_AFTER OPENCU check_rhs_exp CLOSECU
+
+  160 rel_to_angle: OPENCU stand_id CLOSECU ANGLE_AFTER OPENCU check_rhs_exp CLOSECU
+
+  161 rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id COMMA ID CLOSECU
+  162                 | OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id CLOSECU
+  163                 | OPENCU stand_id CLOSECU TIME_TO_COLLIDE OPENCU stand_id CLOSECU
+
+  164 miscellaneous: OPENCU stand_id CLOSECU S_AFTER OPENCU check_rhs_exp CLOSECU
+  165              | OPENCU stand_id CLOSECU ROC_AFTER OPENCU check_rhs_exp CLOSECU
+  166              | OPENCU stand_id CLOSECU P_AFTER OPENCU check_rhs_exp CLOSECU
+  167              | OPENCU stand_id CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU
+  168              | OPENCU stand_id CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU
+
+  169 term_misc: check_rhs_exp
+  170          | QUESTION
+
+  171 decl_stmt_with_exp: datatypes expressions DOT
+
+  172 expressions: expression COMMA expressions
+  173            | expression
+
+  174 single_variable_declare: single_variable
+
+  175 $@11: ε
+
+  176 check_rhs_exp: $@11 rhs_exp
+
+  177 expression: single_variable_declare ASSGN check_rhs_exp
+  178           | single_variable_declare
+
+  179 idadd2: ID
+
+  180 $@12: ε
+
+  181 $@13: ε
+
+  182 function_decl: datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU $@12 body $@13 CLOSECU
+
+  183 $@14: ε
+
+  184 $@15: ε
+
+  185 function_decl: datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU $@14 body $@15 CLOSECU
+
+  186 parameters: datatypes ID
+
+  187 $@16: ε
+
+  188 parameters: datatypes ID $@16 COMMA parameters
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
     error (256)
+<<<<<<< HEAD
     INTEGER_CONSTANT <object> (258) 92
     STRING_CONSTANT <object> (259) 94
     FLOAT_CONSTANT <object> (260) 93
@@ -439,6 +682,99 @@ Terminals, with rules where they appear
     OTHERWISE <object> (346) 136
     SCOPEOPEN <object> (347) 23 41
     SCOPECLOSE <object> (348) 23 41
+=======
+    INTEGER_CONSTANT <object> (258) 79
+    STRING_CONSTANT <object> (259) 81
+    FLOAT_CONSTANT <object> (260) 80
+    TRUE <object> (261) 82
+    FALSE <object> (262) 83
+    INT <object> (263) 53
+    DOUBLE <object> (264) 54
+    STRING <object> (265) 56
+    BOOL <object> (266) 55
+    MASS <object> (267) 57
+    TIME <object> (268) 58
+    POSITION <object> (269) 59
+    VELOCITY <object> (270) 60
+    ACC <object> (271) 61
+    ENERGY <object> (272) 62
+    THETA <object> (273) 63
+    E <object> (274) 64
+    DISTANCE <object> (275) 65
+    MOMENTUM <object> (276) 66
+    ID <object> (277) 69 70 91 111 112 142 161 179 186 188
+    INPUT <object> (278) 128
+    OUTPUT <object> (279) 127
+    SETR <object> (280) 145
+    ADDR <object> (281) 146
+    SETV <object> (282) 149
+    ADDV <object> (283) 150
+    SETA <object> (284) 154
+    ADDA <object> (285) 155
+    SETP <object> (286) 153
+    GETR <object> (287) 148
+    GETA <object> (288) 156
+    GETV <object> (289) 152
+    KE_AFTER <object> (290) 157
+    PE_AFTER <object> (291) 158
+    TE_AFTER <object> (292) 159
+    ANGLE_AFTER <object> (293) 160
+    V_AFTER <object> (294) 151
+    R_AFTER <object> (295) 147
+    GET_TRAJ <object> (296)
+    COLLIDE <object> (297) 161 162
+    TIME_TO_COLLIDE <object> (298) 163
+    ROC_AFTER <object> (299) 165
+    P_AFTER <object> (300) 166
+    S_AFTER <object> (301) 164
+    TIME_TO_R <object> (302) 167
+    TIME_TO_V <object> (303) 168
+    LOOP <object> (304) 121
+    BREAK <object> (305) 39
+    START <object> (306) 8
+    SIN <object> (307) 93
+    COS <object> (308) 94
+    TAN <object> (309) 95
+    MAG <object> (310) 143 144
+    OPENCC <object> (311) 93 94 95 106 107
+    CLOSECC <object> (312) 93 94 95 108 109
+    OPENSQ <object> (313) 52 71 72 115 121
+    CLOSESQ <object> (314) 52 71 72 115 121
+    OPENCU <object> (315) 8 21 36 111 112 115 119 121 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 182 185
+    CLOSECU <object> (316) 8 21 36 111 112 116 119 121 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 182 185
+    DOLLAR <object> (317)
+    DOT <object> (318) 13 28 39 74 110 124 125 127 128 132 171
+    DOUBLE_QUOTE <object> (319)
+    SINGLE_QUOTE <object> (320)
+    COMMA <object> (321) 52 114 130 161 167 168 172 188
+    COLON <object> (322) 127 128
+    ARROW <object> (323) 87 88 90 91
+    ADD <object> (324) 40
+    SUB <object> (325) 41
+    MUL <object> (326) 42
+    DIV <object> (327) 43
+    MOD <object> (328) 44
+    EXP <object> (329) 45
+    EQ <object> (330) 46
+    NEQ <object> (331) 47
+    GEQ <object> (332) 48
+    LEQ <object> (333) 50
+    GT <object> (334) 49
+    LT <object> (335) 51
+    LOGICOP <object> (336) 97
+    UNIOP <object> (337) 92 122
+    UNINEG <object> (338) 86 123
+    ASSGN <object> (339) 74 177 182 185
+    DARR <object> (340) 124 125 182 185
+    CMT <object> (341) 126
+    QUESTION <object> (342) 170
+    NON_NEGATIVE_INT <object> (343) 78
+    FIRST <object> (344) 75
+    SECOND <object> (345) 76
+    OTHERWISE <object> (346) 119
+    SCOPEOPEN <object> (347) 21 36
+    SCOPECLOSE <object> (348) 21 36
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 Nonterminals, with rules where they appear
@@ -461,6 +797,7 @@ Nonterminals, with rules where they appear
         on left: 7
         on right: 8
     body <object> (100)
+<<<<<<< HEAD
         on left: 9 10 11 12 13 14 15 16 17 18 23 24 25
         on right: 8 9 10 11 12 14 15 16 17 23 24 25 41 210 214
     $@3 (101)
@@ -751,6 +1088,205 @@ Nonterminals, with rules where they appear
     $@46 (196)
         on left: 218
         on right: 219
+=======
+        on left: 9 10 11 12 13 14 15 16 17 18 21 22 23
+        on right: 8 9 10 11 12 13 14 15 16 17 21 22 23 36 182 185
+    $@3 (101)
+        on left: 19
+        on right: 21
+    $@4 (102)
+        on left: 20
+        on right: 21
+    loop_body <object> (103)
+        on left: 24 25 26 27 28 29 30 31 32 33 36 37 38 39
+        on right: 24 25 26 27 28 29 30 31 32 36 37 38 39 116 119 121
+    $@5 (104)
+        on left: 34
+        on right: 36
+    $@6 (105)
+        on left: 35
+        on right: 36
+    bi_op <object> (106)
+        on left: 40 41 42 43 44 45
+        on right: 96
+    relop <object> (107)
+        on left: 46 47 48 49 50 51
+        on right: 98
+    vectors <object> (108)
+        on left: 52
+        on right: 85 90 144
+    primi_datatype <object> (109)
+        on left: 53 54 55 56
+        on right: 67
+    non_pri_datatype <object> (110)
+        on left: 57 58 59 60 61 62 63 64 65 66
+        on right: 68
+    datatypes <object> (111)
+        on left: 67 68
+        on right: 171 182 185 186 188
+    single_variable <object> (112)
+        on left: 69 70
+        on right: 73 77 92 122 130 131 174
+    dimensions <object> (113)
+        on left: 71 72
+        on right: 70 72
+    single_variable_for_exp_stmt <object> (114)
+        on left: 73
+        on right: 74
+    exp_stmt <object> (115)
+        on left: 74
+        on right: 9 24
+    pos <object> (116)
+        on left: 75 76
+        on right: 87 88 90 91
+    anything_with_value <object> (117)
+        on left: 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95
+        on right: 86 93 94 95 99 100 101 103 105
+    operations <object> (118)
+        on left: 96 97 98
+        on right: 102 103
+    rhs_term <object> (119)
+        on left: 99 100 101
+        on right: 102 104
+    rhs_exp <object> (120)
+        on left: 102 103 104 105
+        on right: 102 103 176
+    openccs <object> (121)
+        on left: 106 107
+        on right: 99 100 106
+    closeccs <object> (122)
+        on left: 108 109
+        on right: 100 101 108
+    call_stmt_with_dot <object> (123)
+        on left: 110
+        on right: 10 25
+    call_stmt_without_dot <object> (124)
+        on left: 111 112
+        on right: 84 87 110
+    funccallargs <arg_object> (125)
+        on left: 113 114
+        on right: 112 114
+    conditional_stmt_start <object> (126)
+        on left: 115
+        on right: 116 119
+    conditional_stmt <object> (127)
+        on left: 116 119
+        on right: 11 26
+    $@7 (128)
+        on left: 117
+        on right: 119
+    $@8 (129)
+        on left: 118
+        on right: 119
+    loop_stmt <object> (130)
+        on left: 121
+        on right: 12 27
+    $@9 (131)
+        on left: 120
+        on right: 121
+    unary_operation_without_dot <object> (132)
+        on left: 122 123
+        on right: 13 28
+    return_stmt <object> (133)
+        on left: 124 125
+        on right: 14 29
+    comments <object> (134)
+        on left: 126
+        on right: 3 15 30
+    output_stmt <object> (135)
+        on left: 127
+        on right: 16 31
+    input_stmt <object> (136)
+        on left: 128
+        on right: 17 32
+    ids <object> (137)
+        on left: 130 131
+        on right: 128 130
+    $@10 (138)
+        on left: 129
+        on right: 130
+    inbuilt_functions_with_dot <object> (139)
+        on left: 132
+        on right: 22 37
+    inbuilt_functions <object> (140)
+        on left: 133 134 135 136 137 138 139 140 141
+        on right: 88 89 132
+    stand_id <object> (141)
+        on left: 142
+        on right: 143 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168
+    rel_to_mag <object> (142)
+        on left: 143 144
+        on right: 133
+    rel_to_pos <object> (143)
+        on left: 145 146 147 148
+        on right: 135
+    rel_to_vel <object> (144)
+        on left: 149 150 151 152
+        on right: 134
+    rel_to_momentum <object> (145)
+        on left: 153
+        on right: 140
+    rel_to_acc <object> (146)
+        on left: 154 155 156
+        on right: 136
+    rel_to_energy <object> (147)
+        on left: 157 158 159
+        on right: 137
+    rel_to_angle <object> (148)
+        on left: 160
+        on right: 138
+    rel_to_collision <object> (149)
+        on left: 161 162 163
+        on right: 139
+    miscellaneous <object> (150)
+        on left: 164 165 166 167 168
+        on right: 141
+    term_misc <object> (151)
+        on left: 169 170
+        on right: 167 168
+    decl_stmt_with_exp <object> (152)
+        on left: 171
+        on right: 23 38
+    expressions <object> (153)
+        on left: 172 173
+        on right: 171 172
+    single_variable_declare <object> (154)
+        on left: 174
+        on right: 177 178
+    check_rhs_exp <object> (155)
+        on left: 176
+        on right: 52 71 72 74 113 114 115 121 123 124 127 145 146 147 149 150 151 153 154 155 157 158 159 160 164 165 166 169 177
+    $@11 (156)
+        on left: 175
+        on right: 176
+    expression <object> (157)
+        on left: 177 178
+        on right: 172 173
+    idadd2 <object> (158)
+        on left: 179
+        on right: 182 185
+    function_decl <object> (159)
+        on left: 182 185
+        on right: 5
+    $@12 (160)
+        on left: 180
+        on right: 182
+    $@13 (161)
+        on left: 181
+        on right: 182
+    $@14 (162)
+        on left: 183
+        on right: 185
+    $@15 (163)
+        on left: 184
+        on right: 185
+    parameters <object> (164)
+        on left: 186 188
+        on right: 182 188
+    $@16 (165)
+        on left: 187
+        on right: 188
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 0
@@ -786,100 +1322,184 @@ State 0
 
 State 1
 
+<<<<<<< HEAD
    61 primi_datatype: INT •
 
     $default  reduce using rule 61 (primi_datatype)
+=======
+   53 primi_datatype: INT •
+
+    $default  reduce using rule 53 (primi_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 2
 
+<<<<<<< HEAD
    62 primi_datatype: DOUBLE •
 
     $default  reduce using rule 62 (primi_datatype)
+=======
+   54 primi_datatype: DOUBLE •
+
+    $default  reduce using rule 54 (primi_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 3
 
+<<<<<<< HEAD
    64 primi_datatype: STRING •
 
     $default  reduce using rule 64 (primi_datatype)
+=======
+   56 primi_datatype: STRING •
+
+    $default  reduce using rule 56 (primi_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 4
 
+<<<<<<< HEAD
    63 primi_datatype: BOOL •
 
     $default  reduce using rule 63 (primi_datatype)
+=======
+   55 primi_datatype: BOOL •
+
+    $default  reduce using rule 55 (primi_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 5
 
+<<<<<<< HEAD
    65 non_pri_datatype: MASS •
 
     $default  reduce using rule 65 (non_pri_datatype)
+=======
+   57 non_pri_datatype: MASS •
+
+    $default  reduce using rule 57 (non_pri_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 6
 
+<<<<<<< HEAD
    66 non_pri_datatype: TIME •
 
     $default  reduce using rule 66 (non_pri_datatype)
+=======
+   58 non_pri_datatype: TIME •
+
+    $default  reduce using rule 58 (non_pri_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 7
 
+<<<<<<< HEAD
    67 non_pri_datatype: POSITION •
 
     $default  reduce using rule 67 (non_pri_datatype)
+=======
+   59 non_pri_datatype: POSITION •
+
+    $default  reduce using rule 59 (non_pri_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 8
 
+<<<<<<< HEAD
    68 non_pri_datatype: VELOCITY •
 
     $default  reduce using rule 68 (non_pri_datatype)
+=======
+   60 non_pri_datatype: VELOCITY •
+
+    $default  reduce using rule 60 (non_pri_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 9
 
+<<<<<<< HEAD
    69 non_pri_datatype: ACC •
 
     $default  reduce using rule 69 (non_pri_datatype)
+=======
+   61 non_pri_datatype: ACC •
+
+    $default  reduce using rule 61 (non_pri_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 10
 
+<<<<<<< HEAD
    70 non_pri_datatype: ENERGY •
 
     $default  reduce using rule 70 (non_pri_datatype)
+=======
+   62 non_pri_datatype: ENERGY •
+
+    $default  reduce using rule 62 (non_pri_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 11
 
+<<<<<<< HEAD
    71 non_pri_datatype: THETA •
 
     $default  reduce using rule 71 (non_pri_datatype)
+=======
+   63 non_pri_datatype: THETA •
+
+    $default  reduce using rule 63 (non_pri_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 12
 
+<<<<<<< HEAD
    72 non_pri_datatype: E •
 
     $default  reduce using rule 72 (non_pri_datatype)
+=======
+   64 non_pri_datatype: E •
+
+    $default  reduce using rule 64 (non_pri_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 13
 
+<<<<<<< HEAD
    73 non_pri_datatype: DISTANCE •
 
     $default  reduce using rule 73 (non_pri_datatype)
+=======
+   65 non_pri_datatype: DISTANCE •
+
+    $default  reduce using rule 65 (non_pri_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 14
 
+<<<<<<< HEAD
    74 non_pri_datatype: MOMENTUM •
 
     $default  reduce using rule 74 (non_pri_datatype)
+=======
+   66 non_pri_datatype: MOMENTUM •
+
+    $default  reduce using rule 66 (non_pri_datatype)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 15
@@ -891,9 +1511,15 @@ State 15
 
 State 16
 
+<<<<<<< HEAD
   146 comments: CMT •
 
     $default  reduce using rule 146 (comments)
+=======
+  126 comments: CMT •
+
+    $default  reduce using rule 126 (comments)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 17
@@ -944,22 +1570,39 @@ State 19
 
 State 20
 
+<<<<<<< HEAD
    75 datatypes: primi_datatype •
 
     $default  reduce using rule 75 (datatypes)
+=======
+   67 datatypes: primi_datatype •
+
+    $default  reduce using rule 67 (datatypes)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 21
 
+<<<<<<< HEAD
    76 datatypes: non_pri_datatype •
 
     $default  reduce using rule 76 (datatypes)
+=======
+   68 datatypes: non_pri_datatype •
+
+    $default  reduce using rule 68 (datatypes)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 22
 
+<<<<<<< HEAD
   210 function_decl: datatypes • idadd2 ASSGN OPENCU $@36 parameters CLOSECU $@37 DARR OPENCU $@38 $@39 body $@40 CLOSECU
   214              | datatypes • idadd2 ASSGN OPENCU CLOSECU DARR OPENCU $@41 $@42 body $@43 CLOSECU
+=======
+  182 function_decl: datatypes • idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU $@12 body $@13 CLOSECU
+  185              | datatypes • idadd2 ASSGN OPENCU CLOSECU DARR OPENCU $@14 body $@15 CLOSECU
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     ID  shift, and go to state 28
 
@@ -1005,15 +1648,26 @@ State 27
 
 State 28
 
+<<<<<<< HEAD
   204 idadd2: ID •
 
     $default  reduce using rule 204 (idadd2)
+=======
+  179 idadd2: ID •
+
+    $default  reduce using rule 179 (idadd2)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 29
 
+<<<<<<< HEAD
   210 function_decl: datatypes idadd2 • ASSGN OPENCU $@36 parameters CLOSECU $@37 DARR OPENCU $@38 $@39 body $@40 CLOSECU
   214              | datatypes idadd2 • ASSGN OPENCU CLOSECU DARR OPENCU $@41 $@42 body $@43 CLOSECU
+=======
+  182 function_decl: datatypes idadd2 • ASSGN OPENCU parameters CLOSECU DARR OPENCU $@12 body $@13 CLOSECU
+  185              | datatypes idadd2 • ASSGN OPENCU CLOSECU DARR OPENCU $@14 body $@15 CLOSECU
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     ASSGN  shift, and go to state 31
 
@@ -1083,14 +1737,20 @@ State 30
 
 State 31
 
+<<<<<<< HEAD
   210 function_decl: datatypes idadd2 ASSGN • OPENCU $@36 parameters CLOSECU $@37 DARR OPENCU $@38 $@39 body $@40 CLOSECU
   214              | datatypes idadd2 ASSGN • OPENCU CLOSECU DARR OPENCU $@41 $@42 body $@43 CLOSECU
+=======
+  182 function_decl: datatypes idadd2 ASSGN • OPENCU parameters CLOSECU DARR OPENCU $@12 body $@13 CLOSECU
+  185              | datatypes idadd2 ASSGN • OPENCU CLOSECU DARR OPENCU $@14 body $@15 CLOSECU
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     OPENCU  shift, and go to state 69
 
 
 State 32
 
+<<<<<<< HEAD
    77 single_variable: ID •
    79                | ID • $@15 dimensions
   125 call_stmt_without_dot: ID • OPENCU CLOSECU
@@ -1102,10 +1762,24 @@ State 32
     $default  reduce using rule 77 (single_variable)
 
     $@15  go to state 71
+=======
+   69 single_variable: ID •
+   70                | ID • dimensions
+  111 call_stmt_without_dot: ID • OPENCU CLOSECU
+  112                      | ID • OPENCU funccallargs CLOSECU
+
+    OPENSQ  shift, and go to state 70
+    OPENCU  shift, and go to state 71
+
+    $default  reduce using rule 69 (single_variable)
+
+    dimensions  go to state 72
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 33
 
+<<<<<<< HEAD
   150 input_stmt: INPUT • COLON $@30 ids DOT
 
     COLON  shift, and go to state 72
@@ -1114,36 +1788,71 @@ State 33
 State 34
 
   148 output_stmt: OUTPUT • COLON $@29 check_rhs_exp DOT
+=======
+  128 input_stmt: INPUT • COLON ids DOT
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     COLON  shift, and go to state 73
 
 
+<<<<<<< HEAD
 State 35
 
   139 loop_stmt: LOOP • OPENSQ $@25 check_rhs_exp CLOSESQ OPENCU $@26 loop_body CLOSECU
 
     OPENSQ  shift, and go to state 74
+=======
+State 34
+
+  127 output_stmt: OUTPUT • COLON check_rhs_exp DOT
+
+    COLON  shift, and go to state 74
+
+
+State 35
+
+  121 loop_stmt: LOOP • OPENSQ check_rhs_exp CLOSESQ OPENCU $@9 loop_body CLOSECU
+
+    OPENSQ  shift, and go to state 75
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 36
 
+<<<<<<< HEAD
   166 rel_to_mag: MAG • OPENCU stand_id CLOSECU
   167           | MAG • OPENCU vectors CLOSECU
 
     OPENCU  shift, and go to state 75
+=======
+  143 rel_to_mag: MAG • OPENCU stand_id CLOSECU
+  144           | MAG • OPENCU vectors CLOSECU
+
+    OPENCU  shift, and go to state 76
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 37
 
+<<<<<<< HEAD
   132 conditional_stmt_start: OPENSQ • $@22 check_rhs_exp CLOSESQ OPENCU
 
     $default  reduce using rule 131 ($@22)
 
     $@22  go to state 76
+=======
+  115 conditional_stmt_start: OPENSQ • check_rhs_exp CLOSESQ OPENCU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 77
+    $@11           go to state 78
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 38
 
+<<<<<<< HEAD
   168 rel_to_pos: OPENCU • stand_id CLOSECU SETR OPENCU check_rhs_exp CLOSECU
   169           | OPENCU • stand_id CLOSECU ADDR OPENCU check_rhs_exp CLOSECU
   170           | OPENCU • stand_id CLOSECU R_AFTER OPENCU check_rhs_exp CLOSECU
@@ -1172,19 +1881,59 @@ State 38
     ID  shift, and go to state 77
 
     stand_id  go to state 78
+=======
+  145 rel_to_pos: OPENCU • stand_id CLOSECU SETR OPENCU check_rhs_exp CLOSECU
+  146           | OPENCU • stand_id CLOSECU ADDR OPENCU check_rhs_exp CLOSECU
+  147           | OPENCU • stand_id CLOSECU R_AFTER OPENCU check_rhs_exp CLOSECU
+  148           | OPENCU • stand_id CLOSECU GETR
+  149 rel_to_vel: OPENCU • stand_id CLOSECU SETV OPENCU check_rhs_exp CLOSECU
+  150           | OPENCU • stand_id CLOSECU ADDV OPENCU check_rhs_exp CLOSECU
+  151           | OPENCU • stand_id CLOSECU V_AFTER OPENCU check_rhs_exp CLOSECU
+  152           | OPENCU • stand_id CLOSECU GETV
+  153 rel_to_momentum: OPENCU • stand_id CLOSECU SETP OPENCU check_rhs_exp CLOSECU
+  154 rel_to_acc: OPENCU • stand_id CLOSECU SETA OPENCU check_rhs_exp CLOSECU
+  155           | OPENCU • stand_id CLOSECU ADDA OPENCU check_rhs_exp CLOSECU
+  156           | OPENCU • stand_id CLOSECU GETA
+  157 rel_to_energy: OPENCU • stand_id CLOSECU KE_AFTER OPENCU check_rhs_exp CLOSECU
+  158              | OPENCU • stand_id CLOSECU PE_AFTER OPENCU check_rhs_exp CLOSECU
+  159              | OPENCU • stand_id CLOSECU TE_AFTER OPENCU check_rhs_exp CLOSECU
+  160 rel_to_angle: OPENCU • stand_id CLOSECU ANGLE_AFTER OPENCU check_rhs_exp CLOSECU
+  161 rel_to_collision: OPENCU • stand_id CLOSECU COLLIDE OPENCU stand_id COMMA ID CLOSECU
+  162                 | OPENCU • stand_id CLOSECU COLLIDE OPENCU stand_id CLOSECU
+  163                 | OPENCU • stand_id CLOSECU TIME_TO_COLLIDE OPENCU stand_id CLOSECU
+  164 miscellaneous: OPENCU • stand_id CLOSECU S_AFTER OPENCU check_rhs_exp CLOSECU
+  165              | OPENCU • stand_id CLOSECU ROC_AFTER OPENCU check_rhs_exp CLOSECU
+  166              | OPENCU • stand_id CLOSECU P_AFTER OPENCU check_rhs_exp CLOSECU
+  167              | OPENCU • stand_id CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU
+  168              | OPENCU • stand_id CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU
+
+    ID  shift, and go to state 79
+
+    stand_id  go to state 80
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 39
 
+<<<<<<< HEAD
   142 unary_operation_without_dot: UNINEG • $@27 check_rhs_exp
 
     $default  reduce using rule 141 ($@27)
 
     $@27  go to state 79
+=======
+  123 unary_operation_without_dot: UNINEG • check_rhs_exp
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 81
+    $@11           go to state 78
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 40
 
+<<<<<<< HEAD
   144 return_stmt: DARR • $@28 check_rhs_exp DOT
   145            | DARR • DOT
 
@@ -1193,15 +1942,34 @@ State 40
     $default  reduce using rule 143 ($@28)
 
     $@28  go to state 81
+=======
+  124 return_stmt: DARR • check_rhs_exp DOT
+  125            | DARR • DOT
+
+    DOT  shift, and go to state 82
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 83
+    $@11           go to state 78
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 41
 
+<<<<<<< HEAD
    23 body: SCOPEOPEN • $@3 OPENCU $@4 body SCOPECLOSE $@5 CLOSECU $@6 body
 
     $default  reduce using rule 19 ($@3)
 
     $@3  go to state 82
+=======
+   21 body: SCOPEOPEN • $@3 OPENCU body SCOPECLOSE $@4 CLOSECU body
+
+    $default  reduce using rule 19 ($@3)
+
+    $@3  go to state 84
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 42
@@ -1210,11 +1978,16 @@ State 42
 
     $default  reduce using rule 7 ($@2)
 
+<<<<<<< HEAD
     $@2  go to state 83
+=======
+    $@2  go to state 85
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 43
 
+<<<<<<< HEAD
   194 decl_stmt_with_exp: datatypes • expressions DOT
 
     ID  shift, and go to state 84
@@ -1223,23 +1996,48 @@ State 43
     expressions              go to state 86
     single_variable_declare  go to state 87
     expression               go to state 88
+=======
+  171 decl_stmt_with_exp: datatypes • expressions DOT
+
+    ID  shift, and go to state 86
+
+    single_variable          go to state 87
+    expressions              go to state 88
+    single_variable_declare  go to state 89
+    expression               go to state 90
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 44
 
+<<<<<<< HEAD
    84 single_variable_for_exp_stmt: single_variable •
   140 unary_operation_without_dot: single_variable • UNIOP
 
     UNIOP  shift, and go to state 89
 
     $default  reduce using rule 84 (single_variable_for_exp_stmt)
+=======
+   73 single_variable_for_exp_stmt: single_variable •
+  122 unary_operation_without_dot: single_variable • UNIOP
+
+    UNIOP  shift, and go to state 91
+
+    $default  reduce using rule 73 (single_variable_for_exp_stmt)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 45
 
+<<<<<<< HEAD
    87 exp_stmt: single_variable_for_exp_stmt • ASSGN $@17 check_rhs_exp DOT $@18
 
     ASSGN  shift, and go to state 90
+=======
+   74 exp_stmt: single_variable_for_exp_stmt • ASSGN check_rhs_exp DOT
+
+    ASSGN  shift, and go to state 92
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 46
@@ -1274,7 +2072,11 @@ State 46
 
     $default  reduce using rule 18 (body)
 
+<<<<<<< HEAD
     body                          go to state 91
+=======
+    body                          go to state 93
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
@@ -1337,7 +2139,11 @@ State 47
 
     $default  reduce using rule 18 (body)
 
+<<<<<<< HEAD
     body                          go to state 92
+=======
+    body                          go to state 94
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
@@ -1370,15 +2176,26 @@ State 47
 
 State 48
 
+<<<<<<< HEAD
   124 call_stmt_with_dot: call_stmt_without_dot • DOT
 
     DOT  shift, and go to state 93
+=======
+  110 call_stmt_with_dot: call_stmt_without_dot • DOT
+
+    DOT  shift, and go to state 95
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 49
 
+<<<<<<< HEAD
   133 conditional_stmt: conditional_stmt_start • loop_body CLOSECU
   136                 | conditional_stmt_start • loop_body CLOSECU $@23 OTHERWISE OPENCU $@24 loop_body CLOSECU
+=======
+  116 conditional_stmt: conditional_stmt_start • loop_body CLOSECU
+  119                 | conditional_stmt_start • loop_body CLOSECU $@7 OTHERWISE OPENCU $@8 loop_body CLOSECU
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     INT        shift, and go to state 1
     DOUBLE     shift, and go to state 2
@@ -1398,23 +2215,36 @@ State 49
     INPUT      shift, and go to state 33
     OUTPUT     shift, and go to state 34
     LOOP       shift, and go to state 35
+<<<<<<< HEAD
     BREAK      shift, and go to state 94
+=======
+    BREAK      shift, and go to state 96
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     MAG        shift, and go to state 36
     OPENSQ     shift, and go to state 37
     OPENCU     shift, and go to state 38
     UNINEG     shift, and go to state 39
     DARR       shift, and go to state 40
     CMT        shift, and go to state 16
+<<<<<<< HEAD
     SCOPEOPEN  shift, and go to state 95
 
     $default  reduce using rule 36 (loop_body)
 
     loop_body                     go to state 96
+=======
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 98
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
     single_variable               go to state 44
     single_variable_for_exp_stmt  go to state 45
+<<<<<<< HEAD
     exp_stmt                      go to state 97
     call_stmt_with_dot            go to state 98
     call_stmt_without_dot         go to state 48
@@ -1427,6 +2257,20 @@ State 49
     output_stmt                   go to state 104
     input_stmt                    go to state 105
     inbuilt_functions_with_dot    go to state 106
+=======
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     inbuilt_functions             go to state 58
     rel_to_mag                    go to state 59
     rel_to_pos                    go to state 60
@@ -1437,7 +2281,11 @@ State 49
     rel_to_angle                  go to state 65
     rel_to_collision              go to state 66
     miscellaneous                 go to state 67
+<<<<<<< HEAD
     decl_stmt_with_exp            go to state 107
+=======
+    decl_stmt_with_exp            go to state 109
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 50
@@ -1472,7 +2320,11 @@ State 50
 
     $default  reduce using rule 18 (body)
 
+<<<<<<< HEAD
     body                          go to state 108
+=======
+    body                          go to state 110
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
@@ -1535,7 +2387,11 @@ State 51
 
     $default  reduce using rule 18 (body)
 
+<<<<<<< HEAD
     body                          go to state 109
+=======
+    body                          go to state 111
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
@@ -1568,9 +2424,15 @@ State 51
 
 State 52
 
+<<<<<<< HEAD
    13 body: unary_operation_without_dot • DOT
 
     DOT  shift, and go to state 110
+=======
+   13 body: unary_operation_without_dot • DOT body
+
+    DOT  shift, and go to state 112
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 53
@@ -1605,7 +2467,11 @@ State 53
 
     $default  reduce using rule 18 (body)
 
+<<<<<<< HEAD
     body                          go to state 111
+=======
+    body                          go to state 113
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
@@ -1668,7 +2534,11 @@ State 54
 
     $default  reduce using rule 18 (body)
 
+<<<<<<< HEAD
     body                          go to state 112
+=======
+    body                          go to state 114
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
@@ -1731,7 +2601,11 @@ State 55
 
     $default  reduce using rule 18 (body)
 
+<<<<<<< HEAD
     body                          go to state 113
+=======
+    body                          go to state 115
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
@@ -1794,7 +2668,11 @@ State 56
 
     $default  reduce using rule 18 (body)
 
+<<<<<<< HEAD
     body                          go to state 114
+=======
+    body                          go to state 116
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
@@ -1827,6 +2705,7 @@ State 56
 
 State 57
 
+<<<<<<< HEAD
    24 body: inbuilt_functions_with_dot • body
 
     INT        shift, and go to state 1
@@ -1961,6 +2840,9 @@ State 67
 State 68
 
    25 body: decl_stmt_with_exp • body
+=======
+   22 body: inbuilt_functions_with_dot • body
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     INT        shift, and go to state 1
     DOUBLE     shift, and go to state 2
@@ -2021,6 +2903,7 @@ State 68
     decl_stmt_with_exp            go to state 68
 
 
+<<<<<<< HEAD
 State 69
 
   210 function_decl: datatypes idadd2 ASSGN OPENCU • $@36 parameters CLOSECU $@37 DARR OPENCU $@38 $@39 body $@40 CLOSECU
@@ -2031,10 +2914,171 @@ State 69
     $default  reduce using rule 205 ($@36)
 
     $@36  go to state 119
+=======
+State 58
+
+  132 inbuilt_functions_with_dot: inbuilt_functions • DOT
+
+    DOT  shift, and go to state 118
+
+
+State 59
+
+  133 inbuilt_functions: rel_to_mag •
+
+    $default  reduce using rule 133 (inbuilt_functions)
+
+
+State 60
+
+  135 inbuilt_functions: rel_to_pos •
+
+    $default  reduce using rule 135 (inbuilt_functions)
+
+
+State 61
+
+  134 inbuilt_functions: rel_to_vel •
+
+    $default  reduce using rule 134 (inbuilt_functions)
+
+
+State 62
+
+  140 inbuilt_functions: rel_to_momentum •
+
+    $default  reduce using rule 140 (inbuilt_functions)
+
+
+State 63
+
+  136 inbuilt_functions: rel_to_acc •
+
+    $default  reduce using rule 136 (inbuilt_functions)
+
+
+State 64
+
+  137 inbuilt_functions: rel_to_energy •
+
+    $default  reduce using rule 137 (inbuilt_functions)
+
+
+State 65
+
+  138 inbuilt_functions: rel_to_angle •
+
+    $default  reduce using rule 138 (inbuilt_functions)
+
+
+State 66
+
+  139 inbuilt_functions: rel_to_collision •
+
+    $default  reduce using rule 139 (inbuilt_functions)
+
+
+State 67
+
+  141 inbuilt_functions: miscellaneous •
+
+    $default  reduce using rule 141 (inbuilt_functions)
+
+
+State 68
+
+   23 body: decl_stmt_with_exp • body
+
+    INT        shift, and go to state 1
+    DOUBLE     shift, and go to state 2
+    STRING     shift, and go to state 3
+    BOOL       shift, and go to state 4
+    MASS       shift, and go to state 5
+    TIME       shift, and go to state 6
+    POSITION   shift, and go to state 7
+    VELOCITY   shift, and go to state 8
+    ACC        shift, and go to state 9
+    ENERGY     shift, and go to state 10
+    THETA      shift, and go to state 11
+    E          shift, and go to state 12
+    DISTANCE   shift, and go to state 13
+    MOMENTUM   shift, and go to state 14
+    ID         shift, and go to state 32
+    INPUT      shift, and go to state 33
+    OUTPUT     shift, and go to state 34
+    LOOP       shift, and go to state 35
+    MAG        shift, and go to state 36
+    OPENSQ     shift, and go to state 37
+    OPENCU     shift, and go to state 38
+    UNINEG     shift, and go to state 39
+    DARR       shift, and go to state 40
+    CMT        shift, and go to state 16
+    SCOPEOPEN  shift, and go to state 41
+
+    $default  reduce using rule 18 (body)
+
+    body                          go to state 119
+    primi_datatype                go to state 20
+    non_pri_datatype              go to state 21
+    datatypes                     go to state 43
+    single_variable               go to state 44
+    single_variable_for_exp_stmt  go to state 45
+    exp_stmt                      go to state 46
+    call_stmt_with_dot            go to state 47
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 50
+    loop_stmt                     go to state 51
+    unary_operation_without_dot   go to state 52
+    return_stmt                   go to state 53
+    comments                      go to state 54
+    output_stmt                   go to state 55
+    input_stmt                    go to state 56
+    inbuilt_functions_with_dot    go to state 57
+    inbuilt_functions             go to state 58
+    rel_to_mag                    go to state 59
+    rel_to_pos                    go to state 60
+    rel_to_vel                    go to state 61
+    rel_to_momentum               go to state 62
+    rel_to_acc                    go to state 63
+    rel_to_energy                 go to state 64
+    rel_to_angle                  go to state 65
+    rel_to_collision              go to state 66
+    miscellaneous                 go to state 67
+    decl_stmt_with_exp            go to state 68
+
+
+State 69
+
+  182 function_decl: datatypes idadd2 ASSGN OPENCU • parameters CLOSECU DARR OPENCU $@12 body $@13 CLOSECU
+  185              | datatypes idadd2 ASSGN OPENCU • CLOSECU DARR OPENCU $@14 body $@15 CLOSECU
+
+    INT       shift, and go to state 1
+    DOUBLE    shift, and go to state 2
+    STRING    shift, and go to state 3
+    BOOL      shift, and go to state 4
+    MASS      shift, and go to state 5
+    TIME      shift, and go to state 6
+    POSITION  shift, and go to state 7
+    VELOCITY  shift, and go to state 8
+    ACC       shift, and go to state 9
+    ENERGY    shift, and go to state 10
+    THETA     shift, and go to state 11
+    E         shift, and go to state 12
+    DISTANCE  shift, and go to state 13
+    MOMENTUM  shift, and go to state 14
+    CLOSECU   shift, and go to state 120
+
+    primi_datatype    go to state 20
+    non_pri_datatype  go to state 21
+    datatypes         go to state 121
+    parameters        go to state 122
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 70
 
+<<<<<<< HEAD
   125 call_stmt_without_dot: ID OPENCU • CLOSECU
   127                      | ID OPENCU • $@20 funccallargs CLOSECU
 
@@ -2043,47 +3087,94 @@ State 70
     $default  reduce using rule 126 ($@20)
 
     $@20  go to state 121
+=======
+   71 dimensions: OPENSQ • check_rhs_exp CLOSESQ
+   72           | OPENSQ • check_rhs_exp CLOSESQ dimensions
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 123
+    $@11           go to state 78
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 71
 
+<<<<<<< HEAD
    79 single_variable: ID $@15 • dimensions
 
     OPENSQ  shift, and go to state 122
 
     dim_con     go to state 123
     dimensions  go to state 124
+=======
+  111 call_stmt_without_dot: ID OPENCU • CLOSECU
+  112                      | ID OPENCU • funccallargs CLOSECU
+
+    CLOSECU  shift, and go to state 124
+
+    $default  reduce using rule 175 ($@11)
+
+    funccallargs   go to state 125
+    check_rhs_exp  go to state 126
+    $@11           go to state 78
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 72
 
+<<<<<<< HEAD
   150 input_stmt: INPUT COLON • $@30 ids DOT
 
     $default  reduce using rule 149 ($@30)
 
     $@30  go to state 125
+=======
+   70 single_variable: ID dimensions •
+
+    $default  reduce using rule 70 (single_variable)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 73
 
+<<<<<<< HEAD
   148 output_stmt: OUTPUT COLON • $@29 check_rhs_exp DOT
 
     $default  reduce using rule 147 ($@29)
 
     $@29  go to state 126
+=======
+  128 input_stmt: INPUT COLON • ids DOT
+
+    ID  shift, and go to state 86
+
+    single_variable  go to state 127
+    ids              go to state 128
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 74
 
+<<<<<<< HEAD
   139 loop_stmt: LOOP OPENSQ • $@25 check_rhs_exp CLOSESQ OPENCU $@26 loop_body CLOSECU
 
     $default  reduce using rule 137 ($@25)
 
     $@25  go to state 127
+=======
+  127 output_stmt: OUTPUT COLON • check_rhs_exp DOT
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 129
+    $@11           go to state 78
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 75
 
+<<<<<<< HEAD
   166 rel_to_mag: MAG OPENCU • stand_id CLOSECU
   167           | MAG OPENCU • vectors CLOSECU
 
@@ -2092,27 +3183,53 @@ State 75
 
     vectors   go to state 129
     stand_id  go to state 130
+=======
+  121 loop_stmt: LOOP OPENSQ • check_rhs_exp CLOSESQ OPENCU $@9 loop_body CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 130
+    $@11           go to state 78
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 76
 
+<<<<<<< HEAD
   132 conditional_stmt_start: OPENSQ $@22 • check_rhs_exp CLOSESQ OPENCU
 
     $default  reduce using rule 199 ($@34)
 
     check_rhs_exp  go to state 131
     $@34           go to state 132
+=======
+  143 rel_to_mag: MAG OPENCU • stand_id CLOSECU
+  144           | MAG OPENCU • vectors CLOSECU
+
+    ID      shift, and go to state 79
+    OPENSQ  shift, and go to state 131
+
+    vectors   go to state 132
+    stand_id  go to state 133
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 77
 
+<<<<<<< HEAD
   165 stand_id: ID •
 
     $default  reduce using rule 165 (stand_id)
+=======
+  115 conditional_stmt_start: OPENSQ check_rhs_exp • CLOSESQ OPENCU
+
+    CLOSESQ  shift, and go to state 134
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 78
 
+<<<<<<< HEAD
   168 rel_to_pos: OPENCU stand_id • CLOSECU SETR OPENCU check_rhs_exp CLOSECU
   169           | OPENCU stand_id • CLOSECU ADDR OPENCU check_rhs_exp CLOSECU
   170           | OPENCU stand_id • CLOSECU R_AFTER OPENCU check_rhs_exp CLOSECU
@@ -2139,51 +3256,142 @@ State 78
   191              | OPENCU stand_id • CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU
 
     CLOSECU  shift, and go to state 133
+=======
+  176 check_rhs_exp: $@11 • rhs_exp
+
+    INTEGER_CONSTANT  shift, and go to state 135
+    STRING_CONSTANT   shift, and go to state 136
+    FLOAT_CONSTANT    shift, and go to state 137
+    TRUE              shift, and go to state 138
+    FALSE             shift, and go to state 139
+    ID                shift, and go to state 140
+    SIN               shift, and go to state 141
+    COS               shift, and go to state 142
+    TAN               shift, and go to state 143
+    MAG               shift, and go to state 36
+    OPENCC            shift, and go to state 144
+    OPENSQ            shift, and go to state 131
+    OPENCU            shift, and go to state 38
+    UNINEG            shift, and go to state 145
+    NON_NEGATIVE_INT  shift, and go to state 146
+
+    vectors                go to state 147
+    single_variable        go to state 148
+    anything_with_value    go to state 149
+    rhs_term               go to state 150
+    rhs_exp                go to state 151
+    openccs                go to state 152
+    call_stmt_without_dot  go to state 153
+    inbuilt_functions      go to state 154
+    rel_to_mag             go to state 59
+    rel_to_pos             go to state 60
+    rel_to_vel             go to state 61
+    rel_to_momentum        go to state 62
+    rel_to_acc             go to state 63
+    rel_to_energy          go to state 64
+    rel_to_angle           go to state 65
+    rel_to_collision       go to state 66
+    miscellaneous          go to state 67
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 79
 
+<<<<<<< HEAD
   142 unary_operation_without_dot: UNINEG $@27 • check_rhs_exp
 
     $default  reduce using rule 199 ($@34)
 
     check_rhs_exp  go to state 134
     $@34           go to state 132
+=======
+  142 stand_id: ID •
+
+    $default  reduce using rule 142 (stand_id)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 80
 
+<<<<<<< HEAD
   145 return_stmt: DARR DOT •
 
     $default  reduce using rule 145 (return_stmt)
+=======
+  145 rel_to_pos: OPENCU stand_id • CLOSECU SETR OPENCU check_rhs_exp CLOSECU
+  146           | OPENCU stand_id • CLOSECU ADDR OPENCU check_rhs_exp CLOSECU
+  147           | OPENCU stand_id • CLOSECU R_AFTER OPENCU check_rhs_exp CLOSECU
+  148           | OPENCU stand_id • CLOSECU GETR
+  149 rel_to_vel: OPENCU stand_id • CLOSECU SETV OPENCU check_rhs_exp CLOSECU
+  150           | OPENCU stand_id • CLOSECU ADDV OPENCU check_rhs_exp CLOSECU
+  151           | OPENCU stand_id • CLOSECU V_AFTER OPENCU check_rhs_exp CLOSECU
+  152           | OPENCU stand_id • CLOSECU GETV
+  153 rel_to_momentum: OPENCU stand_id • CLOSECU SETP OPENCU check_rhs_exp CLOSECU
+  154 rel_to_acc: OPENCU stand_id • CLOSECU SETA OPENCU check_rhs_exp CLOSECU
+  155           | OPENCU stand_id • CLOSECU ADDA OPENCU check_rhs_exp CLOSECU
+  156           | OPENCU stand_id • CLOSECU GETA
+  157 rel_to_energy: OPENCU stand_id • CLOSECU KE_AFTER OPENCU check_rhs_exp CLOSECU
+  158              | OPENCU stand_id • CLOSECU PE_AFTER OPENCU check_rhs_exp CLOSECU
+  159              | OPENCU stand_id • CLOSECU TE_AFTER OPENCU check_rhs_exp CLOSECU
+  160 rel_to_angle: OPENCU stand_id • CLOSECU ANGLE_AFTER OPENCU check_rhs_exp CLOSECU
+  161 rel_to_collision: OPENCU stand_id • CLOSECU COLLIDE OPENCU stand_id COMMA ID CLOSECU
+  162                 | OPENCU stand_id • CLOSECU COLLIDE OPENCU stand_id CLOSECU
+  163                 | OPENCU stand_id • CLOSECU TIME_TO_COLLIDE OPENCU stand_id CLOSECU
+  164 miscellaneous: OPENCU stand_id • CLOSECU S_AFTER OPENCU check_rhs_exp CLOSECU
+  165              | OPENCU stand_id • CLOSECU ROC_AFTER OPENCU check_rhs_exp CLOSECU
+  166              | OPENCU stand_id • CLOSECU P_AFTER OPENCU check_rhs_exp CLOSECU
+  167              | OPENCU stand_id • CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU
+  168              | OPENCU stand_id • CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU
+
+    CLOSECU  shift, and go to state 155
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 81
 
+<<<<<<< HEAD
   144 return_stmt: DARR $@28 • check_rhs_exp DOT
 
     $default  reduce using rule 199 ($@34)
 
     check_rhs_exp  go to state 135
     $@34           go to state 132
+=======
+  123 unary_operation_without_dot: UNINEG check_rhs_exp •
+
+    $default  reduce using rule 123 (unary_operation_without_dot)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 82
 
+<<<<<<< HEAD
    23 body: SCOPEOPEN $@3 • OPENCU $@4 body SCOPECLOSE $@5 CLOSECU $@6 body
 
     OPENCU  shift, and go to state 136
+=======
+  125 return_stmt: DARR DOT •
+
+    $default  reduce using rule 125 (return_stmt)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 83
 
+<<<<<<< HEAD
     8 startfn: START OPENCU $@1 body $@2 • CLOSECU
 
     CLOSECU  shift, and go to state 137
+=======
+  124 return_stmt: DARR check_rhs_exp • DOT
+
+    DOT  shift, and go to state 156
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 84
 
+<<<<<<< HEAD
    77 single_variable: ID •
    79                | ID • $@15 dimensions
 
@@ -2191,72 +3399,149 @@ State 84
     $default  reduce using rule 77 (single_variable)
 
     $@15  go to state 71
+=======
+   21 body: SCOPEOPEN $@3 • OPENCU body SCOPECLOSE $@4 CLOSECU body
+
+    OPENCU  shift, and go to state 157
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 85
 
+<<<<<<< HEAD
   198 single_variable_declare: single_variable •
 
     $default  reduce using rule 198 (single_variable_declare)
+=======
+    8 startfn: START OPENCU $@1 body $@2 • CLOSECU
+
+    CLOSECU  shift, and go to state 158
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 86
 
+<<<<<<< HEAD
   194 decl_stmt_with_exp: datatypes expressions • DOT
 
     DOT  shift, and go to state 138
+=======
+   69 single_variable: ID •
+   70                | ID • dimensions
+
+    OPENSQ  shift, and go to state 70
+
+    $default  reduce using rule 69 (single_variable)
+
+    dimensions  go to state 72
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 87
 
+<<<<<<< HEAD
   202 expression: single_variable_declare • ASSGN $@35 check_rhs_exp
   203           | single_variable_declare •
 
     ASSGN  shift, and go to state 139
 
     $default  reduce using rule 203 (expression)
+=======
+  174 single_variable_declare: single_variable •
+
+    $default  reduce using rule 174 (single_variable_declare)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 88
 
+<<<<<<< HEAD
   196 expressions: expression • COMMA $@33 expressions
   197            | expression •
 
     COMMA  shift, and go to state 140
 
     $default  reduce using rule 197 (expressions)
+=======
+  171 decl_stmt_with_exp: datatypes expressions • DOT
+
+    DOT  shift, and go to state 159
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 89
 
+<<<<<<< HEAD
   140 unary_operation_without_dot: single_variable UNIOP •
 
     $default  reduce using rule 140 (unary_operation_without_dot)
+=======
+  177 expression: single_variable_declare • ASSGN check_rhs_exp
+  178           | single_variable_declare •
+
+    ASSGN  shift, and go to state 160
+
+    $default  reduce using rule 178 (expression)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 90
 
+<<<<<<< HEAD
    87 exp_stmt: single_variable_for_exp_stmt ASSGN • $@17 check_rhs_exp DOT $@18
 
     $default  reduce using rule 85 ($@17)
 
     $@17  go to state 141
+=======
+  172 expressions: expression • COMMA expressions
+  173            | expression •
+
+    COMMA  shift, and go to state 161
+
+    $default  reduce using rule 173 (expressions)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 91
 
+<<<<<<< HEAD
+=======
+  122 unary_operation_without_dot: single_variable UNIOP •
+
+    $default  reduce using rule 122 (unary_operation_without_dot)
+
+
+State 92
+
+   74 exp_stmt: single_variable_for_exp_stmt ASSGN • check_rhs_exp DOT
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 162
+    $@11           go to state 78
+
+
+State 93
+
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     9 body: exp_stmt body •
 
     $default  reduce using rule 9 (body)
 
 
+<<<<<<< HEAD
 State 92
+=======
+State 94
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
    10 body: call_stmt_with_dot body •
 
     $default  reduce using rule 10 (body)
 
 
+<<<<<<< HEAD
 State 93
 
   124 call_stmt_with_dot: call_stmt_without_dot DOT •
@@ -2278,18 +3563,32 @@ State 95
     $default  reduce using rule 37 ($@8)
 
     $@8  go to state 143
+=======
+State 95
+
+  110 call_stmt_with_dot: call_stmt_without_dot DOT •
+
+    $default  reduce using rule 110 (call_stmt_with_dot)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 96
 
+<<<<<<< HEAD
   133 conditional_stmt: conditional_stmt_start loop_body • CLOSECU
   136                 | conditional_stmt_start loop_body • CLOSECU $@23 OTHERWISE OPENCU $@24 loop_body CLOSECU
 
     CLOSECU  shift, and go to state 144
+=======
+   39 loop_body: BREAK • DOT loop_body
+
+    DOT  shift, and go to state 163
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 97
 
+<<<<<<< HEAD
    26 loop_body: exp_stmt • loop_body
 
     INT        shift, and go to state 1
@@ -2350,10 +3649,18 @@ State 97
     rel_to_collision              go to state 66
     miscellaneous                 go to state 67
     decl_stmt_with_exp            go to state 107
+=======
+   36 loop_body: SCOPEOPEN • $@5 OPENCU loop_body SCOPECLOSE $@6 CLOSECU body
+
+    $default  reduce using rule 34 ($@5)
+
+    $@5  go to state 164
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 98
 
+<<<<<<< HEAD
    27 loop_body: call_stmt_with_dot • loop_body
 
     INT        shift, and go to state 1
@@ -2414,11 +3721,21 @@ State 98
     rel_to_collision              go to state 66
     miscellaneous                 go to state 67
     decl_stmt_with_exp            go to state 107
+=======
+  116 conditional_stmt: conditional_stmt_start loop_body • CLOSECU
+  119                 | conditional_stmt_start loop_body • CLOSECU $@7 OTHERWISE OPENCU $@8 loop_body CLOSECU
+
+    CLOSECU  shift, and go to state 165
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 99
 
+<<<<<<< HEAD
    28 loop_body: conditional_stmt • loop_body
+=======
+   24 loop_body: exp_stmt • loop_body
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     INT        shift, and go to state 1
     DOUBLE     shift, and go to state 2
@@ -2438,23 +3755,36 @@ State 99
     INPUT      shift, and go to state 33
     OUTPUT     shift, and go to state 34
     LOOP       shift, and go to state 35
+<<<<<<< HEAD
     BREAK      shift, and go to state 94
+=======
+    BREAK      shift, and go to state 96
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     MAG        shift, and go to state 36
     OPENSQ     shift, and go to state 37
     OPENCU     shift, and go to state 38
     UNINEG     shift, and go to state 39
     DARR       shift, and go to state 40
     CMT        shift, and go to state 16
+<<<<<<< HEAD
     SCOPEOPEN  shift, and go to state 95
 
     $default  reduce using rule 36 (loop_body)
 
     loop_body                     go to state 147
+=======
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 166
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
     single_variable               go to state 44
     single_variable_for_exp_stmt  go to state 45
+<<<<<<< HEAD
     exp_stmt                      go to state 97
     call_stmt_with_dot            go to state 98
     call_stmt_without_dot         go to state 48
@@ -2467,6 +3797,20 @@ State 99
     output_stmt                   go to state 104
     input_stmt                    go to state 105
     inbuilt_functions_with_dot    go to state 106
+=======
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     inbuilt_functions             go to state 58
     rel_to_mag                    go to state 59
     rel_to_pos                    go to state 60
@@ -2477,12 +3821,20 @@ State 99
     rel_to_angle                  go to state 65
     rel_to_collision              go to state 66
     miscellaneous                 go to state 67
+<<<<<<< HEAD
     decl_stmt_with_exp            go to state 107
+=======
+    decl_stmt_with_exp            go to state 109
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 100
 
+<<<<<<< HEAD
    29 loop_body: loop_stmt • loop_body
+=======
+   25 loop_body: call_stmt_with_dot • loop_body
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     INT        shift, and go to state 1
     DOUBLE     shift, and go to state 2
@@ -2502,23 +3854,36 @@ State 100
     INPUT      shift, and go to state 33
     OUTPUT     shift, and go to state 34
     LOOP       shift, and go to state 35
+<<<<<<< HEAD
     BREAK      shift, and go to state 94
+=======
+    BREAK      shift, and go to state 96
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     MAG        shift, and go to state 36
     OPENSQ     shift, and go to state 37
     OPENCU     shift, and go to state 38
     UNINEG     shift, and go to state 39
     DARR       shift, and go to state 40
     CMT        shift, and go to state 16
+<<<<<<< HEAD
     SCOPEOPEN  shift, and go to state 95
 
     $default  reduce using rule 36 (loop_body)
 
     loop_body                     go to state 148
+=======
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 167
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
     single_variable               go to state 44
     single_variable_for_exp_stmt  go to state 45
+<<<<<<< HEAD
     exp_stmt                      go to state 97
     call_stmt_with_dot            go to state 98
     call_stmt_without_dot         go to state 48
@@ -2531,6 +3896,20 @@ State 100
     output_stmt                   go to state 104
     input_stmt                    go to state 105
     inbuilt_functions_with_dot    go to state 106
+=======
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     inbuilt_functions             go to state 58
     rel_to_mag                    go to state 59
     rel_to_pos                    go to state 60
@@ -2541,19 +3920,21 @@ State 100
     rel_to_angle                  go to state 65
     rel_to_collision              go to state 66
     miscellaneous                 go to state 67
+<<<<<<< HEAD
     decl_stmt_with_exp            go to state 107
+=======
+    decl_stmt_with_exp            go to state 109
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 101
 
+<<<<<<< HEAD
    31 loop_body: unary_operation_without_dot • DOT $@7 loop_body
 
     DOT  shift, and go to state 149
-
-
-State 102
-
-   32 loop_body: return_stmt • loop_body
+=======
+   26 loop_body: conditional_stmt • loop_body
 
     INT        shift, and go to state 1
     DOUBLE     shift, and go to state 2
@@ -2573,23 +3954,105 @@ State 102
     INPUT      shift, and go to state 33
     OUTPUT     shift, and go to state 34
     LOOP       shift, and go to state 35
-    BREAK      shift, and go to state 94
+    BREAK      shift, and go to state 96
     MAG        shift, and go to state 36
     OPENSQ     shift, and go to state 37
     OPENCU     shift, and go to state 38
     UNINEG     shift, and go to state 39
     DARR       shift, and go to state 40
     CMT        shift, and go to state 16
-    SCOPEOPEN  shift, and go to state 95
+    SCOPEOPEN  shift, and go to state 97
 
-    $default  reduce using rule 36 (loop_body)
+    $default  reduce using rule 33 (loop_body)
 
-    loop_body                     go to state 150
+    loop_body                     go to state 168
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
     single_variable               go to state 44
     single_variable_for_exp_stmt  go to state 45
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+    inbuilt_functions             go to state 58
+    rel_to_mag                    go to state 59
+    rel_to_pos                    go to state 60
+    rel_to_vel                    go to state 61
+    rel_to_momentum               go to state 62
+    rel_to_acc                    go to state 63
+    rel_to_energy                 go to state 64
+    rel_to_angle                  go to state 65
+    rel_to_collision              go to state 66
+    miscellaneous                 go to state 67
+    decl_stmt_with_exp            go to state 109
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
+
+
+State 102
+
+<<<<<<< HEAD
+   32 loop_body: return_stmt • loop_body
+=======
+   27 loop_body: loop_stmt • loop_body
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
+
+    INT        shift, and go to state 1
+    DOUBLE     shift, and go to state 2
+    STRING     shift, and go to state 3
+    BOOL       shift, and go to state 4
+    MASS       shift, and go to state 5
+    TIME       shift, and go to state 6
+    POSITION   shift, and go to state 7
+    VELOCITY   shift, and go to state 8
+    ACC        shift, and go to state 9
+    ENERGY     shift, and go to state 10
+    THETA      shift, and go to state 11
+    E          shift, and go to state 12
+    DISTANCE   shift, and go to state 13
+    MOMENTUM   shift, and go to state 14
+    ID         shift, and go to state 32
+    INPUT      shift, and go to state 33
+    OUTPUT     shift, and go to state 34
+    LOOP       shift, and go to state 35
+<<<<<<< HEAD
+    BREAK      shift, and go to state 94
+=======
+    BREAK      shift, and go to state 96
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
+    MAG        shift, and go to state 36
+    OPENSQ     shift, and go to state 37
+    OPENCU     shift, and go to state 38
+    UNINEG     shift, and go to state 39
+    DARR       shift, and go to state 40
+    CMT        shift, and go to state 16
+<<<<<<< HEAD
+    SCOPEOPEN  shift, and go to state 95
+
+    $default  reduce using rule 36 (loop_body)
+
+    loop_body                     go to state 150
+=======
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 169
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
+    primi_datatype                go to state 20
+    non_pri_datatype              go to state 21
+    datatypes                     go to state 43
+    single_variable               go to state 44
+    single_variable_for_exp_stmt  go to state 45
+<<<<<<< HEAD
     exp_stmt                      go to state 97
     call_stmt_with_dot            go to state 98
     call_stmt_without_dot         go to state 48
@@ -2602,6 +4065,20 @@ State 102
     output_stmt                   go to state 104
     input_stmt                    go to state 105
     inbuilt_functions_with_dot    go to state 106
+=======
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     inbuilt_functions             go to state 58
     rel_to_mag                    go to state 59
     rel_to_pos                    go to state 60
@@ -2612,11 +4089,16 @@ State 102
     rel_to_angle                  go to state 65
     rel_to_collision              go to state 66
     miscellaneous                 go to state 67
+<<<<<<< HEAD
     decl_stmt_with_exp            go to state 107
+=======
+    decl_stmt_with_exp            go to state 109
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 103
 
+<<<<<<< HEAD
    33 loop_body: comments • loop_body
 
     INT        shift, and go to state 1
@@ -2677,11 +4159,20 @@ State 103
     rel_to_collision              go to state 66
     miscellaneous                 go to state 67
     decl_stmt_with_exp            go to state 107
+=======
+   28 loop_body: unary_operation_without_dot • DOT loop_body
+
+    DOT  shift, and go to state 170
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 104
 
+<<<<<<< HEAD
    34 loop_body: output_stmt • loop_body
+=======
+   29 loop_body: return_stmt • loop_body
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     INT        shift, and go to state 1
     DOUBLE     shift, and go to state 2
@@ -2701,23 +4192,36 @@ State 104
     INPUT      shift, and go to state 33
     OUTPUT     shift, and go to state 34
     LOOP       shift, and go to state 35
+<<<<<<< HEAD
     BREAK      shift, and go to state 94
+=======
+    BREAK      shift, and go to state 96
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     MAG        shift, and go to state 36
     OPENSQ     shift, and go to state 37
     OPENCU     shift, and go to state 38
     UNINEG     shift, and go to state 39
     DARR       shift, and go to state 40
     CMT        shift, and go to state 16
+<<<<<<< HEAD
     SCOPEOPEN  shift, and go to state 95
 
     $default  reduce using rule 36 (loop_body)
 
     loop_body                     go to state 152
+=======
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 171
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
     single_variable               go to state 44
     single_variable_for_exp_stmt  go to state 45
+<<<<<<< HEAD
     exp_stmt                      go to state 97
     call_stmt_with_dot            go to state 98
     call_stmt_without_dot         go to state 48
@@ -2730,6 +4234,20 @@ State 104
     output_stmt                   go to state 104
     input_stmt                    go to state 105
     inbuilt_functions_with_dot    go to state 106
+=======
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     inbuilt_functions             go to state 58
     rel_to_mag                    go to state 59
     rel_to_pos                    go to state 60
@@ -2740,12 +4258,20 @@ State 104
     rel_to_angle                  go to state 65
     rel_to_collision              go to state 66
     miscellaneous                 go to state 67
+<<<<<<< HEAD
     decl_stmt_with_exp            go to state 107
+=======
+    decl_stmt_with_exp            go to state 109
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 105
 
+<<<<<<< HEAD
    35 loop_body: input_stmt • loop_body
+=======
+   30 loop_body: comments • loop_body
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     INT        shift, and go to state 1
     DOUBLE     shift, and go to state 2
@@ -2765,23 +4291,36 @@ State 105
     INPUT      shift, and go to state 33
     OUTPUT     shift, and go to state 34
     LOOP       shift, and go to state 35
+<<<<<<< HEAD
     BREAK      shift, and go to state 94
+=======
+    BREAK      shift, and go to state 96
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     MAG        shift, and go to state 36
     OPENSQ     shift, and go to state 37
     OPENCU     shift, and go to state 38
     UNINEG     shift, and go to state 39
     DARR       shift, and go to state 40
     CMT        shift, and go to state 16
+<<<<<<< HEAD
     SCOPEOPEN  shift, and go to state 95
 
     $default  reduce using rule 36 (loop_body)
 
     loop_body                     go to state 153
+=======
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 172
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
     single_variable               go to state 44
     single_variable_for_exp_stmt  go to state 45
+<<<<<<< HEAD
     exp_stmt                      go to state 97
     call_stmt_with_dot            go to state 98
     call_stmt_without_dot         go to state 48
@@ -2794,6 +4333,20 @@ State 105
     output_stmt                   go to state 104
     input_stmt                    go to state 105
     inbuilt_functions_with_dot    go to state 106
+=======
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     inbuilt_functions             go to state 58
     rel_to_mag                    go to state 59
     rel_to_pos                    go to state 60
@@ -2804,12 +4357,20 @@ State 105
     rel_to_angle                  go to state 65
     rel_to_collision              go to state 66
     miscellaneous                 go to state 67
+<<<<<<< HEAD
     decl_stmt_with_exp            go to state 107
+=======
+    decl_stmt_with_exp            go to state 109
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 106
 
+<<<<<<< HEAD
    42 loop_body: inbuilt_functions_with_dot • loop_body
+=======
+   31 loop_body: output_stmt • loop_body
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     INT        shift, and go to state 1
     DOUBLE     shift, and go to state 2
@@ -2829,23 +4390,36 @@ State 106
     INPUT      shift, and go to state 33
     OUTPUT     shift, and go to state 34
     LOOP       shift, and go to state 35
+<<<<<<< HEAD
     BREAK      shift, and go to state 94
+=======
+    BREAK      shift, and go to state 96
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     MAG        shift, and go to state 36
     OPENSQ     shift, and go to state 37
     OPENCU     shift, and go to state 38
     UNINEG     shift, and go to state 39
     DARR       shift, and go to state 40
     CMT        shift, and go to state 16
+<<<<<<< HEAD
     SCOPEOPEN  shift, and go to state 95
 
     $default  reduce using rule 36 (loop_body)
 
     loop_body                     go to state 154
+=======
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 173
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
     single_variable               go to state 44
     single_variable_for_exp_stmt  go to state 45
+<<<<<<< HEAD
     exp_stmt                      go to state 97
     call_stmt_with_dot            go to state 98
     call_stmt_without_dot         go to state 48
@@ -2858,6 +4432,20 @@ State 106
     output_stmt                   go to state 104
     input_stmt                    go to state 105
     inbuilt_functions_with_dot    go to state 106
+=======
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     inbuilt_functions             go to state 58
     rel_to_mag                    go to state 59
     rel_to_pos                    go to state 60
@@ -2868,12 +4456,20 @@ State 106
     rel_to_angle                  go to state 65
     rel_to_collision              go to state 66
     miscellaneous                 go to state 67
+<<<<<<< HEAD
     decl_stmt_with_exp            go to state 107
+=======
+    decl_stmt_with_exp            go to state 109
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 107
 
+<<<<<<< HEAD
    43 loop_body: decl_stmt_with_exp • loop_body
+=======
+   32 loop_body: input_stmt • loop_body
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     INT        shift, and go to state 1
     DOUBLE     shift, and go to state 2
@@ -2893,23 +4489,36 @@ State 107
     INPUT      shift, and go to state 33
     OUTPUT     shift, and go to state 34
     LOOP       shift, and go to state 35
+<<<<<<< HEAD
     BREAK      shift, and go to state 94
+=======
+    BREAK      shift, and go to state 96
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     MAG        shift, and go to state 36
     OPENSQ     shift, and go to state 37
     OPENCU     shift, and go to state 38
     UNINEG     shift, and go to state 39
     DARR       shift, and go to state 40
     CMT        shift, and go to state 16
+<<<<<<< HEAD
     SCOPEOPEN  shift, and go to state 95
 
     $default  reduce using rule 36 (loop_body)
 
     loop_body                     go to state 155
+=======
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 174
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
     single_variable               go to state 44
     single_variable_for_exp_stmt  go to state 45
+<<<<<<< HEAD
     exp_stmt                      go to state 97
     call_stmt_with_dot            go to state 98
     call_stmt_without_dot         go to state 48
@@ -2922,6 +4531,20 @@ State 107
     output_stmt                   go to state 104
     input_stmt                    go to state 105
     inbuilt_functions_with_dot    go to state 106
+=======
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     inbuilt_functions             go to state 58
     rel_to_mag                    go to state 59
     rel_to_pos                    go to state 60
@@ -2932,23 +4555,163 @@ State 107
     rel_to_angle                  go to state 65
     rel_to_collision              go to state 66
     miscellaneous                 go to state 67
+<<<<<<< HEAD
     decl_stmt_with_exp            go to state 107
+=======
+    decl_stmt_with_exp            go to state 109
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 108
 
+<<<<<<< HEAD
+=======
+   37 loop_body: inbuilt_functions_with_dot • loop_body
+
+    INT        shift, and go to state 1
+    DOUBLE     shift, and go to state 2
+    STRING     shift, and go to state 3
+    BOOL       shift, and go to state 4
+    MASS       shift, and go to state 5
+    TIME       shift, and go to state 6
+    POSITION   shift, and go to state 7
+    VELOCITY   shift, and go to state 8
+    ACC        shift, and go to state 9
+    ENERGY     shift, and go to state 10
+    THETA      shift, and go to state 11
+    E          shift, and go to state 12
+    DISTANCE   shift, and go to state 13
+    MOMENTUM   shift, and go to state 14
+    ID         shift, and go to state 32
+    INPUT      shift, and go to state 33
+    OUTPUT     shift, and go to state 34
+    LOOP       shift, and go to state 35
+    BREAK      shift, and go to state 96
+    MAG        shift, and go to state 36
+    OPENSQ     shift, and go to state 37
+    OPENCU     shift, and go to state 38
+    UNINEG     shift, and go to state 39
+    DARR       shift, and go to state 40
+    CMT        shift, and go to state 16
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 175
+    primi_datatype                go to state 20
+    non_pri_datatype              go to state 21
+    datatypes                     go to state 43
+    single_variable               go to state 44
+    single_variable_for_exp_stmt  go to state 45
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+    inbuilt_functions             go to state 58
+    rel_to_mag                    go to state 59
+    rel_to_pos                    go to state 60
+    rel_to_vel                    go to state 61
+    rel_to_momentum               go to state 62
+    rel_to_acc                    go to state 63
+    rel_to_energy                 go to state 64
+    rel_to_angle                  go to state 65
+    rel_to_collision              go to state 66
+    miscellaneous                 go to state 67
+    decl_stmt_with_exp            go to state 109
+
+
+State 109
+
+   38 loop_body: decl_stmt_with_exp • loop_body
+
+    INT        shift, and go to state 1
+    DOUBLE     shift, and go to state 2
+    STRING     shift, and go to state 3
+    BOOL       shift, and go to state 4
+    MASS       shift, and go to state 5
+    TIME       shift, and go to state 6
+    POSITION   shift, and go to state 7
+    VELOCITY   shift, and go to state 8
+    ACC        shift, and go to state 9
+    ENERGY     shift, and go to state 10
+    THETA      shift, and go to state 11
+    E          shift, and go to state 12
+    DISTANCE   shift, and go to state 13
+    MOMENTUM   shift, and go to state 14
+    ID         shift, and go to state 32
+    INPUT      shift, and go to state 33
+    OUTPUT     shift, and go to state 34
+    LOOP       shift, and go to state 35
+    BREAK      shift, and go to state 96
+    MAG        shift, and go to state 36
+    OPENSQ     shift, and go to state 37
+    OPENCU     shift, and go to state 38
+    UNINEG     shift, and go to state 39
+    DARR       shift, and go to state 40
+    CMT        shift, and go to state 16
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 176
+    primi_datatype                go to state 20
+    non_pri_datatype              go to state 21
+    datatypes                     go to state 43
+    single_variable               go to state 44
+    single_variable_for_exp_stmt  go to state 45
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+    inbuilt_functions             go to state 58
+    rel_to_mag                    go to state 59
+    rel_to_pos                    go to state 60
+    rel_to_vel                    go to state 61
+    rel_to_momentum               go to state 62
+    rel_to_acc                    go to state 63
+    rel_to_energy                 go to state 64
+    rel_to_angle                  go to state 65
+    rel_to_collision              go to state 66
+    miscellaneous                 go to state 67
+    decl_stmt_with_exp            go to state 109
+
+
+State 110
+
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
    11 body: conditional_stmt body •
 
     $default  reduce using rule 11 (body)
 
 
+<<<<<<< HEAD
 State 109
+=======
+State 111
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
    12 body: loop_stmt body •
 
     $default  reduce using rule 12 (body)
 
 
+<<<<<<< HEAD
 State 110
 
    13 body: unary_operation_without_dot DOT •
@@ -2957,33 +4720,112 @@ State 110
 
 
 State 111
+=======
+State 112
+
+   13 body: unary_operation_without_dot DOT • body
+
+    INT        shift, and go to state 1
+    DOUBLE     shift, and go to state 2
+    STRING     shift, and go to state 3
+    BOOL       shift, and go to state 4
+    MASS       shift, and go to state 5
+    TIME       shift, and go to state 6
+    POSITION   shift, and go to state 7
+    VELOCITY   shift, and go to state 8
+    ACC        shift, and go to state 9
+    ENERGY     shift, and go to state 10
+    THETA      shift, and go to state 11
+    E          shift, and go to state 12
+    DISTANCE   shift, and go to state 13
+    MOMENTUM   shift, and go to state 14
+    ID         shift, and go to state 32
+    INPUT      shift, and go to state 33
+    OUTPUT     shift, and go to state 34
+    LOOP       shift, and go to state 35
+    MAG        shift, and go to state 36
+    OPENSQ     shift, and go to state 37
+    OPENCU     shift, and go to state 38
+    UNINEG     shift, and go to state 39
+    DARR       shift, and go to state 40
+    CMT        shift, and go to state 16
+    SCOPEOPEN  shift, and go to state 41
+
+    $default  reduce using rule 18 (body)
+
+    body                          go to state 177
+    primi_datatype                go to state 20
+    non_pri_datatype              go to state 21
+    datatypes                     go to state 43
+    single_variable               go to state 44
+    single_variable_for_exp_stmt  go to state 45
+    exp_stmt                      go to state 46
+    call_stmt_with_dot            go to state 47
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 50
+    loop_stmt                     go to state 51
+    unary_operation_without_dot   go to state 52
+    return_stmt                   go to state 53
+    comments                      go to state 54
+    output_stmt                   go to state 55
+    input_stmt                    go to state 56
+    inbuilt_functions_with_dot    go to state 57
+    inbuilt_functions             go to state 58
+    rel_to_mag                    go to state 59
+    rel_to_pos                    go to state 60
+    rel_to_vel                    go to state 61
+    rel_to_momentum               go to state 62
+    rel_to_acc                    go to state 63
+    rel_to_energy                 go to state 64
+    rel_to_angle                  go to state 65
+    rel_to_collision              go to state 66
+    miscellaneous                 go to state 67
+    decl_stmt_with_exp            go to state 68
+
+
+State 113
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
    14 body: return_stmt body •
 
     $default  reduce using rule 14 (body)
 
 
+<<<<<<< HEAD
 State 112
+=======
+State 114
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
    15 body: comments body •
 
     $default  reduce using rule 15 (body)
 
 
+<<<<<<< HEAD
 State 113
+=======
+State 115
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
    16 body: output_stmt body •
 
     $default  reduce using rule 16 (body)
 
 
+<<<<<<< HEAD
 State 114
+=======
+State 116
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
    17 body: input_stmt body •
 
     $default  reduce using rule 17 (body)
 
 
+<<<<<<< HEAD
 State 115
 
    24 body: inbuilt_functions_with_dot body •
@@ -3003,17 +4845,31 @@ State 117
    25 body: decl_stmt_with_exp body •
 
     $default  reduce using rule 25 (body)
+=======
+State 117
+
+   22 body: inbuilt_functions_with_dot body •
+
+    $default  reduce using rule 22 (body)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 118
 
+<<<<<<< HEAD
   214 function_decl: datatypes idadd2 ASSGN OPENCU CLOSECU • DARR OPENCU $@41 $@42 body $@43 CLOSECU
 
     DARR  shift, and go to state 156
+=======
+  132 inbuilt_functions_with_dot: inbuilt_functions DOT •
+
+    $default  reduce using rule 132 (inbuilt_functions_with_dot)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 119
 
+<<<<<<< HEAD
   210 function_decl: datatypes idadd2 ASSGN OPENCU $@36 • parameters CLOSECU $@37 DARR OPENCU $@38 $@39 body $@40 CLOSECU
 
     INT       shift, and go to state 1
@@ -3035,17 +4891,29 @@ State 119
     non_pri_datatype  go to state 21
     datatypes         go to state 157
     parameters        go to state 158
+=======
+   23 body: decl_stmt_with_exp body •
+
+    $default  reduce using rule 23 (body)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 120
 
+<<<<<<< HEAD
   125 call_stmt_without_dot: ID OPENCU CLOSECU •
 
     $default  reduce using rule 125 (call_stmt_without_dot)
+=======
+  185 function_decl: datatypes idadd2 ASSGN OPENCU CLOSECU • DARR OPENCU $@14 body $@15 CLOSECU
+
+    DARR  shift, and go to state 178
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 121
 
+<<<<<<< HEAD
   127 call_stmt_without_dot: ID OPENCU $@20 • funccallargs CLOSECU
 
     $default  reduce using rule 199 ($@34)
@@ -3053,17 +4921,30 @@ State 121
     funccallargs   go to state 159
     check_rhs_exp  go to state 160
     $@34           go to state 132
+=======
+  186 parameters: datatypes • ID
+  188           | datatypes • ID $@16 COMMA parameters
+
+    ID  shift, and go to state 179
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 122
 
+<<<<<<< HEAD
    80 dim_con: OPENSQ •
 
     $default  reduce using rule 80 (dim_con)
+=======
+  182 function_decl: datatypes idadd2 ASSGN OPENCU parameters • CLOSECU DARR OPENCU $@12 body $@13 CLOSECU
+
+    CLOSECU  shift, and go to state 180
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 123
 
+<<<<<<< HEAD
    81 dimensions: dim_con • check_rhs_exp CLOSESQ
    83           | dim_con • check_rhs_exp CLOSESQ $@16 dimensions
 
@@ -3071,77 +4952,142 @@ State 123
 
     check_rhs_exp  go to state 161
     $@34           go to state 132
+=======
+   71 dimensions: OPENSQ check_rhs_exp • CLOSESQ
+   72           | OPENSQ check_rhs_exp • CLOSESQ dimensions
+
+    CLOSESQ  shift, and go to state 181
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 124
 
+<<<<<<< HEAD
    79 single_variable: ID $@15 dimensions •
 
     $default  reduce using rule 79 (single_variable)
+=======
+  111 call_stmt_without_dot: ID OPENCU CLOSECU •
+
+    $default  reduce using rule 111 (call_stmt_without_dot)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 125
 
+<<<<<<< HEAD
   150 input_stmt: INPUT COLON $@30 • ids DOT
 
     ID  shift, and go to state 84
 
     single_variable  go to state 162
     ids              go to state 163
+=======
+  112 call_stmt_without_dot: ID OPENCU funccallargs • CLOSECU
+
+    CLOSECU  shift, and go to state 182
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 126
 
+<<<<<<< HEAD
   148 output_stmt: OUTPUT COLON $@29 • check_rhs_exp DOT
 
     $default  reduce using rule 199 ($@34)
 
     check_rhs_exp  go to state 164
     $@34           go to state 132
+=======
+  113 funccallargs: check_rhs_exp •
+  114             | check_rhs_exp • COMMA funccallargs
+
+    COMMA  shift, and go to state 183
+
+    $default  reduce using rule 113 (funccallargs)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 127
 
+<<<<<<< HEAD
   139 loop_stmt: LOOP OPENSQ $@25 • check_rhs_exp CLOSESQ OPENCU $@26 loop_body CLOSECU
 
     $default  reduce using rule 199 ($@34)
 
     check_rhs_exp  go to state 165
     $@34           go to state 132
+=======
+  130 ids: single_variable • $@10 COMMA ids
+  131    | single_variable •
+
+    DOT       reduce using rule 131 (ids)
+    $default  reduce using rule 129 ($@10)
+
+    $@10  go to state 184
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 128
 
+<<<<<<< HEAD
    60 vectors: OPENSQ • $@12 check_rhs_exp COMMA $@13 check_rhs_exp CLOSESQ $@14
 
     $default  reduce using rule 57 ($@12)
 
     $@12  go to state 166
+=======
+  128 input_stmt: INPUT COLON ids • DOT
+
+    DOT  shift, and go to state 185
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 129
 
+<<<<<<< HEAD
   167 rel_to_mag: MAG OPENCU vectors • CLOSECU
 
     CLOSECU  shift, and go to state 167
+=======
+  127 output_stmt: OUTPUT COLON check_rhs_exp • DOT
+
+    DOT  shift, and go to state 186
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 130
 
+<<<<<<< HEAD
   166 rel_to_mag: MAG OPENCU stand_id • CLOSECU
 
     CLOSECU  shift, and go to state 168
+=======
+  121 loop_stmt: LOOP OPENSQ check_rhs_exp • CLOSESQ OPENCU $@9 loop_body CLOSECU
+
+    CLOSESQ  shift, and go to state 187
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 131
 
+<<<<<<< HEAD
   132 conditional_stmt_start: OPENSQ $@22 check_rhs_exp • CLOSESQ OPENCU
 
     CLOSESQ  shift, and go to state 169
+=======
+   52 vectors: OPENSQ • check_rhs_exp COMMA check_rhs_exp CLOSESQ
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 188
+    $@11           go to state 78
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 132
 
+<<<<<<< HEAD
   200 check_rhs_exp: $@34 • rhs_exp
 
     INTEGER_CONSTANT  shift, and go to state 170
@@ -3168,6 +5114,131 @@ State 132
     openccs                go to state 187
     call_stmt_without_dot  go to state 188
     inbuilt_functions      go to state 189
+=======
+  144 rel_to_mag: MAG OPENCU vectors • CLOSECU
+
+    CLOSECU  shift, and go to state 189
+
+
+State 133
+
+  143 rel_to_mag: MAG OPENCU stand_id • CLOSECU
+
+    CLOSECU  shift, and go to state 190
+
+
+State 134
+
+  115 conditional_stmt_start: OPENSQ check_rhs_exp CLOSESQ • OPENCU
+
+    OPENCU  shift, and go to state 191
+
+
+State 135
+
+   79 anything_with_value: INTEGER_CONSTANT •
+
+    $default  reduce using rule 79 (anything_with_value)
+
+
+State 136
+
+   81 anything_with_value: STRING_CONSTANT •
+
+    $default  reduce using rule 81 (anything_with_value)
+
+
+State 137
+
+   80 anything_with_value: FLOAT_CONSTANT •
+
+    $default  reduce using rule 80 (anything_with_value)
+
+
+State 138
+
+   82 anything_with_value: TRUE •
+
+    $default  reduce using rule 82 (anything_with_value)
+
+
+State 139
+
+   83 anything_with_value: FALSE •
+
+    $default  reduce using rule 83 (anything_with_value)
+
+
+State 140
+
+   69 single_variable: ID •
+   70                | ID • dimensions
+   91 anything_with_value: ID • ARROW pos
+  111 call_stmt_without_dot: ID • OPENCU CLOSECU
+  112                      | ID • OPENCU funccallargs CLOSECU
+
+    OPENSQ  shift, and go to state 70
+    OPENCU  shift, and go to state 71
+    ARROW   shift, and go to state 192
+
+    $default  reduce using rule 69 (single_variable)
+
+    dimensions  go to state 72
+
+
+State 141
+
+   93 anything_with_value: SIN • OPENCC anything_with_value CLOSECC
+
+    OPENCC  shift, and go to state 193
+
+
+State 142
+
+   94 anything_with_value: COS • OPENCC anything_with_value CLOSECC
+
+    OPENCC  shift, and go to state 194
+
+
+State 143
+
+   95 anything_with_value: TAN • OPENCC anything_with_value CLOSECC
+
+    OPENCC  shift, and go to state 195
+
+
+State 144
+
+  107 openccs: OPENCC •
+
+    $default  reduce using rule 107 (openccs)
+
+
+State 145
+
+   86 anything_with_value: UNINEG • anything_with_value
+
+    INTEGER_CONSTANT  shift, and go to state 135
+    STRING_CONSTANT   shift, and go to state 136
+    FLOAT_CONSTANT    shift, and go to state 137
+    TRUE              shift, and go to state 138
+    FALSE             shift, and go to state 139
+    ID                shift, and go to state 140
+    SIN               shift, and go to state 141
+    COS               shift, and go to state 142
+    TAN               shift, and go to state 143
+    MAG               shift, and go to state 36
+    OPENSQ            shift, and go to state 131
+    OPENCU            shift, and go to state 38
+    UNINEG            shift, and go to state 145
+    NON_NEGATIVE_INT  shift, and go to state 146
+
+    vectors                go to state 147
+    single_variable        go to state 148
+    anything_with_value    go to state 196
+    call_stmt_without_dot  go to state 153
+    inbuilt_functions      go to state 154
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     rel_to_mag             go to state 59
     rel_to_pos             go to state 60
     rel_to_vel             go to state 61
@@ -3179,6 +5250,7 @@ State 132
     miscellaneous          go to state 67
 
 
+<<<<<<< HEAD
 State 133
 
   168 rel_to_pos: OPENCU stand_id CLOSECU • SETR OPENCU check_rhs_exp CLOSECU
@@ -3255,12 +5327,285 @@ State 136
 
 
 State 137
+=======
+State 146
+
+   78 anything_with_value: NON_NEGATIVE_INT •
+
+    $default  reduce using rule 78 (anything_with_value)
+
+
+State 147
+
+   85 anything_with_value: vectors •
+   90                    | vectors • ARROW pos
+
+    ARROW  shift, and go to state 197
+
+    $default  reduce using rule 85 (anything_with_value)
+
+
+State 148
+
+   77 anything_with_value: single_variable •
+   92                    | single_variable • UNIOP
+
+    UNIOP  shift, and go to state 198
+
+    $default  reduce using rule 77 (anything_with_value)
+
+
+State 149
+
+  101 rhs_term: anything_with_value • closeccs
+  103 rhs_exp: anything_with_value • operations rhs_exp
+  105        | anything_with_value •
+
+    CLOSECC  shift, and go to state 199
+    ADD      shift, and go to state 200
+    SUB      shift, and go to state 201
+    MUL      shift, and go to state 202
+    DIV      shift, and go to state 203
+    MOD      shift, and go to state 204
+    EXP      shift, and go to state 205
+    EQ       shift, and go to state 206
+    NEQ      shift, and go to state 207
+    GEQ      shift, and go to state 208
+    LEQ      shift, and go to state 209
+    GT       shift, and go to state 210
+    LT       shift, and go to state 211
+    LOGICOP  shift, and go to state 212
+
+    $default  reduce using rule 105 (rhs_exp)
+
+    bi_op       go to state 213
+    relop       go to state 214
+    operations  go to state 215
+    closeccs    go to state 216
+
+
+State 150
+
+  102 rhs_exp: rhs_term • operations rhs_exp
+  104        | rhs_term •
+
+    ADD      shift, and go to state 200
+    SUB      shift, and go to state 201
+    MUL      shift, and go to state 202
+    DIV      shift, and go to state 203
+    MOD      shift, and go to state 204
+    EXP      shift, and go to state 205
+    EQ       shift, and go to state 206
+    NEQ      shift, and go to state 207
+    GEQ      shift, and go to state 208
+    LEQ      shift, and go to state 209
+    GT       shift, and go to state 210
+    LT       shift, and go to state 211
+    LOGICOP  shift, and go to state 212
+
+    $default  reduce using rule 104 (rhs_exp)
+
+    bi_op       go to state 213
+    relop       go to state 214
+    operations  go to state 217
+
+
+State 151
+
+  176 check_rhs_exp: $@11 rhs_exp •
+
+    $default  reduce using rule 176 (check_rhs_exp)
+
+
+State 152
+
+   99 rhs_term: openccs • anything_with_value
+  100         | openccs • anything_with_value closeccs
+  106 openccs: openccs • OPENCC
+
+    INTEGER_CONSTANT  shift, and go to state 135
+    STRING_CONSTANT   shift, and go to state 136
+    FLOAT_CONSTANT    shift, and go to state 137
+    TRUE              shift, and go to state 138
+    FALSE             shift, and go to state 139
+    ID                shift, and go to state 140
+    SIN               shift, and go to state 141
+    COS               shift, and go to state 142
+    TAN               shift, and go to state 143
+    MAG               shift, and go to state 36
+    OPENCC            shift, and go to state 218
+    OPENSQ            shift, and go to state 131
+    OPENCU            shift, and go to state 38
+    UNINEG            shift, and go to state 145
+    NON_NEGATIVE_INT  shift, and go to state 146
+
+    vectors                go to state 147
+    single_variable        go to state 148
+    anything_with_value    go to state 219
+    call_stmt_without_dot  go to state 153
+    inbuilt_functions      go to state 154
+    rel_to_mag             go to state 59
+    rel_to_pos             go to state 60
+    rel_to_vel             go to state 61
+    rel_to_momentum        go to state 62
+    rel_to_acc             go to state 63
+    rel_to_energy          go to state 64
+    rel_to_angle           go to state 65
+    rel_to_collision       go to state 66
+    miscellaneous          go to state 67
+
+
+State 153
+
+   84 anything_with_value: call_stmt_without_dot •
+   87                    | call_stmt_without_dot • ARROW pos
+
+    ARROW  shift, and go to state 220
+
+    $default  reduce using rule 84 (anything_with_value)
+
+
+State 154
+
+   88 anything_with_value: inbuilt_functions • ARROW pos
+   89                    | inbuilt_functions •
+
+    ARROW  shift, and go to state 221
+
+    $default  reduce using rule 89 (anything_with_value)
+
+
+State 155
+
+  145 rel_to_pos: OPENCU stand_id CLOSECU • SETR OPENCU check_rhs_exp CLOSECU
+  146           | OPENCU stand_id CLOSECU • ADDR OPENCU check_rhs_exp CLOSECU
+  147           | OPENCU stand_id CLOSECU • R_AFTER OPENCU check_rhs_exp CLOSECU
+  148           | OPENCU stand_id CLOSECU • GETR
+  149 rel_to_vel: OPENCU stand_id CLOSECU • SETV OPENCU check_rhs_exp CLOSECU
+  150           | OPENCU stand_id CLOSECU • ADDV OPENCU check_rhs_exp CLOSECU
+  151           | OPENCU stand_id CLOSECU • V_AFTER OPENCU check_rhs_exp CLOSECU
+  152           | OPENCU stand_id CLOSECU • GETV
+  153 rel_to_momentum: OPENCU stand_id CLOSECU • SETP OPENCU check_rhs_exp CLOSECU
+  154 rel_to_acc: OPENCU stand_id CLOSECU • SETA OPENCU check_rhs_exp CLOSECU
+  155           | OPENCU stand_id CLOSECU • ADDA OPENCU check_rhs_exp CLOSECU
+  156           | OPENCU stand_id CLOSECU • GETA
+  157 rel_to_energy: OPENCU stand_id CLOSECU • KE_AFTER OPENCU check_rhs_exp CLOSECU
+  158              | OPENCU stand_id CLOSECU • PE_AFTER OPENCU check_rhs_exp CLOSECU
+  159              | OPENCU stand_id CLOSECU • TE_AFTER OPENCU check_rhs_exp CLOSECU
+  160 rel_to_angle: OPENCU stand_id CLOSECU • ANGLE_AFTER OPENCU check_rhs_exp CLOSECU
+  161 rel_to_collision: OPENCU stand_id CLOSECU • COLLIDE OPENCU stand_id COMMA ID CLOSECU
+  162                 | OPENCU stand_id CLOSECU • COLLIDE OPENCU stand_id CLOSECU
+  163                 | OPENCU stand_id CLOSECU • TIME_TO_COLLIDE OPENCU stand_id CLOSECU
+  164 miscellaneous: OPENCU stand_id CLOSECU • S_AFTER OPENCU check_rhs_exp CLOSECU
+  165              | OPENCU stand_id CLOSECU • ROC_AFTER OPENCU check_rhs_exp CLOSECU
+  166              | OPENCU stand_id CLOSECU • P_AFTER OPENCU check_rhs_exp CLOSECU
+  167              | OPENCU stand_id CLOSECU • TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU
+  168              | OPENCU stand_id CLOSECU • TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU
+
+    SETR             shift, and go to state 222
+    ADDR             shift, and go to state 223
+    SETV             shift, and go to state 224
+    ADDV             shift, and go to state 225
+    SETA             shift, and go to state 226
+    ADDA             shift, and go to state 227
+    SETP             shift, and go to state 228
+    GETR             shift, and go to state 229
+    GETA             shift, and go to state 230
+    GETV             shift, and go to state 231
+    KE_AFTER         shift, and go to state 232
+    PE_AFTER         shift, and go to state 233
+    TE_AFTER         shift, and go to state 234
+    ANGLE_AFTER      shift, and go to state 235
+    V_AFTER          shift, and go to state 236
+    R_AFTER          shift, and go to state 237
+    COLLIDE          shift, and go to state 238
+    TIME_TO_COLLIDE  shift, and go to state 239
+    ROC_AFTER        shift, and go to state 240
+    P_AFTER          shift, and go to state 241
+    S_AFTER          shift, and go to state 242
+    TIME_TO_R        shift, and go to state 243
+    TIME_TO_V        shift, and go to state 244
+
+
+State 156
+
+  124 return_stmt: DARR check_rhs_exp DOT •
+
+    $default  reduce using rule 124 (return_stmt)
+
+
+State 157
+
+   21 body: SCOPEOPEN $@3 OPENCU • body SCOPECLOSE $@4 CLOSECU body
+
+    INT        shift, and go to state 1
+    DOUBLE     shift, and go to state 2
+    STRING     shift, and go to state 3
+    BOOL       shift, and go to state 4
+    MASS       shift, and go to state 5
+    TIME       shift, and go to state 6
+    POSITION   shift, and go to state 7
+    VELOCITY   shift, and go to state 8
+    ACC        shift, and go to state 9
+    ENERGY     shift, and go to state 10
+    THETA      shift, and go to state 11
+    E          shift, and go to state 12
+    DISTANCE   shift, and go to state 13
+    MOMENTUM   shift, and go to state 14
+    ID         shift, and go to state 32
+    INPUT      shift, and go to state 33
+    OUTPUT     shift, and go to state 34
+    LOOP       shift, and go to state 35
+    MAG        shift, and go to state 36
+    OPENSQ     shift, and go to state 37
+    OPENCU     shift, and go to state 38
+    UNINEG     shift, and go to state 39
+    DARR       shift, and go to state 40
+    CMT        shift, and go to state 16
+    SCOPEOPEN  shift, and go to state 41
+
+    $default  reduce using rule 18 (body)
+
+    body                          go to state 245
+    primi_datatype                go to state 20
+    non_pri_datatype              go to state 21
+    datatypes                     go to state 43
+    single_variable               go to state 44
+    single_variable_for_exp_stmt  go to state 45
+    exp_stmt                      go to state 46
+    call_stmt_with_dot            go to state 47
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 50
+    loop_stmt                     go to state 51
+    unary_operation_without_dot   go to state 52
+    return_stmt                   go to state 53
+    comments                      go to state 54
+    output_stmt                   go to state 55
+    input_stmt                    go to state 56
+    inbuilt_functions_with_dot    go to state 57
+    inbuilt_functions             go to state 58
+    rel_to_mag                    go to state 59
+    rel_to_pos                    go to state 60
+    rel_to_vel                    go to state 61
+    rel_to_momentum               go to state 62
+    rel_to_acc                    go to state 63
+    rel_to_energy                 go to state 64
+    rel_to_angle                  go to state 65
+    rel_to_collision              go to state 66
+    miscellaneous                 go to state 67
+    decl_stmt_with_exp            go to state 68
+
+
+State 158
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     8 startfn: START OPENCU $@1 body $@2 CLOSECU •
 
     $default  reduce using rule 8 (startfn)
 
 
+<<<<<<< HEAD
 State 138
 
   194 decl_stmt_with_exp: datatypes expressions DOT •
@@ -3484,28 +5829,56 @@ State 159
   127 call_stmt_without_dot: ID OPENCU $@20 funccallargs • CLOSECU
 
     CLOSECU  shift, and go to state 225
+=======
+State 159
+
+  171 decl_stmt_with_exp: datatypes expressions DOT •
+
+    $default  reduce using rule 171 (decl_stmt_with_exp)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 160
 
+<<<<<<< HEAD
   128 funccallargs: check_rhs_exp •
   130             | check_rhs_exp • COMMA $@21 funccallargs
 
     COMMA  shift, and go to state 226
 
     $default  reduce using rule 128 (funccallargs)
+=======
+  177 expression: single_variable_declare ASSGN • check_rhs_exp
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 246
+    $@11           go to state 78
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 161
 
+<<<<<<< HEAD
    81 dimensions: dim_con check_rhs_exp • CLOSESQ
    83           | dim_con check_rhs_exp • CLOSESQ $@16 dimensions
 
     CLOSESQ  shift, and go to state 227
+=======
+  172 expressions: expression COMMA • expressions
+
+    ID  shift, and go to state 86
+
+    single_variable          go to state 87
+    expressions              go to state 247
+    single_variable_declare  go to state 89
+    expression               go to state 90
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 162
 
+<<<<<<< HEAD
   153 ids: single_variable • $@31 COMMA $@32 ids
   154    | single_variable •
 
@@ -3513,83 +5886,267 @@ State 162
     $default  reduce using rule 151 ($@31)
 
     $@31  go to state 228
+=======
+   74 exp_stmt: single_variable_for_exp_stmt ASSGN check_rhs_exp • DOT
+
+    DOT  shift, and go to state 248
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 163
 
+<<<<<<< HEAD
   150 input_stmt: INPUT COLON $@30 ids • DOT
 
     DOT  shift, and go to state 229
+=======
+   39 loop_body: BREAK DOT • loop_body
+
+    INT        shift, and go to state 1
+    DOUBLE     shift, and go to state 2
+    STRING     shift, and go to state 3
+    BOOL       shift, and go to state 4
+    MASS       shift, and go to state 5
+    TIME       shift, and go to state 6
+    POSITION   shift, and go to state 7
+    VELOCITY   shift, and go to state 8
+    ACC        shift, and go to state 9
+    ENERGY     shift, and go to state 10
+    THETA      shift, and go to state 11
+    E          shift, and go to state 12
+    DISTANCE   shift, and go to state 13
+    MOMENTUM   shift, and go to state 14
+    ID         shift, and go to state 32
+    INPUT      shift, and go to state 33
+    OUTPUT     shift, and go to state 34
+    LOOP       shift, and go to state 35
+    BREAK      shift, and go to state 96
+    MAG        shift, and go to state 36
+    OPENSQ     shift, and go to state 37
+    OPENCU     shift, and go to state 38
+    UNINEG     shift, and go to state 39
+    DARR       shift, and go to state 40
+    CMT        shift, and go to state 16
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 249
+    primi_datatype                go to state 20
+    non_pri_datatype              go to state 21
+    datatypes                     go to state 43
+    single_variable               go to state 44
+    single_variable_for_exp_stmt  go to state 45
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+    inbuilt_functions             go to state 58
+    rel_to_mag                    go to state 59
+    rel_to_pos                    go to state 60
+    rel_to_vel                    go to state 61
+    rel_to_momentum               go to state 62
+    rel_to_acc                    go to state 63
+    rel_to_energy                 go to state 64
+    rel_to_angle                  go to state 65
+    rel_to_collision              go to state 66
+    miscellaneous                 go to state 67
+    decl_stmt_with_exp            go to state 109
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 164
 
+<<<<<<< HEAD
   148 output_stmt: OUTPUT COLON $@29 check_rhs_exp • DOT
 
     DOT  shift, and go to state 230
+=======
+   36 loop_body: SCOPEOPEN $@5 • OPENCU loop_body SCOPECLOSE $@6 CLOSECU body
+
+    OPENCU  shift, and go to state 250
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 165
 
+<<<<<<< HEAD
   139 loop_stmt: LOOP OPENSQ $@25 check_rhs_exp • CLOSESQ OPENCU $@26 loop_body CLOSECU
 
     CLOSESQ  shift, and go to state 231
+=======
+  116 conditional_stmt: conditional_stmt_start loop_body CLOSECU •
+  119                 | conditional_stmt_start loop_body CLOSECU • $@7 OTHERWISE OPENCU $@8 loop_body CLOSECU
+
+    OTHERWISE  reduce using rule 117 ($@7)
+    $default   reduce using rule 116 (conditional_stmt)
+
+    $@7  go to state 251
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 166
 
+<<<<<<< HEAD
    60 vectors: OPENSQ $@12 • check_rhs_exp COMMA $@13 check_rhs_exp CLOSESQ $@14
 
     $default  reduce using rule 199 ($@34)
 
     check_rhs_exp  go to state 232
     $@34           go to state 132
+=======
+   24 loop_body: exp_stmt loop_body •
+
+    $default  reduce using rule 24 (loop_body)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 167
 
+<<<<<<< HEAD
   167 rel_to_mag: MAG OPENCU vectors CLOSECU •
 
     $default  reduce using rule 167 (rel_to_mag)
+=======
+   25 loop_body: call_stmt_with_dot loop_body •
+
+    $default  reduce using rule 25 (loop_body)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 168
 
+<<<<<<< HEAD
   166 rel_to_mag: MAG OPENCU stand_id CLOSECU •
 
     $default  reduce using rule 166 (rel_to_mag)
+=======
+   26 loop_body: conditional_stmt loop_body •
+
+    $default  reduce using rule 26 (loop_body)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 169
 
+<<<<<<< HEAD
   132 conditional_stmt_start: OPENSQ $@22 check_rhs_exp CLOSESQ • OPENCU
 
     OPENCU  shift, and go to state 233
+=======
+   27 loop_body: loop_stmt loop_body •
+
+    $default  reduce using rule 27 (loop_body)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 170
 
+<<<<<<< HEAD
    92 anything_with_value: INTEGER_CONSTANT •
 
     $default  reduce using rule 92 (anything_with_value)
+=======
+   28 loop_body: unary_operation_without_dot DOT • loop_body
+
+    INT        shift, and go to state 1
+    DOUBLE     shift, and go to state 2
+    STRING     shift, and go to state 3
+    BOOL       shift, and go to state 4
+    MASS       shift, and go to state 5
+    TIME       shift, and go to state 6
+    POSITION   shift, and go to state 7
+    VELOCITY   shift, and go to state 8
+    ACC        shift, and go to state 9
+    ENERGY     shift, and go to state 10
+    THETA      shift, and go to state 11
+    E          shift, and go to state 12
+    DISTANCE   shift, and go to state 13
+    MOMENTUM   shift, and go to state 14
+    ID         shift, and go to state 32
+    INPUT      shift, and go to state 33
+    OUTPUT     shift, and go to state 34
+    LOOP       shift, and go to state 35
+    BREAK      shift, and go to state 96
+    MAG        shift, and go to state 36
+    OPENSQ     shift, and go to state 37
+    OPENCU     shift, and go to state 38
+    UNINEG     shift, and go to state 39
+    DARR       shift, and go to state 40
+    CMT        shift, and go to state 16
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 252
+    primi_datatype                go to state 20
+    non_pri_datatype              go to state 21
+    datatypes                     go to state 43
+    single_variable               go to state 44
+    single_variable_for_exp_stmt  go to state 45
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+    inbuilt_functions             go to state 58
+    rel_to_mag                    go to state 59
+    rel_to_pos                    go to state 60
+    rel_to_vel                    go to state 61
+    rel_to_momentum               go to state 62
+    rel_to_acc                    go to state 63
+    rel_to_energy                 go to state 64
+    rel_to_angle                  go to state 65
+    rel_to_collision              go to state 66
+    miscellaneous                 go to state 67
+    decl_stmt_with_exp            go to state 109
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 171
 
+<<<<<<< HEAD
    94 anything_with_value: STRING_CONSTANT •
 
     $default  reduce using rule 94 (anything_with_value)
+=======
+   29 loop_body: return_stmt loop_body •
+
+    $default  reduce using rule 29 (loop_body)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 172
 
+<<<<<<< HEAD
    93 anything_with_value: FLOAT_CONSTANT •
 
     $default  reduce using rule 93 (anything_with_value)
+=======
+   30 loop_body: comments loop_body •
+
+    $default  reduce using rule 30 (loop_body)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 173
 
+<<<<<<< HEAD
    95 anything_with_value: TRUE •
 
     $default  reduce using rule 95 (anything_with_value)
@@ -4965,10 +7522,14 @@ State 289
 State 290
 
    31 loop_body: unary_operation_without_dot DOT $@7 loop_body •
+=======
+   31 loop_body: output_stmt loop_body •
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     $default  reduce using rule 31 (loop_body)
 
 
+<<<<<<< HEAD
 State 291
 
   214 function_decl: datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU $@41 • $@42 body $@43 CLOSECU
@@ -4976,31 +7537,1195 @@ State 291
     $default  reduce using rule 212 ($@42)
 
     $@42  go to state 340
+=======
+State 174
+
+   32 loop_body: input_stmt loop_body •
+
+    $default  reduce using rule 32 (loop_body)
+
+
+State 175
+
+   37 loop_body: inbuilt_functions_with_dot loop_body •
+
+    $default  reduce using rule 37 (loop_body)
+
+
+State 176
+
+   38 loop_body: decl_stmt_with_exp loop_body •
+
+    $default  reduce using rule 38 (loop_body)
+
+
+State 177
+
+   13 body: unary_operation_without_dot DOT body •
+
+    $default  reduce using rule 13 (body)
+
+
+State 178
+
+  185 function_decl: datatypes idadd2 ASSGN OPENCU CLOSECU DARR • OPENCU $@14 body $@15 CLOSECU
+
+    OPENCU  shift, and go to state 253
+
+
+State 179
+
+  186 parameters: datatypes ID •
+  188           | datatypes ID • $@16 COMMA parameters
+
+    COMMA     reduce using rule 187 ($@16)
+    $default  reduce using rule 186 (parameters)
+
+    $@16  go to state 254
+
+
+State 180
+
+  182 function_decl: datatypes idadd2 ASSGN OPENCU parameters CLOSECU • DARR OPENCU $@12 body $@13 CLOSECU
+
+    DARR  shift, and go to state 255
+
+
+State 181
+
+   71 dimensions: OPENSQ check_rhs_exp CLOSESQ •
+   72           | OPENSQ check_rhs_exp CLOSESQ • dimensions
+
+    OPENSQ  shift, and go to state 70
+
+    $default  reduce using rule 71 (dimensions)
+
+    dimensions  go to state 256
+
+
+State 182
+
+  112 call_stmt_without_dot: ID OPENCU funccallargs CLOSECU •
+
+    $default  reduce using rule 112 (call_stmt_without_dot)
+
+
+State 183
+
+  114 funccallargs: check_rhs_exp COMMA • funccallargs
+
+    $default  reduce using rule 175 ($@11)
+
+    funccallargs   go to state 257
+    check_rhs_exp  go to state 126
+    $@11           go to state 78
+
+
+State 184
+
+  130 ids: single_variable $@10 • COMMA ids
+
+    COMMA  shift, and go to state 258
+
+
+State 185
+
+  128 input_stmt: INPUT COLON ids DOT •
+
+    $default  reduce using rule 128 (input_stmt)
+
+
+State 186
+
+  127 output_stmt: OUTPUT COLON check_rhs_exp DOT •
+
+    $default  reduce using rule 127 (output_stmt)
+
+
+State 187
+
+  121 loop_stmt: LOOP OPENSQ check_rhs_exp CLOSESQ • OPENCU $@9 loop_body CLOSECU
+
+    OPENCU  shift, and go to state 259
+
+
+State 188
+
+   52 vectors: OPENSQ check_rhs_exp • COMMA check_rhs_exp CLOSESQ
+
+    COMMA  shift, and go to state 260
+
+
+State 189
+
+  144 rel_to_mag: MAG OPENCU vectors CLOSECU •
+
+    $default  reduce using rule 144 (rel_to_mag)
+
+
+State 190
+
+  143 rel_to_mag: MAG OPENCU stand_id CLOSECU •
+
+    $default  reduce using rule 143 (rel_to_mag)
+
+
+State 191
+
+  115 conditional_stmt_start: OPENSQ check_rhs_exp CLOSESQ OPENCU •
+
+    $default  reduce using rule 115 (conditional_stmt_start)
+
+
+State 192
+
+   91 anything_with_value: ID ARROW • pos
+
+    FIRST   shift, and go to state 261
+    SECOND  shift, and go to state 262
+
+    pos  go to state 263
+
+
+State 193
+
+   93 anything_with_value: SIN OPENCC • anything_with_value CLOSECC
+
+    INTEGER_CONSTANT  shift, and go to state 135
+    STRING_CONSTANT   shift, and go to state 136
+    FLOAT_CONSTANT    shift, and go to state 137
+    TRUE              shift, and go to state 138
+    FALSE             shift, and go to state 139
+    ID                shift, and go to state 140
+    SIN               shift, and go to state 141
+    COS               shift, and go to state 142
+    TAN               shift, and go to state 143
+    MAG               shift, and go to state 36
+    OPENSQ            shift, and go to state 131
+    OPENCU            shift, and go to state 38
+    UNINEG            shift, and go to state 145
+    NON_NEGATIVE_INT  shift, and go to state 146
+
+    vectors                go to state 147
+    single_variable        go to state 148
+    anything_with_value    go to state 264
+    call_stmt_without_dot  go to state 153
+    inbuilt_functions      go to state 154
+    rel_to_mag             go to state 59
+    rel_to_pos             go to state 60
+    rel_to_vel             go to state 61
+    rel_to_momentum        go to state 62
+    rel_to_acc             go to state 63
+    rel_to_energy          go to state 64
+    rel_to_angle           go to state 65
+    rel_to_collision       go to state 66
+    miscellaneous          go to state 67
+
+
+State 194
+
+   94 anything_with_value: COS OPENCC • anything_with_value CLOSECC
+
+    INTEGER_CONSTANT  shift, and go to state 135
+    STRING_CONSTANT   shift, and go to state 136
+    FLOAT_CONSTANT    shift, and go to state 137
+    TRUE              shift, and go to state 138
+    FALSE             shift, and go to state 139
+    ID                shift, and go to state 140
+    SIN               shift, and go to state 141
+    COS               shift, and go to state 142
+    TAN               shift, and go to state 143
+    MAG               shift, and go to state 36
+    OPENSQ            shift, and go to state 131
+    OPENCU            shift, and go to state 38
+    UNINEG            shift, and go to state 145
+    NON_NEGATIVE_INT  shift, and go to state 146
+
+    vectors                go to state 147
+    single_variable        go to state 148
+    anything_with_value    go to state 265
+    call_stmt_without_dot  go to state 153
+    inbuilt_functions      go to state 154
+    rel_to_mag             go to state 59
+    rel_to_pos             go to state 60
+    rel_to_vel             go to state 61
+    rel_to_momentum        go to state 62
+    rel_to_acc             go to state 63
+    rel_to_energy          go to state 64
+    rel_to_angle           go to state 65
+    rel_to_collision       go to state 66
+    miscellaneous          go to state 67
+
+
+State 195
+
+   95 anything_with_value: TAN OPENCC • anything_with_value CLOSECC
+
+    INTEGER_CONSTANT  shift, and go to state 135
+    STRING_CONSTANT   shift, and go to state 136
+    FLOAT_CONSTANT    shift, and go to state 137
+    TRUE              shift, and go to state 138
+    FALSE             shift, and go to state 139
+    ID                shift, and go to state 140
+    SIN               shift, and go to state 141
+    COS               shift, and go to state 142
+    TAN               shift, and go to state 143
+    MAG               shift, and go to state 36
+    OPENSQ            shift, and go to state 131
+    OPENCU            shift, and go to state 38
+    UNINEG            shift, and go to state 145
+    NON_NEGATIVE_INT  shift, and go to state 146
+
+    vectors                go to state 147
+    single_variable        go to state 148
+    anything_with_value    go to state 266
+    call_stmt_without_dot  go to state 153
+    inbuilt_functions      go to state 154
+    rel_to_mag             go to state 59
+    rel_to_pos             go to state 60
+    rel_to_vel             go to state 61
+    rel_to_momentum        go to state 62
+    rel_to_acc             go to state 63
+    rel_to_energy          go to state 64
+    rel_to_angle           go to state 65
+    rel_to_collision       go to state 66
+    miscellaneous          go to state 67
+
+
+State 196
+
+   86 anything_with_value: UNINEG anything_with_value •
+
+    $default  reduce using rule 86 (anything_with_value)
+
+
+State 197
+
+   90 anything_with_value: vectors ARROW • pos
+
+    FIRST   shift, and go to state 261
+    SECOND  shift, and go to state 262
+
+    pos  go to state 267
+
+
+State 198
+
+   92 anything_with_value: single_variable UNIOP •
+
+    $default  reduce using rule 92 (anything_with_value)
+
+
+State 199
+
+  109 closeccs: CLOSECC •
+
+    $default  reduce using rule 109 (closeccs)
+
+
+State 200
+
+   40 bi_op: ADD •
+
+    $default  reduce using rule 40 (bi_op)
+
+
+State 201
+
+   41 bi_op: SUB •
+
+    $default  reduce using rule 41 (bi_op)
+
+
+State 202
+
+   42 bi_op: MUL •
+
+    $default  reduce using rule 42 (bi_op)
+
+
+State 203
+
+   43 bi_op: DIV •
+
+    $default  reduce using rule 43 (bi_op)
+
+
+State 204
+
+   44 bi_op: MOD •
+
+    $default  reduce using rule 44 (bi_op)
+
+
+State 205
+
+   45 bi_op: EXP •
+
+    $default  reduce using rule 45 (bi_op)
+
+
+State 206
+
+   46 relop: EQ •
+
+    $default  reduce using rule 46 (relop)
+
+
+State 207
+
+   47 relop: NEQ •
+
+    $default  reduce using rule 47 (relop)
+
+
+State 208
+
+   48 relop: GEQ •
+
+    $default  reduce using rule 48 (relop)
+
+
+State 209
+
+   50 relop: LEQ •
+
+    $default  reduce using rule 50 (relop)
+
+
+State 210
+
+   49 relop: GT •
+
+    $default  reduce using rule 49 (relop)
+
+
+State 211
+
+   51 relop: LT •
+
+    $default  reduce using rule 51 (relop)
+
+
+State 212
+
+   97 operations: LOGICOP •
+
+    $default  reduce using rule 97 (operations)
+
+
+State 213
+
+   96 operations: bi_op •
+
+    $default  reduce using rule 96 (operations)
+
+
+State 214
+
+   98 operations: relop •
+
+    $default  reduce using rule 98 (operations)
+
+
+State 215
+
+  103 rhs_exp: anything_with_value operations • rhs_exp
+
+    INTEGER_CONSTANT  shift, and go to state 135
+    STRING_CONSTANT   shift, and go to state 136
+    FLOAT_CONSTANT    shift, and go to state 137
+    TRUE              shift, and go to state 138
+    FALSE             shift, and go to state 139
+    ID                shift, and go to state 140
+    SIN               shift, and go to state 141
+    COS               shift, and go to state 142
+    TAN               shift, and go to state 143
+    MAG               shift, and go to state 36
+    OPENCC            shift, and go to state 144
+    OPENSQ            shift, and go to state 131
+    OPENCU            shift, and go to state 38
+    UNINEG            shift, and go to state 145
+    NON_NEGATIVE_INT  shift, and go to state 146
+
+    vectors                go to state 147
+    single_variable        go to state 148
+    anything_with_value    go to state 149
+    rhs_term               go to state 150
+    rhs_exp                go to state 268
+    openccs                go to state 152
+    call_stmt_without_dot  go to state 153
+    inbuilt_functions      go to state 154
+    rel_to_mag             go to state 59
+    rel_to_pos             go to state 60
+    rel_to_vel             go to state 61
+    rel_to_momentum        go to state 62
+    rel_to_acc             go to state 63
+    rel_to_energy          go to state 64
+    rel_to_angle           go to state 65
+    rel_to_collision       go to state 66
+    miscellaneous          go to state 67
+
+
+State 216
+
+  101 rhs_term: anything_with_value closeccs •
+  108 closeccs: closeccs • CLOSECC
+
+    CLOSECC  shift, and go to state 269
+
+    $default  reduce using rule 101 (rhs_term)
+
+
+State 217
+
+  102 rhs_exp: rhs_term operations • rhs_exp
+
+    INTEGER_CONSTANT  shift, and go to state 135
+    STRING_CONSTANT   shift, and go to state 136
+    FLOAT_CONSTANT    shift, and go to state 137
+    TRUE              shift, and go to state 138
+    FALSE             shift, and go to state 139
+    ID                shift, and go to state 140
+    SIN               shift, and go to state 141
+    COS               shift, and go to state 142
+    TAN               shift, and go to state 143
+    MAG               shift, and go to state 36
+    OPENCC            shift, and go to state 144
+    OPENSQ            shift, and go to state 131
+    OPENCU            shift, and go to state 38
+    UNINEG            shift, and go to state 145
+    NON_NEGATIVE_INT  shift, and go to state 146
+
+    vectors                go to state 147
+    single_variable        go to state 148
+    anything_with_value    go to state 149
+    rhs_term               go to state 150
+    rhs_exp                go to state 270
+    openccs                go to state 152
+    call_stmt_without_dot  go to state 153
+    inbuilt_functions      go to state 154
+    rel_to_mag             go to state 59
+    rel_to_pos             go to state 60
+    rel_to_vel             go to state 61
+    rel_to_momentum        go to state 62
+    rel_to_acc             go to state 63
+    rel_to_energy          go to state 64
+    rel_to_angle           go to state 65
+    rel_to_collision       go to state 66
+    miscellaneous          go to state 67
+
+
+State 218
+
+  106 openccs: openccs OPENCC •
+
+    $default  reduce using rule 106 (openccs)
+
+
+State 219
+
+   99 rhs_term: openccs anything_with_value •
+  100         | openccs anything_with_value • closeccs
+
+    CLOSECC  shift, and go to state 199
+
+    $default  reduce using rule 99 (rhs_term)
+
+    closeccs  go to state 271
+
+
+State 220
+
+   87 anything_with_value: call_stmt_without_dot ARROW • pos
+
+    FIRST   shift, and go to state 261
+    SECOND  shift, and go to state 262
+
+    pos  go to state 272
+
+
+State 221
+
+   88 anything_with_value: inbuilt_functions ARROW • pos
+
+    FIRST   shift, and go to state 261
+    SECOND  shift, and go to state 262
+
+    pos  go to state 273
+
+
+State 222
+
+  145 rel_to_pos: OPENCU stand_id CLOSECU SETR • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 274
+
+
+State 223
+
+  146 rel_to_pos: OPENCU stand_id CLOSECU ADDR • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 275
+
+
+State 224
+
+  149 rel_to_vel: OPENCU stand_id CLOSECU SETV • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 276
+
+
+State 225
+
+  150 rel_to_vel: OPENCU stand_id CLOSECU ADDV • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 277
+
+
+State 226
+
+  154 rel_to_acc: OPENCU stand_id CLOSECU SETA • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 278
+
+
+State 227
+
+  155 rel_to_acc: OPENCU stand_id CLOSECU ADDA • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 279
+
+
+State 228
+
+  153 rel_to_momentum: OPENCU stand_id CLOSECU SETP • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 280
+
+
+State 229
+
+  148 rel_to_pos: OPENCU stand_id CLOSECU GETR •
+
+    $default  reduce using rule 148 (rel_to_pos)
+
+
+State 230
+
+  156 rel_to_acc: OPENCU stand_id CLOSECU GETA •
+
+    $default  reduce using rule 156 (rel_to_acc)
+
+
+State 231
+
+  152 rel_to_vel: OPENCU stand_id CLOSECU GETV •
+
+    $default  reduce using rule 152 (rel_to_vel)
+
+
+State 232
+
+  157 rel_to_energy: OPENCU stand_id CLOSECU KE_AFTER • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 281
+
+
+State 233
+
+  158 rel_to_energy: OPENCU stand_id CLOSECU PE_AFTER • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 282
+
+
+State 234
+
+  159 rel_to_energy: OPENCU stand_id CLOSECU TE_AFTER • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 283
+
+
+State 235
+
+  160 rel_to_angle: OPENCU stand_id CLOSECU ANGLE_AFTER • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 284
+
+
+State 236
+
+  151 rel_to_vel: OPENCU stand_id CLOSECU V_AFTER • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 285
+
+
+State 237
+
+  147 rel_to_pos: OPENCU stand_id CLOSECU R_AFTER • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 286
+
+
+State 238
+
+  161 rel_to_collision: OPENCU stand_id CLOSECU COLLIDE • OPENCU stand_id COMMA ID CLOSECU
+  162                 | OPENCU stand_id CLOSECU COLLIDE • OPENCU stand_id CLOSECU
+
+    OPENCU  shift, and go to state 287
+
+
+State 239
+
+  163 rel_to_collision: OPENCU stand_id CLOSECU TIME_TO_COLLIDE • OPENCU stand_id CLOSECU
+
+    OPENCU  shift, and go to state 288
+
+
+State 240
+
+  165 miscellaneous: OPENCU stand_id CLOSECU ROC_AFTER • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 289
+
+
+State 241
+
+  166 miscellaneous: OPENCU stand_id CLOSECU P_AFTER • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 290
+
+
+State 242
+
+  164 miscellaneous: OPENCU stand_id CLOSECU S_AFTER • OPENCU check_rhs_exp CLOSECU
+
+    OPENCU  shift, and go to state 291
+
+
+State 243
+
+  167 miscellaneous: OPENCU stand_id CLOSECU TIME_TO_R • OPENCU term_misc COMMA term_misc CLOSECU
+
+    OPENCU  shift, and go to state 292
+
+
+State 244
+
+  168 miscellaneous: OPENCU stand_id CLOSECU TIME_TO_V • OPENCU term_misc COMMA term_misc CLOSECU
+
+    OPENCU  shift, and go to state 293
+
+
+State 245
+
+   21 body: SCOPEOPEN $@3 OPENCU body • SCOPECLOSE $@4 CLOSECU body
+
+    SCOPECLOSE  shift, and go to state 294
+
+
+State 246
+
+  177 expression: single_variable_declare ASSGN check_rhs_exp •
+
+    $default  reduce using rule 177 (expression)
+
+
+State 247
+
+  172 expressions: expression COMMA expressions •
+
+    $default  reduce using rule 172 (expressions)
+
+
+State 248
+
+   74 exp_stmt: single_variable_for_exp_stmt ASSGN check_rhs_exp DOT •
+
+    $default  reduce using rule 74 (exp_stmt)
+
+
+State 249
+
+   39 loop_body: BREAK DOT loop_body •
+
+    $default  reduce using rule 39 (loop_body)
+
+
+State 250
+
+   36 loop_body: SCOPEOPEN $@5 OPENCU • loop_body SCOPECLOSE $@6 CLOSECU body
+
+    INT        shift, and go to state 1
+    DOUBLE     shift, and go to state 2
+    STRING     shift, and go to state 3
+    BOOL       shift, and go to state 4
+    MASS       shift, and go to state 5
+    TIME       shift, and go to state 6
+    POSITION   shift, and go to state 7
+    VELOCITY   shift, and go to state 8
+    ACC        shift, and go to state 9
+    ENERGY     shift, and go to state 10
+    THETA      shift, and go to state 11
+    E          shift, and go to state 12
+    DISTANCE   shift, and go to state 13
+    MOMENTUM   shift, and go to state 14
+    ID         shift, and go to state 32
+    INPUT      shift, and go to state 33
+    OUTPUT     shift, and go to state 34
+    LOOP       shift, and go to state 35
+    BREAK      shift, and go to state 96
+    MAG        shift, and go to state 36
+    OPENSQ     shift, and go to state 37
+    OPENCU     shift, and go to state 38
+    UNINEG     shift, and go to state 39
+    DARR       shift, and go to state 40
+    CMT        shift, and go to state 16
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 295
+    primi_datatype                go to state 20
+    non_pri_datatype              go to state 21
+    datatypes                     go to state 43
+    single_variable               go to state 44
+    single_variable_for_exp_stmt  go to state 45
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+    inbuilt_functions             go to state 58
+    rel_to_mag                    go to state 59
+    rel_to_pos                    go to state 60
+    rel_to_vel                    go to state 61
+    rel_to_momentum               go to state 62
+    rel_to_acc                    go to state 63
+    rel_to_energy                 go to state 64
+    rel_to_angle                  go to state 65
+    rel_to_collision              go to state 66
+    miscellaneous                 go to state 67
+    decl_stmt_with_exp            go to state 109
+
+
+State 251
+
+  119 conditional_stmt: conditional_stmt_start loop_body CLOSECU $@7 • OTHERWISE OPENCU $@8 loop_body CLOSECU
+
+    OTHERWISE  shift, and go to state 296
+
+
+State 252
+
+   28 loop_body: unary_operation_without_dot DOT loop_body •
+
+    $default  reduce using rule 28 (loop_body)
+
+
+State 253
+
+  185 function_decl: datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU • $@14 body $@15 CLOSECU
+
+    $default  reduce using rule 183 ($@14)
+
+    $@14  go to state 297
+
+
+State 254
+
+  188 parameters: datatypes ID $@16 • COMMA parameters
+
+    COMMA  shift, and go to state 298
+
+
+State 255
+
+  182 function_decl: datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR • OPENCU $@12 body $@13 CLOSECU
+
+    OPENCU  shift, and go to state 299
+
+
+State 256
+
+   72 dimensions: OPENSQ check_rhs_exp CLOSESQ dimensions •
+
+    $default  reduce using rule 72 (dimensions)
+
+
+State 257
+
+  114 funccallargs: check_rhs_exp COMMA funccallargs •
+
+    $default  reduce using rule 114 (funccallargs)
+
+
+State 258
+
+  130 ids: single_variable $@10 COMMA • ids
+
+    ID  shift, and go to state 86
+
+    single_variable  go to state 127
+    ids              go to state 300
+
+
+State 259
+
+  121 loop_stmt: LOOP OPENSQ check_rhs_exp CLOSESQ OPENCU • $@9 loop_body CLOSECU
+
+    $default  reduce using rule 120 ($@9)
+
+    $@9  go to state 301
+
+
+State 260
+
+   52 vectors: OPENSQ check_rhs_exp COMMA • check_rhs_exp CLOSESQ
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 302
+    $@11           go to state 78
+
+
+State 261
+
+   75 pos: FIRST •
+
+    $default  reduce using rule 75 (pos)
+
+
+State 262
+
+   76 pos: SECOND •
+
+    $default  reduce using rule 76 (pos)
+
+
+State 263
+
+   91 anything_with_value: ID ARROW pos •
+
+    $default  reduce using rule 91 (anything_with_value)
+
+
+State 264
+
+   93 anything_with_value: SIN OPENCC anything_with_value • CLOSECC
+
+    CLOSECC  shift, and go to state 303
+
+
+State 265
+
+   94 anything_with_value: COS OPENCC anything_with_value • CLOSECC
+
+    CLOSECC  shift, and go to state 304
+
+
+State 266
+
+   95 anything_with_value: TAN OPENCC anything_with_value • CLOSECC
+
+    CLOSECC  shift, and go to state 305
+
+
+State 267
+
+   90 anything_with_value: vectors ARROW pos •
+
+    $default  reduce using rule 90 (anything_with_value)
+
+
+State 268
+
+  103 rhs_exp: anything_with_value operations rhs_exp •
+
+    $default  reduce using rule 103 (rhs_exp)
+
+
+State 269
+
+  108 closeccs: closeccs CLOSECC •
+
+    $default  reduce using rule 108 (closeccs)
+
+
+State 270
+
+  102 rhs_exp: rhs_term operations rhs_exp •
+
+    $default  reduce using rule 102 (rhs_exp)
+
+
+State 271
+
+  100 rhs_term: openccs anything_with_value closeccs •
+  108 closeccs: closeccs • CLOSECC
+
+    CLOSECC  shift, and go to state 269
+
+    $default  reduce using rule 100 (rhs_term)
+
+
+State 272
+
+   87 anything_with_value: call_stmt_without_dot ARROW pos •
+
+    $default  reduce using rule 87 (anything_with_value)
+
+
+State 273
+
+   88 anything_with_value: inbuilt_functions ARROW pos •
+
+    $default  reduce using rule 88 (anything_with_value)
+
+
+State 274
+
+  145 rel_to_pos: OPENCU stand_id CLOSECU SETR OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 306
+    $@11           go to state 78
+
+
+State 275
+
+  146 rel_to_pos: OPENCU stand_id CLOSECU ADDR OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 307
+    $@11           go to state 78
+
+
+State 276
+
+  149 rel_to_vel: OPENCU stand_id CLOSECU SETV OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 308
+    $@11           go to state 78
+
+
+State 277
+
+  150 rel_to_vel: OPENCU stand_id CLOSECU ADDV OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 309
+    $@11           go to state 78
+
+
+State 278
+
+  154 rel_to_acc: OPENCU stand_id CLOSECU SETA OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 310
+    $@11           go to state 78
+
+
+State 279
+
+  155 rel_to_acc: OPENCU stand_id CLOSECU ADDA OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 311
+    $@11           go to state 78
+
+
+State 280
+
+  153 rel_to_momentum: OPENCU stand_id CLOSECU SETP OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 312
+    $@11           go to state 78
+
+
+State 281
+
+  157 rel_to_energy: OPENCU stand_id CLOSECU KE_AFTER OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 313
+    $@11           go to state 78
+
+
+State 282
+
+  158 rel_to_energy: OPENCU stand_id CLOSECU PE_AFTER OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 314
+    $@11           go to state 78
+
+
+State 283
+
+  159 rel_to_energy: OPENCU stand_id CLOSECU TE_AFTER OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 315
+    $@11           go to state 78
+
+
+State 284
+
+  160 rel_to_angle: OPENCU stand_id CLOSECU ANGLE_AFTER OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 316
+    $@11           go to state 78
+
+
+State 285
+
+  151 rel_to_vel: OPENCU stand_id CLOSECU V_AFTER OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 317
+    $@11           go to state 78
+
+
+State 286
+
+  147 rel_to_pos: OPENCU stand_id CLOSECU R_AFTER OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 318
+    $@11           go to state 78
+
+
+State 287
+
+  161 rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU • stand_id COMMA ID CLOSECU
+  162                 | OPENCU stand_id CLOSECU COLLIDE OPENCU • stand_id CLOSECU
+
+    ID  shift, and go to state 79
+
+    stand_id  go to state 319
+
+
+State 288
+
+  163 rel_to_collision: OPENCU stand_id CLOSECU TIME_TO_COLLIDE OPENCU • stand_id CLOSECU
+
+    ID  shift, and go to state 79
+
+    stand_id  go to state 320
+
+
+State 289
+
+  165 miscellaneous: OPENCU stand_id CLOSECU ROC_AFTER OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 321
+    $@11           go to state 78
+
+
+State 290
+
+  166 miscellaneous: OPENCU stand_id CLOSECU P_AFTER OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 322
+    $@11           go to state 78
+
+
+State 291
+
+  164 miscellaneous: OPENCU stand_id CLOSECU S_AFTER OPENCU • check_rhs_exp CLOSECU
+
+    $default  reduce using rule 175 ($@11)
+
+    check_rhs_exp  go to state 323
+    $@11           go to state 78
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 292
 
+<<<<<<< HEAD
   216 parameters: datatypes ID $@44 •
 
     $default  reduce using rule 216 (parameters)
+=======
+  167 miscellaneous: OPENCU stand_id CLOSECU TIME_TO_R OPENCU • term_misc COMMA term_misc CLOSECU
+
+    QUESTION  shift, and go to state 324
+
+    $default  reduce using rule 175 ($@11)
+
+    term_misc      go to state 325
+    check_rhs_exp  go to state 326
+    $@11           go to state 78
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 293
 
+<<<<<<< HEAD
   219 parameters: datatypes ID $@45 • COMMA $@46 parameters
 
     COMMA  shift, and go to state 341
+=======
+  168 miscellaneous: OPENCU stand_id CLOSECU TIME_TO_V OPENCU • term_misc COMMA term_misc CLOSECU
+
+    QUESTION  shift, and go to state 324
+
+    $default  reduce using rule 175 ($@11)
+
+    term_misc      go to state 327
+    check_rhs_exp  go to state 326
+    $@11           go to state 78
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 294
 
+<<<<<<< HEAD
   210 function_decl: datatypes idadd2 ASSGN OPENCU $@36 parameters CLOSECU $@37 • DARR OPENCU $@38 $@39 body $@40 CLOSECU
 
     DARR  shift, and go to state 342
+=======
+   21 body: SCOPEOPEN $@3 OPENCU body SCOPECLOSE • $@4 CLOSECU body
+
+    $default  reduce using rule 20 ($@4)
+
+    $@4  go to state 328
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 295
 
+<<<<<<< HEAD
   130 funccallargs: check_rhs_exp COMMA $@21 • funccallargs
 
     $default  reduce using rule 199 ($@34)
@@ -5008,20 +8733,32 @@ State 295
     funccallargs   go to state 343
     check_rhs_exp  go to state 160
     $@34           go to state 132
+=======
+   36 loop_body: SCOPEOPEN $@5 OPENCU loop_body • SCOPECLOSE $@6 CLOSECU body
+
+    SCOPECLOSE  shift, and go to state 329
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 296
 
+<<<<<<< HEAD
    83 dimensions: dim_con check_rhs_exp CLOSESQ $@16 • dimensions
 
     OPENSQ  shift, and go to state 122
 
     dim_con     go to state 123
     dimensions  go to state 344
+=======
+  119 conditional_stmt: conditional_stmt_start loop_body CLOSECU $@7 OTHERWISE • OPENCU $@8 loop_body CLOSECU
+
+    OPENCU  shift, and go to state 330
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
 
 State 297
 
+<<<<<<< HEAD
   153 ids: single_variable $@31 COMMA • $@32 ids
 
     $default  reduce using rule 152 ($@32)
@@ -5339,6 +9076,9 @@ State 339
 State 340
 
   214 function_decl: datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU $@41 $@42 • body $@43 CLOSECU
+=======
+  185 function_decl: datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU $@14 • body $@15 CLOSECU
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     INT        shift, and go to state 1
     DOUBLE     shift, and go to state 2
@@ -5368,7 +9108,11 @@ State 340
 
     $default  reduce using rule 18 (body)
 
+<<<<<<< HEAD
     body                          go to state 375
+=======
+    body                          go to state 331
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
@@ -5399,6 +9143,7 @@ State 340
     decl_stmt_with_exp            go to state 68
 
 
+<<<<<<< HEAD
 State 341
 
   219 parameters: datatypes ID $@45 COMMA • $@46 parameters
@@ -5785,6 +9530,11 @@ State 375
 State 376
 
   219 parameters: datatypes ID $@45 COMMA $@46 • parameters
+=======
+State 298
+
+  188 parameters: datatypes ID $@16 COMMA • parameters
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     INT       shift, and go to state 1
     DOUBLE    shift, and go to state 2
@@ -5803,6 +9553,7 @@ State 376
 
     primi_datatype    go to state 20
     non_pri_datatype  go to state 21
+<<<<<<< HEAD
     datatypes         go to state 157
     parameters        go to state 388
 
@@ -5944,6 +9695,320 @@ State 394
 State 395
 
    23 body: SCOPEOPEN $@3 OPENCU $@4 body SCOPECLOSE $@5 CLOSECU $@6 • body
+=======
+    datatypes         go to state 121
+    parameters        go to state 332
+
+
+State 299
+
+  182 function_decl: datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU • $@12 body $@13 CLOSECU
+
+    $default  reduce using rule 180 ($@12)
+
+    $@12  go to state 333
+
+
+State 300
+
+  130 ids: single_variable $@10 COMMA ids •
+
+    $default  reduce using rule 130 (ids)
+
+
+State 301
+
+  121 loop_stmt: LOOP OPENSQ check_rhs_exp CLOSESQ OPENCU $@9 • loop_body CLOSECU
+
+    INT        shift, and go to state 1
+    DOUBLE     shift, and go to state 2
+    STRING     shift, and go to state 3
+    BOOL       shift, and go to state 4
+    MASS       shift, and go to state 5
+    TIME       shift, and go to state 6
+    POSITION   shift, and go to state 7
+    VELOCITY   shift, and go to state 8
+    ACC        shift, and go to state 9
+    ENERGY     shift, and go to state 10
+    THETA      shift, and go to state 11
+    E          shift, and go to state 12
+    DISTANCE   shift, and go to state 13
+    MOMENTUM   shift, and go to state 14
+    ID         shift, and go to state 32
+    INPUT      shift, and go to state 33
+    OUTPUT     shift, and go to state 34
+    LOOP       shift, and go to state 35
+    BREAK      shift, and go to state 96
+    MAG        shift, and go to state 36
+    OPENSQ     shift, and go to state 37
+    OPENCU     shift, and go to state 38
+    UNINEG     shift, and go to state 39
+    DARR       shift, and go to state 40
+    CMT        shift, and go to state 16
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 334
+    primi_datatype                go to state 20
+    non_pri_datatype              go to state 21
+    datatypes                     go to state 43
+    single_variable               go to state 44
+    single_variable_for_exp_stmt  go to state 45
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+    inbuilt_functions             go to state 58
+    rel_to_mag                    go to state 59
+    rel_to_pos                    go to state 60
+    rel_to_vel                    go to state 61
+    rel_to_momentum               go to state 62
+    rel_to_acc                    go to state 63
+    rel_to_energy                 go to state 64
+    rel_to_angle                  go to state 65
+    rel_to_collision              go to state 66
+    miscellaneous                 go to state 67
+    decl_stmt_with_exp            go to state 109
+
+
+State 302
+
+   52 vectors: OPENSQ check_rhs_exp COMMA check_rhs_exp • CLOSESQ
+
+    CLOSESQ  shift, and go to state 335
+
+
+State 303
+
+   93 anything_with_value: SIN OPENCC anything_with_value CLOSECC •
+
+    $default  reduce using rule 93 (anything_with_value)
+
+
+State 304
+
+   94 anything_with_value: COS OPENCC anything_with_value CLOSECC •
+
+    $default  reduce using rule 94 (anything_with_value)
+
+
+State 305
+
+   95 anything_with_value: TAN OPENCC anything_with_value CLOSECC •
+
+    $default  reduce using rule 95 (anything_with_value)
+
+
+State 306
+
+  145 rel_to_pos: OPENCU stand_id CLOSECU SETR OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 336
+
+
+State 307
+
+  146 rel_to_pos: OPENCU stand_id CLOSECU ADDR OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 337
+
+
+State 308
+
+  149 rel_to_vel: OPENCU stand_id CLOSECU SETV OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 338
+
+
+State 309
+
+  150 rel_to_vel: OPENCU stand_id CLOSECU ADDV OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 339
+
+
+State 310
+
+  154 rel_to_acc: OPENCU stand_id CLOSECU SETA OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 340
+
+
+State 311
+
+  155 rel_to_acc: OPENCU stand_id CLOSECU ADDA OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 341
+
+
+State 312
+
+  153 rel_to_momentum: OPENCU stand_id CLOSECU SETP OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 342
+
+
+State 313
+
+  157 rel_to_energy: OPENCU stand_id CLOSECU KE_AFTER OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 343
+
+
+State 314
+
+  158 rel_to_energy: OPENCU stand_id CLOSECU PE_AFTER OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 344
+
+
+State 315
+
+  159 rel_to_energy: OPENCU stand_id CLOSECU TE_AFTER OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 345
+
+
+State 316
+
+  160 rel_to_angle: OPENCU stand_id CLOSECU ANGLE_AFTER OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 346
+
+
+State 317
+
+  151 rel_to_vel: OPENCU stand_id CLOSECU V_AFTER OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 347
+
+
+State 318
+
+  147 rel_to_pos: OPENCU stand_id CLOSECU R_AFTER OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 348
+
+
+State 319
+
+  161 rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id • COMMA ID CLOSECU
+  162                 | OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id • CLOSECU
+
+    CLOSECU  shift, and go to state 349
+    COMMA    shift, and go to state 350
+
+
+State 320
+
+  163 rel_to_collision: OPENCU stand_id CLOSECU TIME_TO_COLLIDE OPENCU stand_id • CLOSECU
+
+    CLOSECU  shift, and go to state 351
+
+
+State 321
+
+  165 miscellaneous: OPENCU stand_id CLOSECU ROC_AFTER OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 352
+
+
+State 322
+
+  166 miscellaneous: OPENCU stand_id CLOSECU P_AFTER OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 353
+
+
+State 323
+
+  164 miscellaneous: OPENCU stand_id CLOSECU S_AFTER OPENCU check_rhs_exp • CLOSECU
+
+    CLOSECU  shift, and go to state 354
+
+
+State 324
+
+  170 term_misc: QUESTION •
+
+    $default  reduce using rule 170 (term_misc)
+
+
+State 325
+
+  167 miscellaneous: OPENCU stand_id CLOSECU TIME_TO_R OPENCU term_misc • COMMA term_misc CLOSECU
+
+    COMMA  shift, and go to state 355
+
+
+State 326
+
+  169 term_misc: check_rhs_exp •
+
+    $default  reduce using rule 169 (term_misc)
+
+
+State 327
+
+  168 miscellaneous: OPENCU stand_id CLOSECU TIME_TO_V OPENCU term_misc • COMMA term_misc CLOSECU
+
+    COMMA  shift, and go to state 356
+
+
+State 328
+
+   21 body: SCOPEOPEN $@3 OPENCU body SCOPECLOSE $@4 • CLOSECU body
+
+    CLOSECU  shift, and go to state 357
+
+
+State 329
+
+   36 loop_body: SCOPEOPEN $@5 OPENCU loop_body SCOPECLOSE • $@6 CLOSECU body
+
+    $default  reduce using rule 35 ($@6)
+
+    $@6  go to state 358
+
+
+State 330
+
+  119 conditional_stmt: conditional_stmt_start loop_body CLOSECU $@7 OTHERWISE OPENCU • $@8 loop_body CLOSECU
+
+    $default  reduce using rule 118 ($@8)
+
+    $@8  go to state 359
+
+
+State 331
+
+  185 function_decl: datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU $@14 body • $@15 CLOSECU
+
+    $default  reduce using rule 184 ($@15)
+
+    $@15  go to state 360
+
+
+State 332
+
+  188 parameters: datatypes ID $@16 COMMA parameters •
+
+    $default  reduce using rule 188 (parameters)
+
+
+State 333
+
+  182 function_decl: datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU $@12 • body $@13 CLOSECU
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     INT        shift, and go to state 1
     DOUBLE     shift, and go to state 2
@@ -5973,7 +10038,11 @@ State 395
 
     $default  reduce using rule 18 (body)
 
+<<<<<<< HEAD
     body                          go to state 401
+=======
+    body                          go to state 361
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
@@ -6004,6 +10073,7 @@ State 395
     decl_stmt_with_exp            go to state 68
 
 
+<<<<<<< HEAD
 State 396
 
    41 loop_body: SCOPEOPEN $@8 OPENCU $@9 loop_body SCOPECLOSE $@10 CLOSECU • $@11 body
@@ -6030,6 +10100,184 @@ State 398
 State 399
 
   210 function_decl: datatypes idadd2 ASSGN OPENCU $@36 parameters CLOSECU $@37 DARR OPENCU $@38 $@39 • body $@40 CLOSECU
+=======
+State 334
+
+  121 loop_stmt: LOOP OPENSQ check_rhs_exp CLOSESQ OPENCU $@9 loop_body • CLOSECU
+
+    CLOSECU  shift, and go to state 362
+
+
+State 335
+
+   52 vectors: OPENSQ check_rhs_exp COMMA check_rhs_exp CLOSESQ •
+
+    $default  reduce using rule 52 (vectors)
+
+
+State 336
+
+  145 rel_to_pos: OPENCU stand_id CLOSECU SETR OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 145 (rel_to_pos)
+
+
+State 337
+
+  146 rel_to_pos: OPENCU stand_id CLOSECU ADDR OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 146 (rel_to_pos)
+
+
+State 338
+
+  149 rel_to_vel: OPENCU stand_id CLOSECU SETV OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 149 (rel_to_vel)
+
+
+State 339
+
+  150 rel_to_vel: OPENCU stand_id CLOSECU ADDV OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 150 (rel_to_vel)
+
+
+State 340
+
+  154 rel_to_acc: OPENCU stand_id CLOSECU SETA OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 154 (rel_to_acc)
+
+
+State 341
+
+  155 rel_to_acc: OPENCU stand_id CLOSECU ADDA OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 155 (rel_to_acc)
+
+
+State 342
+
+  153 rel_to_momentum: OPENCU stand_id CLOSECU SETP OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 153 (rel_to_momentum)
+
+
+State 343
+
+  157 rel_to_energy: OPENCU stand_id CLOSECU KE_AFTER OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 157 (rel_to_energy)
+
+
+State 344
+
+  158 rel_to_energy: OPENCU stand_id CLOSECU PE_AFTER OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 158 (rel_to_energy)
+
+
+State 345
+
+  159 rel_to_energy: OPENCU stand_id CLOSECU TE_AFTER OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 159 (rel_to_energy)
+
+
+State 346
+
+  160 rel_to_angle: OPENCU stand_id CLOSECU ANGLE_AFTER OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 160 (rel_to_angle)
+
+
+State 347
+
+  151 rel_to_vel: OPENCU stand_id CLOSECU V_AFTER OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 151 (rel_to_vel)
+
+
+State 348
+
+  147 rel_to_pos: OPENCU stand_id CLOSECU R_AFTER OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 147 (rel_to_pos)
+
+
+State 349
+
+  162 rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id CLOSECU •
+
+    $default  reduce using rule 162 (rel_to_collision)
+
+
+State 350
+
+  161 rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id COMMA • ID CLOSECU
+
+    ID  shift, and go to state 363
+
+
+State 351
+
+  163 rel_to_collision: OPENCU stand_id CLOSECU TIME_TO_COLLIDE OPENCU stand_id CLOSECU •
+
+    $default  reduce using rule 163 (rel_to_collision)
+
+
+State 352
+
+  165 miscellaneous: OPENCU stand_id CLOSECU ROC_AFTER OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 165 (miscellaneous)
+
+
+State 353
+
+  166 miscellaneous: OPENCU stand_id CLOSECU P_AFTER OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 166 (miscellaneous)
+
+
+State 354
+
+  164 miscellaneous: OPENCU stand_id CLOSECU S_AFTER OPENCU check_rhs_exp CLOSECU •
+
+    $default  reduce using rule 164 (miscellaneous)
+
+
+State 355
+
+  167 miscellaneous: OPENCU stand_id CLOSECU TIME_TO_R OPENCU term_misc COMMA • term_misc CLOSECU
+
+    QUESTION  shift, and go to state 324
+
+    $default  reduce using rule 175 ($@11)
+
+    term_misc      go to state 364
+    check_rhs_exp  go to state 326
+    $@11           go to state 78
+
+
+State 356
+
+  168 miscellaneous: OPENCU stand_id CLOSECU TIME_TO_V OPENCU term_misc COMMA • term_misc CLOSECU
+
+    QUESTION  shift, and go to state 324
+
+    $default  reduce using rule 175 ($@11)
+
+    term_misc      go to state 365
+    check_rhs_exp  go to state 326
+    $@11           go to state 78
+
+
+State 357
+
+   21 body: SCOPEOPEN $@3 OPENCU body SCOPECLOSE $@4 CLOSECU • body
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     INT        shift, and go to state 1
     DOUBLE     shift, and go to state 2
@@ -6059,7 +10307,11 @@ State 399
 
     $default  reduce using rule 18 (body)
 
+<<<<<<< HEAD
     body                          go to state 403
+=======
+    body                          go to state 366
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
@@ -6090,6 +10342,7 @@ State 399
     decl_stmt_with_exp            go to state 68
 
 
+<<<<<<< HEAD
 State 400
 
    60 vectors: OPENSQ $@12 check_rhs_exp COMMA $@13 check_rhs_exp CLOSESQ $@14 •
@@ -6107,6 +10360,133 @@ State 401
 State 402
 
    41 loop_body: SCOPEOPEN $@8 OPENCU $@9 loop_body SCOPECLOSE $@10 CLOSECU $@11 • body
+=======
+State 358
+
+   36 loop_body: SCOPEOPEN $@5 OPENCU loop_body SCOPECLOSE $@6 • CLOSECU body
+
+    CLOSECU  shift, and go to state 367
+
+
+State 359
+
+  119 conditional_stmt: conditional_stmt_start loop_body CLOSECU $@7 OTHERWISE OPENCU $@8 • loop_body CLOSECU
+
+    INT        shift, and go to state 1
+    DOUBLE     shift, and go to state 2
+    STRING     shift, and go to state 3
+    BOOL       shift, and go to state 4
+    MASS       shift, and go to state 5
+    TIME       shift, and go to state 6
+    POSITION   shift, and go to state 7
+    VELOCITY   shift, and go to state 8
+    ACC        shift, and go to state 9
+    ENERGY     shift, and go to state 10
+    THETA      shift, and go to state 11
+    E          shift, and go to state 12
+    DISTANCE   shift, and go to state 13
+    MOMENTUM   shift, and go to state 14
+    ID         shift, and go to state 32
+    INPUT      shift, and go to state 33
+    OUTPUT     shift, and go to state 34
+    LOOP       shift, and go to state 35
+    BREAK      shift, and go to state 96
+    MAG        shift, and go to state 36
+    OPENSQ     shift, and go to state 37
+    OPENCU     shift, and go to state 38
+    UNINEG     shift, and go to state 39
+    DARR       shift, and go to state 40
+    CMT        shift, and go to state 16
+    SCOPEOPEN  shift, and go to state 97
+
+    $default  reduce using rule 33 (loop_body)
+
+    loop_body                     go to state 368
+    primi_datatype                go to state 20
+    non_pri_datatype              go to state 21
+    datatypes                     go to state 43
+    single_variable               go to state 44
+    single_variable_for_exp_stmt  go to state 45
+    exp_stmt                      go to state 99
+    call_stmt_with_dot            go to state 100
+    call_stmt_without_dot         go to state 48
+    conditional_stmt_start        go to state 49
+    conditional_stmt              go to state 101
+    loop_stmt                     go to state 102
+    unary_operation_without_dot   go to state 103
+    return_stmt                   go to state 104
+    comments                      go to state 105
+    output_stmt                   go to state 106
+    input_stmt                    go to state 107
+    inbuilt_functions_with_dot    go to state 108
+    inbuilt_functions             go to state 58
+    rel_to_mag                    go to state 59
+    rel_to_pos                    go to state 60
+    rel_to_vel                    go to state 61
+    rel_to_momentum               go to state 62
+    rel_to_acc                    go to state 63
+    rel_to_energy                 go to state 64
+    rel_to_angle                  go to state 65
+    rel_to_collision              go to state 66
+    miscellaneous                 go to state 67
+    decl_stmt_with_exp            go to state 109
+
+
+State 360
+
+  185 function_decl: datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU $@14 body $@15 • CLOSECU
+
+    CLOSECU  shift, and go to state 369
+
+
+State 361
+
+  182 function_decl: datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU $@12 body • $@13 CLOSECU
+
+    $default  reduce using rule 181 ($@13)
+
+    $@13  go to state 370
+
+
+State 362
+
+  121 loop_stmt: LOOP OPENSQ check_rhs_exp CLOSESQ OPENCU $@9 loop_body CLOSECU •
+
+    $default  reduce using rule 121 (loop_stmt)
+
+
+State 363
+
+  161 rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id COMMA ID • CLOSECU
+
+    CLOSECU  shift, and go to state 371
+
+
+State 364
+
+  167 miscellaneous: OPENCU stand_id CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc • CLOSECU
+
+    CLOSECU  shift, and go to state 372
+
+
+State 365
+
+  168 miscellaneous: OPENCU stand_id CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc • CLOSECU
+
+    CLOSECU  shift, and go to state 373
+
+
+State 366
+
+   21 body: SCOPEOPEN $@3 OPENCU body SCOPECLOSE $@4 CLOSECU body •
+
+    $default  reduce using rule 21 (body)
+
+
+State 367
+
+   36 loop_body: SCOPEOPEN $@5 OPENCU loop_body SCOPECLOSE $@6 CLOSECU • body
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
 
     INT        shift, and go to state 1
     DOUBLE     shift, and go to state 2
@@ -6136,7 +10516,11 @@ State 402
 
     $default  reduce using rule 18 (body)
 
+<<<<<<< HEAD
     body                          go to state 404
+=======
+    body                          go to state 374
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
     primi_datatype                go to state 20
     non_pri_datatype              go to state 21
     datatypes                     go to state 43
@@ -6167,6 +10551,7 @@ State 402
     decl_stmt_with_exp            go to state 68
 
 
+<<<<<<< HEAD
 State 403
 
   210 function_decl: datatypes idadd2 ASSGN OPENCU $@36 parameters CLOSECU $@37 DARR OPENCU $@38 $@39 body • $@40 CLOSECU
@@ -6195,3 +10580,66 @@ State 406
   210 function_decl: datatypes idadd2 ASSGN OPENCU $@36 parameters CLOSECU $@37 DARR OPENCU $@38 $@39 body $@40 CLOSECU •
 
     $default  reduce using rule 210 (function_decl)
+=======
+State 368
+
+  119 conditional_stmt: conditional_stmt_start loop_body CLOSECU $@7 OTHERWISE OPENCU $@8 loop_body • CLOSECU
+
+    CLOSECU  shift, and go to state 375
+
+
+State 369
+
+  185 function_decl: datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU $@14 body $@15 CLOSECU •
+
+    $default  reduce using rule 185 (function_decl)
+
+
+State 370
+
+  182 function_decl: datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU $@12 body $@13 • CLOSECU
+
+    CLOSECU  shift, and go to state 376
+
+
+State 371
+
+  161 rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id COMMA ID CLOSECU •
+
+    $default  reduce using rule 161 (rel_to_collision)
+
+
+State 372
+
+  167 miscellaneous: OPENCU stand_id CLOSECU TIME_TO_R OPENCU term_misc COMMA term_misc CLOSECU •
+
+    $default  reduce using rule 167 (miscellaneous)
+
+
+State 373
+
+  168 miscellaneous: OPENCU stand_id CLOSECU TIME_TO_V OPENCU term_misc COMMA term_misc CLOSECU •
+
+    $default  reduce using rule 168 (miscellaneous)
+
+
+State 374
+
+   36 loop_body: SCOPEOPEN $@5 OPENCU loop_body SCOPECLOSE $@6 CLOSECU body •
+
+    $default  reduce using rule 36 (loop_body)
+
+
+State 375
+
+  119 conditional_stmt: conditional_stmt_start loop_body CLOSECU $@7 OTHERWISE OPENCU $@8 loop_body CLOSECU •
+
+    $default  reduce using rule 119 (conditional_stmt)
+
+
+State 376
+
+  182 function_decl: datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU $@12 body $@13 CLOSECU •
+
+    $default  reduce using rule 182 (function_decl)
+>>>>>>> e5e67e992621007fb70519ea2ef45fd336629741
