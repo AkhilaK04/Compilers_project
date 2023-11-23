@@ -2,7 +2,7 @@
 #include <bits/stdc++.h>
 #include "semantics.hpp"
 
-extern FILE *yyin, *tokfile, *parsefile ;
+extern FILE *yyin, *tokfile, *parsefile, *outfile ;
 extern int yylineno;
 int yylex();
 void yyerror(char *s);
@@ -56,7 +56,7 @@ void yyerror(char *s);
 %token <object> SCOPECLOSE
 
 
-%type <object> check_rhs_exp stand_id single_variable_for_exp_stmt single_variable_declare code code_subpart comments startfn function_decl loop_body body exp_stmt call_stmt_with_dot conditional_stmt loop_stmt unary_operation_without_dot return_stmt output_stmt input_stmt inbuilt_functions_with_dot decl_stmt_with_exp bi_op relop vectors primi_datatype non_pri_datatype datatypes single_variable dimensions pos idadd2 anything_with_value operations rhs_exp rhs_term openccs closeccs call_stmt_without_dot conditional_stmt_start ids  rel_to_mag rel_to_vel rel_to_pos rel_to_acc rel_to_energy rel_to_angle  rel_to_collision rel_to_momentum miscellaneous term_misc expression expressions  parameters inbuilt_functions
+%type <object> dim_con check_rhs_exp stand_id single_variable_for_exp_stmt single_variable_declare code code_subpart comments startfn function_decl loop_body body exp_stmt call_stmt_with_dot conditional_stmt loop_stmt unary_operation_without_dot return_stmt output_stmt input_stmt inbuilt_functions_with_dot decl_stmt_with_exp bi_op relop vectors primi_datatype non_pri_datatype datatypes single_variable dimensions pos idadd2 anything_with_value operations rhs_exp rhs_term openccs closeccs call_stmt_without_dot conditional_stmt_start ids  rel_to_mag rel_to_vel rel_to_pos rel_to_acc rel_to_energy rel_to_angle  rel_to_collision rel_to_momentum miscellaneous term_misc expression expressions  parameters inbuilt_functions
 %type <arg_object> funccallargs
 %start code
 %%
@@ -90,13 +90,13 @@ body : exp_stmt body
      | call_stmt_with_dot body
      | conditional_stmt body
      | loop_stmt body
-     | unary_operation_without_dot DOT body
+     | unary_operation_without_dot DOT {fprintf(outfile, ";");}
      | return_stmt body
      | comments body
      | output_stmt body
      | input_stmt body
      | {}
-     | SCOPEOPEN { current_pointer++;  curr_scopes[current_pointer]++; }OPENCU body SCOPECLOSE {current_pointer--; }CLOSECU body 
+     | SCOPEOPEN { current_pointer++;  curr_scopes[current_pointer]++; }OPENCU {fprintf(outfile, "{");} body SCOPECLOSE {current_pointer--; }CLOSECU {fprintf(outfile, "}");} body
      | inbuilt_functions_with_dot body
      | decl_stmt_with_exp body 
      ;
@@ -105,59 +105,65 @@ loop_body : exp_stmt loop_body
      | call_stmt_with_dot loop_body
      | conditional_stmt loop_body
      | loop_stmt loop_body
-     | unary_operation_without_dot DOT loop_body
+     | unary_operation_without_dot DOT {fprintf(outfile, ";");} loop_body 
      | return_stmt loop_body
      | comments loop_body
      | output_stmt loop_body
      | input_stmt loop_body
      | {}
-     | SCOPEOPEN { current_pointer++;  curr_scopes[current_pointer]++; } OPENCU loop_body SCOPECLOSE {current_pointer--; } CLOSECU body 
+     | SCOPEOPEN { current_pointer++;  curr_scopes[current_pointer]++; } OPENCU {fprintf(outfile, "{");} loop_body SCOPECLOSE {current_pointer--; } CLOSECU {fprintf(outfile, "}");} body
      | inbuilt_functions_with_dot loop_body
      | decl_stmt_with_exp loop_body 
-     | BREAK DOT loop_body
+     | BREAK DOT loop_body {fprintf(outfile, "break; %s", $3);}
      ;
 
-bi_op : ADD
-      | SUB
-      | MUL
-      | DIV
-      | MOD
-      | EXP
+bi_op : ADD {fprintf(outfile, "+");}
+      | SUB {fprintf(outfile, "-");}
+      | MUL {fprintf(outfile, "*");}
+      | DIV {fprintf(outfile, "/");}
+      | MOD 
+      | EXP 
       ;
 
-relop : EQ
-      | NEQ
-      | GEQ
-      | GT
-      | LEQ
-      | LT
+relop : EQ {fprintf(outfile, "==");}
+      | NEQ {fprintf(outfile, "!=");}
+      | GEQ {fprintf(outfile, ">=");}
+      | GT {fprintf(outfile, ">");}
+      | LEQ {fprintf(outfile, "<=");}
+      | LT {fprintf(outfile, "<");}
       ;
 
-vectors : OPENSQ check_rhs_exp COMMA check_rhs_exp CLOSESQ {
-              if(($2.type == 1 || $2.type == 4 || $2.type == 2) && ($2.type == 1 || $2.type == 4 || $2.type == 2)){
+vectors : OPENSQ {fprintf(outfile, "{");} check_rhs_exp COMMA {fprintf(outfile, ",");} check_rhs_exp CLOSESQ {fprintf(outfile, "}");} {
+              if(($3.type == 1 || $3.type == 4 || $3.type == 2) && ($3.type == 1 || $3.type == 4 || $3.type == 2)){
                 $$.type = 10;
               }
               else{
                 cout << "Invalid vector in line " << yylineno << endl;
-              }}
+              }
+              
+              } 
         ;
 
-primi_datatype: INT {insert_type($1.value);}
-              | DOUBLE {insert_type($1.value);}
-              | BOOL {insert_type($1.value);}
-              | STRING {insert_type($1.value);}
+primi_datatype: INT {insert_type($1.value);
+                  fprintf(outfile, "int");} 
+              | DOUBLE {insert_type($1.value);
+               fprintf(outfile, "double");}
+              | BOOL {insert_type($1.value);
+              fprintf(outfile, "bool");}
+              | STRING {insert_type($1.value);
+              fprintf(outfile, "string");}
               ;
             
-non_pri_datatype: MASS {insert_type($1.value);}
-                | TIME {insert_type($1.value);}
-                | POSITION {insert_type($1.value);}
-                | VELOCITY {insert_type($1.value);}
-                | ACC {insert_type($1.value);}
-                | ENERGY {insert_type($1.value);}
-                | THETA {insert_type($1.value);}
-                | E       {insert_type($1.value);}
-                | DISTANCE {insert_type($1.value);}
-                | MOMENTUM {insert_type($1.value);}
+non_pri_datatype: MASS {insert_type($1.value); fprintf(outfile, "mass");}
+                | TIME {insert_type($1.value); fprintf(outfile, "double");} 
+                | POSITION {insert_type($1.value); fprintf(outfile, "pair<double,double>");}
+                | VELOCITY {insert_type($1.value); fprintf(outfile, "pair<double,double>");}
+                | ACC {insert_type($1.value); fprintf(outfile, "pair<double,double>");}
+                | ENERGY {insert_type($1.value); fprintf(outfile, "double");}
+                | THETA {insert_type($1.value); fprintf(outfile, "double");}
+                | E       {insert_type($1.value); fprintf(outfile, "double");}
+                | DISTANCE {insert_type($1.value); fprintf(outfile, "double");}
+                | MOMENTUM {insert_type($1.value); fprintf(outfile, "double");}
                 ;
             
 datatypes : primi_datatype
@@ -166,11 +172,14 @@ datatypes : primi_datatype
 
 /* DECLARATION STATEMENT needed things */
 
-single_variable : ID 
-                | ID dimensions 
+single_variable : ID { fprintf(outfile,"%s", $1);}
+                | ID { fprintf(outfile,"%s", $1);} dimensions 
                 ;
 
-dimensions : OPENSQ check_rhs_exp CLOSESQ {
+dim_con : OPENSQ {fprintf(outfile, "[");} ;
+
+dimensions : dim_con check_rhs_exp CLOSESQ {
+              fprintf(outfile, "]");
               if($2.type == 1){
                 $$.type = 10;
               }
@@ -178,7 +187,7 @@ dimensions : OPENSQ check_rhs_exp CLOSESQ {
                 cout << "Invalid dimension in line " << yylineno << endl;
               }
               }
-           | OPENSQ check_rhs_exp CLOSESQ dimensions{
+           | dim_con check_rhs_exp CLOSESQ {fprintf(outfile, "]");} dimensions{
               if($2.type == 1){
                 $$.type = 10;
               }
@@ -198,10 +207,11 @@ single_variable_for_exp_stmt :  single_variable
                                 }
                                 ;
 
-exp_stmt : single_variable_for_exp_stmt ASSGN check_rhs_exp DOT
-          {if(!type_checking_assign($1.type,$3.type)){
-            cout << "From exp_stmt Expression statement types not compatible " << $1.type << ' ' << $3.type << ' ' <<" at " << yylineno << endl;
-          }}
+exp_stmt : single_variable_for_exp_stmt ASSGN { fprintf(outfile, "=");} check_rhs_exp DOT {fprintf(outfile, ";");} 
+          {if(!type_checking_assign($1.type,$4.type)){
+            cout << "From exp_stmt Expression statement types not compatible " << $1.type << ' ' << $4.type << ' ' <<" at " << yylineno << endl;
+          }
+          }
          ;
 
 pos : FIRST
@@ -211,15 +221,15 @@ pos : FIRST
 anything_with_value : single_variable {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
     cout << "From anything_with_value Undeclared variable used " << $1.value << " at " << yylineno<< endl;
   }}
-                    | NON_NEGATIVE_INT
-                    | INTEGER_CONSTANT
-                    | FLOAT_CONSTANT
-                    | STRING_CONSTANT
-                    | TRUE 
-                    | FALSE 
+                    | NON_NEGATIVE_INT {fprintf(outfile, "%s", $1);}
+                    | INTEGER_CONSTANT {fprintf(outfile, "%s", $1);}
+                    | FLOAT_CONSTANT {fprintf(outfile, "%s", $1);}
+                    | STRING_CONSTANT {fprintf(outfile, "%s", $1);}
+                    | TRUE {fprintf(outfile, "%s", $1);}
+                    | FALSE {fprintf(outfile, "%s", $1);}
                     | call_stmt_without_dot
                     | vectors {$$.type = 10;}
-                    | UNINEG anything_with_value {$$.type = 4;}
+                    | UNINEG {fprintf(outfile, "!");}anything_with_value {$$.type = 4;}
                     | call_stmt_without_dot ARROW pos {if($1.type != 5 && $1.type != 6 && $1.type != 7 && $1.type != 8 && $1.type != 9 && $1.type != 10){
                       cout << "From anything with value call statement return is not a vector" << endl;
                     }}
@@ -249,7 +259,7 @@ anything_with_value : single_variable {if(($$.type = undeclare_check($1.value,co
                     ;
         
 operations : bi_op 
-           | LOGICOP
+           | LOGICOP {fprintf(outfile, "%s", $1);}
            | relop
            ;
 
@@ -258,27 +268,29 @@ rhs_term : openccs anything_with_value {$$.type = $2.type;}
          | anything_with_value closeccs {$$.type = $1.type;}
          ;
 
-rhs_exp : rhs_term operations rhs_exp {cout << $1.type << ' ' << $2.value << ' '<< $3.type << endl;
-$$.type = give_result_type($1.type,$2.value,$3.type); 
-if($$.type == -1){cout << "From rhs_exp Invalid operation in rhs side " << $1.type << " " << $2.value << " "  << $3.type << " at " << yylineno << endl;}}
-        | anything_with_value operations rhs_exp {cout << $1.type << ' ' << $2.value << ' '<< $3.type << endl; 
-$$.type = give_result_type($1.type,$2.value,$3.type); 
-if($$.type == -1){cout << "From rhs_exp Invalid operation in rhs side " << $1.type << " " << $2.value << " " << $3.type << " at " << yylineno  << endl;}}
+rhs_exp : rhs_term operations rhs_exp 
+          {cout << $1.type << ' ' << $2.value << ' '<< $3.type << endl;
+            $$.type = give_result_type($1.type,$2.value,$3.type); 
+            if($$.type == -1){cout << "From rhs_exp Invalid operation in rhs side " << $1.type << " " << $2.value << " "  << $3.type << " at " << yylineno << endl;}}
+        | anything_with_value operations rhs_exp 
+        {cout << $1.type << ' ' << $2.value << ' '<< $3.type << endl; 
+          $$.type = give_result_type($1.type,$2.value,$3.type); 
+          if($$.type == -1){cout << "From rhs_exp Invalid operation in rhs side " << $1.type << " " << $2.value << " " << $3.type << " at " << yylineno  << endl;}}
         | rhs_term
         | anything_with_value
         ;
 
-openccs : openccs OPENCC {open_brackets = open_brackets + 1;}
-        | OPENCC {open_brackets = open_brackets + 1;}
+openccs : openccs OPENCC {open_brackets = open_brackets + 1; fprintf(outfile, "(");} 
+        | OPENCC {open_brackets = open_brackets + 1; fprintf(outfile, "(");} 
         ;
 
-closeccs : closeccs CLOSECC {close_brackets = close_brackets + 1;}
-         | CLOSECC {close_brackets = close_brackets + 1;}
+closeccs : closeccs CLOSECC {close_brackets = close_brackets + 1; fprintf(outfile, ")");}
+         | CLOSECC {close_brackets = close_brackets + 1; fprintf(outfile, ")");} 
          ;
 
 /* CALL STATEMENT WITH DOT */
 
-call_stmt_with_dot : call_stmt_without_dot DOT
+call_stmt_with_dot : call_stmt_without_dot DOT {fprintf(outfile, ";");} 
                    ;
 
 call_stmt_without_dot : ID OPENCU CLOSECU 
@@ -290,14 +302,16 @@ call_stmt_without_dot : ID OPENCU CLOSECU
                         }
                         func_args_list.clear();
                         $$.type = find_return_type($1.value,templist,temp);
+                        fprintf(outfile, "%s()", $1);
                       }
-	                  | ID OPENCU funccallargs CLOSECU 
+	                  | ID OPENCU  {fprintf(outfile, "%s(",$1);} funccallargs CLOSECU  
                       {
-                          if(!check_func_args($1.value, $3.list,$3.present)){
+                          if(!check_func_args($1.value, $4.list,$4.present)){
                             cout << "From call_stmt_without_dot Undeclared function " << $1.value <<" at " << yylineno  << endl;
                           }
                           func_args_list.clear();
-                          $$.type = find_return_type($1.value,$3.list,$3.present);
+                          $$.type = find_return_type($1.value,$4.list,$4.present);
+                          fprintf(outfile, ")");
                       }
                       
 	                  ;
@@ -307,41 +321,44 @@ funccallargs : check_rhs_exp
                   $$.list[0] = &(get_string_type($1.type)[0]);
                   $$.present = 1;
                 }
-             | check_rhs_exp COMMA funccallargs
+             | check_rhs_exp COMMA {fprintf(outfile, ",");} funccallargs
               {
-                for(int i=0;i<$3.present;i++){
-                  $$.list[i+1] = $3.list[i];
+                for(int i=0;i<$4.present;i++){
+                  $$.list[i+1] = $4.list[i];
                 }
-                $$.present = $3.present + 1;
+                $$.present = $4.present + 1;
                 $$.list[0] = &(get_string_type($1.type)[0]);
               }
              ;
 
 /* CONDITIONAL STATEMENT  */
 
-conditional_stmt_start : OPENSQ check_rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; }
+conditional_stmt_start : OPENSQ {fprintf(outfile, "if(");} check_rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; fprintf(outfile, "){");}
                       ;
 
 
-conditional_stmt: conditional_stmt_start loop_body CLOSECU {current_pointer--; }
-                | conditional_stmt_start loop_body CLOSECU {current_pointer--; } OTHERWISE OPENCU { current_pointer++;  curr_scopes[current_pointer]++; } loop_body  CLOSECU {current_pointer--; }
+conditional_stmt: conditional_stmt_start loop_body CLOSECU {current_pointer--; fprintf(outfile, "\n}\n");} 
+                | conditional_stmt_start loop_body CLOSECU {current_pointer--; } OTHERWISE OPENCU { current_pointer++;  curr_scopes[current_pointer]++; fprintf(outfile, "} else {");} loop_body  CLOSECU {current_pointer--; fprintf(outfile, "}");} 
                 ;
 
 /* LOOP STATEMENT */
       
-loop_stmt: LOOP OPENSQ check_rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; } loop_body CLOSECU {current_pointer--; }
+loop_stmt: LOOP OPENSQ {fprintf(outfile, "while(");} check_rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; fprintf(outfile, "){");} loop_body CLOSECU {current_pointer--; fprintf(outfile, "}");} 
          ; 
 
 /* UNIRARY OPERATION WITHOUT DOT */
 
-unary_operation_without_dot: single_variable UNIOP {if (($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0) cout << "undeclaration error at " << yylineno << $1.value << endl;
+unary_operation_without_dot: single_variable UNIOP {
+                              fprintf(outfile, "%s", $2);
+                              if (($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0) cout << "undeclaration error at " << yylineno << $1.value << endl;
                               if($1.type != 1 && $1.type != 2){
                                 cout << "From unary_operation_without_dot cant perform operation" << endl;
                               }
-                              $$.type = $1.type;}
-                           | UNINEG check_rhs_exp {
+                              $$.type = $1.type;
+                              }
+                           | UNINEG {fprintf(outfile, " !");} check_rhs_exp {
                             $$.type = 4;
-                            if ($2.type != 1 && $2.type !=2 && $2.type != 4){
+                            if ($3.type != 1 && $3.type !=2 && $3.type != 4){
                               cout << "From unary_operation_without_dot invalid negation operation" << endl;
                             }
                            }
@@ -349,28 +366,28 @@ unary_operation_without_dot: single_variable UNIOP {if (($$.type = undeclare_che
 
 /* RETURN STATEMENT */
     
-return_stmt: DARR check_rhs_exp DOT
-           | DARR DOT
+return_stmt: DARR {fprintf(outfile, "return ");}  check_rhs_exp DOT {fprintf(outfile, ";");} 
+           | DARR DOT {fprintf(outfile, "return ;");} 
            ;
 
 /* COMMENT STATEMENT */
 
-comments : CMT
+comments : CMT {fprintf(outfile, "%s", $1);} 
          ;
 
 /* OUTPUT STATEMENT */
      
-output_stmt : OUTPUT COLON check_rhs_exp DOT
+output_stmt : OUTPUT COLON {fprintf(outfile, " cout << ");} check_rhs_exp DOT {fprintf(outfile, ";");} 
             ;
 
 /* INPUT STATEMENT */
      
-input_stmt : INPUT COLON ids DOT
+input_stmt : INPUT COLON {fprintf(outfile, "cin >>  ");} ids DOT {fprintf(outfile, ";");} 
            ;
 
 ids : single_variable {if(undeclare_check($1.value,convert_scope_to_string()) == 0){
                           cout << "Undeclared variable used at " << yylineno << $1.value << endl;
-                        }}COMMA ids
+                        }}COMMA {fprintf(outfile, ",");} ids
     | single_variable {if(undeclare_check($1.value,convert_scope_to_string()) == 0){
                           cout << "Undeclared variable used at " << yylineno << $1.value << endl;
                         }}
@@ -378,7 +395,7 @@ ids : single_variable {if(undeclare_check($1.value,convert_scope_to_string()) ==
 
 /* INBUILT STATEMENT */
 
-inbuilt_functions_with_dot : inbuilt_functions DOT
+inbuilt_functions_with_dot : inbuilt_functions DOT {fprintf(outfile, ";");} 
                            ;
      
 inbuilt_functions : rel_to_mag
@@ -484,10 +501,10 @@ term_misc : check_rhs_exp {if($1.type != 1 && $1.type != 2){
 
 /* DECLARATION OR DECLARATION WITH INITIALIZATION STATEMENT */
      
-decl_stmt_with_exp : datatypes expressions DOT
+decl_stmt_with_exp : datatypes expressions DOT {fprintf(outfile,";");}
                    ;
 
-expressions : expression COMMA expressions
+expressions : expression COMMA {fprintf(outfile,",");} expressions
             | expression
             ;
 
@@ -507,17 +524,20 @@ single_variable_declare : single_variable {
 
 check_rhs_exp : {open_brackets = 0;close_brackets = 0;} rhs_exp {if(open_brackets != close_brackets){cout << "Incorrect RHS expression at " << yylineno << endl;}open_brackets = 0;close_brackets = 0;$$.type = $2.type;$$.value = $2.value;}
 
-expression : single_variable_declare ASSGN check_rhs_exp { if(!type_checking_assign($1.type,$3.type)){cout << "Declaration with expression type error " <<  $1.type <<  ' ' << $3.type << " at " << yylineno << endl;}}
+expression : single_variable_declare ASSGN {fprintf(outfile, "=");} check_rhs_exp { if(!type_checking_assign($1.type,$4.type)){cout << "Declaration with expression type error " <<  $1.type <<  ' ' << $4.type << " at " << yylineno << endl;}}
            | single_variable_declare 
             ;
 
 /* FUNCTION DECLARATION */
 
 idadd2 : ID {is_func_bool = true;
-        if(!func_red_var($1.value)){cout << "Redeclaration error : Function is redeclared as variable nameat " << yylineno << endl;}}
+        if(!func_red_var($1.value)){cout << "Redeclaration error : Function is redeclared as variable nameat " << yylineno << endl;}
+        fprintf(outfile,"%s", $1);
+        }
 	   ;
 
-function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU {current_pointer++;  curr_scopes[current_pointer]++; }body
+function_decl : datatypes idadd2 ASSGN OPENCU {fprintf(outfile,"(");} parameters CLOSECU {fprintf(outfile,")");} DARR OPENCU {fprintf(outfile,"{");}
+{current_pointer++;  curr_scopes[current_pointer]++; }body
                 {   
                   if (valid_func_entry($2.value , par_list)){
                     new_func_entry( $2.value, $1.value, par_list.size(), par_list, var_list);
@@ -529,8 +549,9 @@ function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU {cu
                   var_list.clear(); 
                   par_list.clear();
                 }
-                CLOSECU {is_func_bool = false;current_pointer--; }
-              | datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU {current_pointer++;  curr_scopes[current_pointer]++;}body 
+                CLOSECU {is_func_bool = false;current_pointer--; fprintf(outfile,"}"); }
+
+              | datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU {fprintf(outfile,"(){");} {current_pointer++;  curr_scopes[current_pointer]++;}body 
                 {
                     if (valid_func_entry($2.value , par_list)){
                       new_func_entry( $2.value, $1.value, par_list.size(), par_list, var_list);
@@ -542,10 +563,11 @@ function_decl : datatypes idadd2 ASSGN OPENCU parameters CLOSECU DARR OPENCU {cu
                     var_list.clear(); 
                     par_list.clear();
                 }
-                CLOSECU {is_func_bool = false;current_pointer--; }
+                CLOSECU {is_func_bool = false;current_pointer--; 
+                fprintf(outfile,"}");}
               ;
 
-parameters: datatypes ID
+parameters: datatypes ID {fprintf(outfile,"%s", $2);}
         {
           if(!within_func_parameters_redeclaration($2.value)) cout << "Redeclaration of parameters in the functionat " << yylineno << endl;
             par_records* rec = new par_records;
@@ -561,7 +583,7 @@ parameters: datatypes ID
 						rec->type = type;
             par_list.push_back(rec);
           }
-          COMMA parameters
+          COMMA {fprintf(outfile,"%s,",$2);} parameters  
           ;
 
 /*  */
@@ -574,17 +596,23 @@ void yyerror(char* s){
 }
 
 int main(int argc ,char * argv[]){
-    char inp_file[100],tok[100],parse[100];
+    char inp_file[100],tok[100],parse[100],out_file[100];
 
     sprintf(inp_file,"inp.phic");
+    sprintf(out_file,"outc.cpp");
 
     yyin = fopen(inp_file,"r");
+
+  outfile = fopen(out_file,"w");
+    fprintf(outfile,"#include <bits/stdc++.h> \nusing namespace std;\n\n");
+
 
   construct_stack();
 	int i = yyparse();
 
     print_table();
     print_function_table();
+
 
 	if(i) printf("Failure\n");
 	else printf("Success\n");

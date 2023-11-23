@@ -1,0 +1,48 @@
+bool nextfn ={acceleration a, velocity v, time t} =>{
+    int a,b,c.
+    int a.
+    double _a1 , _b1 = 0.1.
+    velocity new_v = [5 ,10.7], u_old1.
+    return_val = nextfn{ u_old1 , fn2{a,b,c} }.
+}
+
+bool nextfn_2 ={acceleration a, velocity v, time t} =>{
+    int a,b.
+    double _a1 , _b1 = 0.1.
+    velocity new_v = [5 ,10.7],u_old1.
+    SCOPEOPEN {
+        int a.
+        SCOPEOPEN{
+            SCOPEOPEN{
+            int b.
+            SCOPECLOSE}
+        SCOPECLOSE}
+        SCOPEOPEN{
+            int c.
+        SCOPECLOSE}
+    SCOPECLOSE}
+}
+
+int solve ={acceleration a, velocity v, time t} =>{
+    int c.
+    string str = "fgf".
+    c = 5 + str.
+    int loop_var1.
+    c = loop_var1 - 12.
+    =>loop_var1.
+}
+
+bool solve = {int x, int y} =>{
+    string str1 = "Hello".
+    string str2 = "world".
+    string str3 = str2 - str1.
+    =>1.
+}
+
+velocity func = { bool b, double x, int b} => {
+    acceleration a.
+    velocity v.
+    time t.
+    int temp = solve{a,v,t}.
+    =>[12,4].
+}
