@@ -6,6 +6,8 @@ extern FILE *yyin, *tokfile, *parsefile ;
 extern int yylineno;
 int yylex();
 void yyerror(char *s);
+bool arr_check=false;
+int dim_count = 0;
 %}
 
 %union {
@@ -18,6 +20,7 @@ void yyerror(char *s);
     int present;
   } arg_object ;
 }
+
 
 
 %token <object> INTEGER_CONSTANT STRING_CONSTANT FLOAT_CONSTANT TRUE FALSE
@@ -166,13 +169,15 @@ datatypes : primi_datatype
 
 /* DECLARATION STATEMENT needed things */
 
-single_variable : ID 
-                | ID dimensions 
+single_variable : ID {arr_check = false;}
+                | ID dimensions {arr_check = true;}
                 ;
 
-dimensions : OPENSQ check_rhs_exp CLOSESQ {
+
+dimensions : OPENSQ check_rhs_exp  CLOSESQ {
               if($2.type == 1){
                 $$.type = 10;
+                dim_count++;
               }
               else{
                 cout << "Invalid dimension in line " << yylineno << endl;
@@ -181,6 +186,7 @@ dimensions : OPENSQ check_rhs_exp CLOSESQ {
            | OPENSQ check_rhs_exp CLOSESQ dimensions{
               if($2.type == 1){
                 $$.type = 10;
+                dim_count++;
               }
               else{
                 cout << "Invalid dimension in line " << yylineno << endl;
@@ -498,6 +504,10 @@ single_variable_declare : single_variable {
 													rec->name = $1.value;
 													rec->type = type;
 													rec->scope = convert_scope_to_string();
+                          if(arr_check) rec->arr_type = "Array";
+                          else rec->arr_type = "Simple";
+                          rec->dim_countt = dim_count;
+                          dim_count = 0;
                           fn_var_entry(rec);
                           }
                         else{
