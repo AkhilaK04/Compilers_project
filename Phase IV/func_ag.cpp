@@ -32,8 +32,14 @@ pair<double,double> addr(mass* m, pair<double,double> r){
 }
 
 pair<double,double> r_after(mass* m, double t){
-    m->position.first = m->position.first + m->velocity.first*t + 0.5*m->acceleration.first*t*t;
-    m->position.second = m->position.second + m->velocity.second*t + 0.5*m->acceleration.second*t*t;
+    pair<double,double> temp;
+    temp.first = m->position.first + m->velocity.first*t + 0.5*m->acceleration.first*t*t;
+    temp.second = m->position.second + m->velocity.second*t + 0.5*m->acceleration.second*t*t;
+    return temp;
+}
+
+pair<double,double> get_r(mass* m){
+    return m->position;
 }
 
 // Related to velocity
@@ -48,13 +54,27 @@ pair<double,double> addv(mass* m, pair<double,double> v){
 }
 
 pair<double,double> v_after(mass* m, double t){
-    m->velocity.first = m->velocity.first + m->acceleration.first*t;
-    m->velocity.second = m->velocity.second + m->acceleration.second*t;
+    pair<double,double> temp;
+    temp.first = m->velocity.first + m->acceleration.first*t;
+    temp.second = m->velocity.second + m->acceleration.second*t;
 }
 
 pair<double,double> v_after(mass* m,  pair<double,double> r){
-    m->velocity.first = sqrt(pow(m->velocity.first, 2) + 2 * m->acceleration.first * r.first);
-    m->velocity.second = sqrt(pow(m->velocity.second, 2) + 2 * m->acceleration.second * r.second);
+    pair<double,double> temp;
+    temp.first = sqrt(pow(m->velocity.first, 2) + 2 * m->acceleration.first * r.first);
+    temp.second = sqrt(pow(m->velocity.second, 2) + 2 * m->acceleration.second * r.second);
+    return temp;
+}
+
+pair<double,double> get_v(mass* m){
+    return m->velocity;
+}
+
+// Related to momentum
+
+pair<double,double> setp(mass* m ,pair<double,double> p){
+    m->velocity.first = p.first / m->mass;
+    m->velocity.second = p.second / m->mass;
 }
 
 // Related to accerlation
@@ -66,4 +86,8 @@ pair<double,double> seta(mass* m, pair<double,double> vec){
 pair<double,double> adda(mass* m, pair<double,double> a){
     m->acceleration.first = m->acceleration.first + a.first;
     m->acceleration.second = m->acceleration.second + a.second;
+}
+
+pair<double,double> geta(mass* m){
+    return m->acceleration;
 }

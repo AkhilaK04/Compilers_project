@@ -8,6 +8,8 @@ int yylex();
 void yyerror(char *s);
 bool arr_check = false;
 int dim_count = 0;
+int num_return = 0;
+int function_return_type = 0;
 %}
 
 %union {
@@ -177,6 +179,12 @@ datatypes : primi_datatype
 
 single_variable : ID { fprintf(outfile,"%s", $1); arr_check = false;}
                 | ID { fprintf(outfile,"%s", $1); arr_check = true; } dimensions 
+                {
+                  int k;
+                  if((k = get_num_dim($1.value,convert_scope_to_string())) != -1 && k != dim_count){
+                    cout << "Invalid access of array at line no " << yylineno << endl;
+                  } 
+                }
                 ;
 
 dim_con : OPENSQ {fprintf(outfile, "[");} ;
@@ -210,6 +218,7 @@ single_variable_for_exp_stmt :  single_variable
                                   if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
                                     cout << "From single_variable_for_exp_stmt Undeclared variable used " << $1.value << " at " << yylineno << endl;
                                   }
+                                  dim_count = 0;
                                 }
                                 ;
 
@@ -226,7 +235,8 @@ pos : FIRST
 
 anything_with_value : single_variable {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
     cout << "From anything_with_value Undeclared variable used " << $1.value << " at " << yylineno<< endl;
-  }}
+  }
+  dim_count = 0;}
                     | NON_NEGATIVE_INT {fprintf(outfile, "%s", $1);}
                     | INTEGER_CONSTANT {fprintf(outfile, "%s", $1);}
                     | FLOAT_CONSTANT {fprintf(outfile, "%s", $1);}
@@ -324,7 +334,8 @@ call_stmt_without_dot : ID OPENCU CLOSECU
 
 funccallargs : check_rhs_exp 
                 {
-                  $$.list[0] = &(get_string_type($1.type)[0]);
+                  const char* temp = get_string_type($1.type).c_str();
+                  $$.list[0] = strdup(temp);
                   $$.present = 1;
                 }
              | check_rhs_exp COMMA {fprintf(outfile, ",");} funccallargs
@@ -333,7 +344,8 @@ funccallargs : check_rhs_exp
                   $$.list[i+1] = $4.list[i];
                 }
                 $$.present = $4.present + 1;
-                $$.list[0] = &(get_string_type($1.type)[0]);
+                const char* temp = get_string_type($1.type).c_str();
+                $$.list[0] = strdup(temp);
               }
              ;
 
@@ -372,8 +384,11 @@ unary_operation_without_dot: single_variable UNIOP {
 
 /* RETURN STATEMENT */
     
-return_stmt: DARR {fprintf(outfile, "return ");}  check_rhs_exp DOT {fprintf(outfile, ";");} 
-           | DARR DOT {fprintf(outfile, "return ;");} 
+return_stmt: DARR {fprintf(outfile, "return ");}  check_rhs_exp DOT {fprintf(outfile, ";"); num_return ++;if(type_checking_assign($3.type,function_return_type) == 0){
+  cout << "Return type doesnot match with function defined return type" << endl;
+  cout << $3.type <<  ' ' << function_return_type << endl;
+}} 
+           /* | DARR DOT {fprintf(outfile, "return ;"); num_return ++; if()}  */
            ;
 
 /* COMMENT STATEMENT */
@@ -648,7 +663,7 @@ idadd2 : ID {is_func_bool = true;
         }
        ;
 
-function_decl : datatypes idadd2 ASSGN OPENCU {fprintf(outfile,"(");} parameters CLOSECU {fprintf(outfile,")");} DARR OPENCU {fprintf(outfile,"{");}
+function_decl : datatypes idadd2 ASSGN OPENCU {fprintf(outfile,"(");function_return_type = give_type_index($1.value);} parameters CLOSECU {fprintf(outfile,")");} DARR OPENCU {fprintf(outfile,"{");}
 {current_pointer++;  curr_scopes[current_pointer]++; }body
                 {   
                   if (valid_func_entry($2.value , par_list)){
@@ -661,9 +676,13 @@ function_decl : datatypes idadd2 ASSGN OPENCU {fprintf(outfile,"(");} parameters
                   var_list.clear(); 
                   par_list.clear();
                 }
-                CLOSECU {is_func_bool = false;current_pointer--; fprintf(outfile,"}"); }
+                CLOSECU {is_func_bool = false;current_pointer--; fprintf(outfile,"}"); if(num_return  == 0){
+                  cout << "No return statement" << endl;
+                }
+                num_return  = 0;
+                }
                 
-                | datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU {fprintf(outfile,"(){");} {current_pointer++;  curr_scopes[current_pointer]++;}body 
+                | datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU {fprintf(outfile,"(){");function_return_type = give_type_index($1.value);} {current_pointer++;  curr_scopes[current_pointer]++;}body 
                 {
                     if (valid_func_entry($2.value , par_list)){
                       new_func_entry( $2.value, $1.value, par_list.size(), par_list, var_list);
@@ -676,7 +695,12 @@ function_decl : datatypes idadd2 ASSGN OPENCU {fprintf(outfile,"(");} parameters
                     par_list.clear();
                 }
                 CLOSECU {is_func_bool = false;current_pointer--;
-                fprintf(outfile,"}");}
+                fprintf(outfile,"}");
+                if(num_return  == 0){
+                  cout << "No return statement" << endl;
+                }
+                num_return  = 0;
+                }
               ;
 
 parameters: datatypes ID {fprintf(outfile,"%s", $2);}
@@ -710,7 +734,7 @@ void yyerror(char* s){
 int main(int argc ,char * argv[]){
     char inp_file[100],tok[100],parse[100],out_file[100];
 
-    sprintf(inp_file,"std_checks.phic");
+    sprintf(inp_file,"inp.phic");
     sprintf(out_file,"outc.cpp");
 
     yyin = fopen(inp_file,"r");

@@ -4,7 +4,6 @@ bool coercion(string type1, string type2){
 
   if(type1 == "int" && (type2 == "double" || type2 == "bool" || type2 == "int")) return true;
   else if(type1 == "double" && (type2 == "double" || type2 == "bool" || type2 == "int")) return true;
-  else if(type1 == "string" && type2 == "string") return true;
   else if(type1 == "bool" && (type2 == "double" || type2 == "int" || type2 == "bool")) return true;
   else if(type1 == "velocity" && (type2 == "velocity" || type2 == "vector")) return true;
   else if(type1 == "position" && (type2 == "position" || type2 == "vector")) return true;
@@ -13,9 +12,10 @@ bool coercion(string type1, string type2){
   else if(type1 == "momentum" && (type2 == "momentum" || type2 == "vector")) return true;
   else if(type1 == "mass" && (type2 == "mass")) return true;
   else if(type1 == "time" && (type2 == "time" || type2 == "int" || type2 == "double")) return true;
-  else if(type1 == "energy" && (type2 == "energy" || type2 == "vector")) return true;
+  else if(type1 == "energy" && (type2 == "energy" || type2 == "int" || type2 =="double")) return true;
   else if(type1 == "theta" && (type2 == "int" || type2 == "double" || type2 == "theta")) return true;
   else if(type1 == "e" && (type2 == "e" || type2 == "int" || type2 == "double")) return true;
+  else if(type1 == "vector" && (type2 == "velocity" || type2 == "position" || type2 =="acceleration" || type2 =="distance" || type2 =="momentum")) return true;
   else return false;
 
 //     unordered_map<string,int> mp_valid;
@@ -204,7 +204,6 @@ return true;
 }
 
 bool check_func_args(string name,char** func_args_list,int present){ //fn name, types of fn_args.
-    
     for(int i=0; i < function_sym_table.size(); i++){
         if(function_sym_table[i]->name == name){
             bool valid_fn = true;
@@ -260,8 +259,7 @@ bool std_lib_semantics (string name,int ID1,vector<int> ID2){
 
         if(name == "mag" && (get_string_type(ID2[0]) == "velocity" || get_string_type(ID2[0]) == "position" || 
                             get_string_type(ID2[0]) == "acceleration" || get_string_type(ID2[0]) == "momentum" || 
-                            get_string_type(ID2[0]) == "distance" || get_string_type(ID2[0]) == "vector" ||
-                            get_string_type(ID2[0]) == "energy" )){
+                            get_string_type(ID2[0]) == "distance" || get_string_type(ID2[0]) == "vector" )){
             return true;
         }
 
@@ -412,6 +410,28 @@ int undeclare_check(string name, string scope){
   return 0;
 }
 
+int get_num_dim(string name,string scope){
+    if(is_func_bool){
+
+    for(int i=current_pointer;i>=0;i--){
+      string scope_temp = to_string(curr_scopes[0]);
+      for(int k=1;k<=i;k++){
+        scope_temp.push_back('_');
+        scope_temp = scope_temp + to_string(curr_scopes[k]);
+      }
+      for(int j=0;j<var_list.size();j++){
+        if(var_list[j]->name == name && scope_temp == var_list[j]->scope && var_list[j]->arr_type == "Array"){
+          return var_list[j]->dim_countt;
+        }
+      }
+    }
+
+  }
+  if(scope=="1"){
+
+  } 
+  return -1;
+}
 
 bool redeclaration_check(string name, string scope){
 
@@ -462,5 +482,6 @@ bool within_func_parameters_redeclaration(string name){
 
 //Type checking for assigning variables
 bool type_checking_assign(int type1, int type2){
+  if(get_string_type(type1) == "string" && get_string_type(type2) == "string") return true;
     return coercion(get_string_type(type1),get_string_type(type2));
 }
