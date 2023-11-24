@@ -1,0 +1,84 @@
+time cal_time = {acceleration a1, position p1, energy e1} => {
+
+output: "Enter the values a1,p1,e1: ".
+input: a1,p1,e1.
+
+mass m1,m2.
+output: "Enter the masses: ".
+input:m1,m2.
+
+time t1.
+velocity u1 = [9,5], u2 = [0,0].
+e ece = 0.6.
+
+theta ngle = 45.
+double temp1 = 9.8.
+
+a1->first = u1->first + u2->second.
+
+
+{m1} collide {m2,ece}.
+
+int i = 0.
+    loop [e1 < 0.89 & e1 > = 0] {
+        energy loss = e1 / 3.
+        [ece <= 0.5] {
+            int temp = 6.
+            t1 = ((1-ece) / (1+ece)) * m1 * temp.
+            {m1} v_after {t1}.
+            output: "Time is given by:" + t1.
+        }
+        otherwise {
+            [m1 != 5] {
+                t1 =  ((2 * ece) / (1+ece)) * m1 +loss.
+                {m1} addr {p1}.
+                {m1} angle_after {t1}.
+               }
+            otherwise {
+                break. 
+                }
+        }
+     i++.
+    }
+
+
+=> t1.
+}
+
+bool check = {string str1 , string str2} {
+    str1 = "Hi".
+    str2 = "Hi".
+    bool temp = false.
+
+    [str1 == str2]{
+        temp = true.
+        output:"Two strings are equal".
+    }
+    otherwise {
+        temp = false.
+        output: "Not equal".
+    }
+
+=>temp.
+}
+
+start {
+    
+    int n.
+    int array[n].
+
+    int i = 0.
+
+    loop [i<=n]{
+     output:"Enter the array elements: ".
+     input: array[i].
+     [array[i]>0] {
+        output:"Is greater than zero".
+     }
+     otherwise {
+        output:"Is less than zero".
+     }
+     i++.
+    }
+
+}
