@@ -234,7 +234,7 @@ bool std_lib_semantics (string name,int ID1,vector<int> ID2){
     if(ID2.size() == 2){
         // collide function.
         bool rhs1;
-        if(get_string_type(ID2[1]) == "e" || get_string_type(ID2[1]) == "int" ) rhs1 = true; 
+        if(get_string_type(ID2[1]) == "e" || get_string_type(ID2[1]) == "double" ) rhs1 = true; 
         if(name == "collide" || get_string_type(ID1) == "mass" && get_string_type(ID2[1]) == "mass" && rhs1){
             return true;
         }
