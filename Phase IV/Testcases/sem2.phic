@@ -16,7 +16,6 @@ double temp1 = 9.8.
 
 a1->first = u1->first + u2->second.
 
-
 {m1} collide {m2,ece}.
 
 int i = 0.
@@ -24,7 +23,7 @@ int i = 0.
         energy loss = e1 / 3.
         [ece <= 0.5] {
             int temp = 6.
-            t1 = ((1-ece) / (1+ece)) * m1 * temp.
+            t1 = ((1-ece) / (1+ece)) * m1 * temp * sin(ngle).
             {m1} v_after {t1}.
             output: "Time is given by:" + t1.
         }
