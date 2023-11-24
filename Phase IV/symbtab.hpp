@@ -2,6 +2,7 @@
 using namespace std;
 
 extern char* yytext;
+extern int yylineno;
 bool q;
 string type = "null";
 string function_type = "null";
@@ -113,7 +114,7 @@ return true;
 void fn_var_entry(var_records* rec){
   if(bool_fn_var_entry(rec)) var_list.push_back(rec);
   else {
-    cout<<rec->name<<" Re-def of var "<<rec->type<<endl;
+    cout<<rec->name<<" !ERROR: Redefining of variable at " << yylineno <<" ("<< rec->type <<")"<<endl;
   }
 }
 
@@ -180,7 +181,7 @@ void add(char c,string id,string type) {
       if(q){
         new_entry(id,type,"Variable");
       }else{
-        cout<<"Error re defining variable"<<endl;
+        cout<<"!ERROR: Redefining of variable at " << yylineno <<endl;
         //WRITE ERROR IN ERROR FN.
       }
     } 

@@ -39,8 +39,16 @@ question ("?")
 
 %%
 
+
+
 \$[ \t\n]*[^$]*[ \t\n]*\$ {
     yylval.object.value = strdup(yytext);
+    fprintf(outfile, "/* %.*s */", yyleng - 2, yytext + 1);
+    char* newlinePtr = strchr(yytext, '\n');
+    while (newlinePtr != NULL) {
+    yylineno++;
+    newlinePtr = strchr(newlinePtr + 1, '\n');
+    }
     return CMT;
 }
 
