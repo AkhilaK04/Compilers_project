@@ -41,13 +41,11 @@ int i = 0.
      i++.
     }
 
-
 => t1.
 }
 
 bool check = {string str1 , string str2} {
-    str1 = "Hi".
-    str2 = "Hi".
+
     bool temp = false.
 
     [str1 == str2]{
@@ -63,16 +61,20 @@ bool check = {string str1 , string str2} {
 }
 
 start {
-    
+
     int n.
     int array[n].
 
     int i = 0.
+    string str1 ="Hi".
+    string str2 = "Hi".
+
+    bool che = check{str1,str2}.
 
     loop [i<=n]{
      output:"Enter the array elements: ".
      input: array[i].
-     [array[i]>0] {
+     [array[i]>0 & che] {
         output:"Is greater than zero".
      }
      otherwise {
