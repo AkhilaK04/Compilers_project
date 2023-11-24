@@ -2,7 +2,7 @@
 #include <bits/stdc++.h>
 #include "semantics.hpp"
 
-extern FILE *yyin, *tokfile, *parsefile, *outfile ;
+extern FILE *yyin, *tokfile, *parsefile, *outfile, *headerfile ;
 extern int yylineno;
 int yylex();
 void yyerror(char *s);
@@ -764,21 +764,39 @@ void yyerror(char* s){
 }
 
 int main(int argc ,char * argv[]){
-    char inp_file[100],tok[100],parse[100],out_file[100];
+  char inp_file[100],tok[100],parse[100],out_file[100], header_file[100];
 
-    sprintf(inp_file,"inp.phic");
-    sprintf(out_file,"outc.cpp");
+  sprintf(inp_file,"inp.phic");
+  sprintf(out_file,"outc.cpp");
+  sprintf(header_file,"std_lib.h");
 
-    yyin = fopen(inp_file,"r");
+  yyin = fopen(inp_file,"r");
 
   outfile = fopen(out_file,"w");
-    fprintf(outfile,"#include <bits/stdc++.h> \nusing namespace std;\n\n");
+  fprintf(outfile,"#include <bits/stdc++.h> \nusing namespace std;\n\n");
+
+  headerfile = fopen(header_file, "w");
+  fprintf(headerfile, "#include <bits/stdc++.h>\nusing namespace std; \n\nclass mass{\npublic:\n\tint mass;\n\tpair<double,double> position;\n\tpair<double,double> velocity;\n\tpair<double,double> acceleration;\n};\n");
+
+  fprintf(headerfile, "\n\n// Related to Magnitude\n\ndouble mag(pair<double,double> vec){\n\tdouble vecx = vec.first;\n\tdouble vecy = vec.second;\n\tdouble magnitude = sqrt(vecx * vecx + vecy * vecy);\n\treturn magnitude;\n}");
+  fprintf(headerfile, "\n\n\n// Related to Position\n\npair<double,double> setr(mass* m, pair<double,double> r){\n\tm->position = r;\n}\n\npair<double,double> addr(mass* m, pair<double,double> r){\n\tm->position.first = m->position.first + r.first;\n\tm->position.second = m->position.second + r.second;\n}\npair<double,double> r_after(mass* m, double t){\n\tpair<double,double> temp;\n\ttemp.first = m->position.first + m->velocity.first*t + 0.5*m->acceleration.first*t*t;\n\ttemp.second = m->position.second + m->velocity.second*t + 0.5*m->acceleration.second*t*t;\n\treturn temp;\n}\n\npair<double,double> get_r(mass* m){\n\treturn m->position;\n}");
+  fprintf(headerfile, "\n\n\n// Related to velocity\n\npair<double,double> setv(mass* m, pair<double,double> vec){\n\tm->velocity = vec;\n}\n\npair<double,double> addv(mass* m, pair<double,double> v){\n\tm->velocity.first = m->velocity.first + v.first;\n\tm->velocity.second = m->velocity.second + v.second;\n}\n\npair<double,double> v_after(mass* m, double t){\n\tpair<double,double> temp;\n\ttemp.first = m->velocity.first + m->acceleration.first*t;\n\ttemp.second = m->velocity.second + m->acceleration.second*t;\n}\n\npair<double,double> v_after(mass* m,  pair<double,double> r){\n\tpair<double,double> temp;\n\ttemp.first = sqrt(pow(m->velocity.first, 2) + 2 * m->acceleration.first * r.first);\n\ttemp.second = sqrt(pow(m->velocity.second, 2) + 2 * m->acceleration.second * r.second);\n\treturn temp;\n}\n\npair<double,double> get_v(mass* m){\n\treturn m->velocity;\n}");
+  fprintf(headerfile, "\n\n\n// Related to accerlation\n\npair<double,double> seta(mass* m, pair<double,double> vec){\n\tm->acceleration = vec;\n}\n\npair<double,double> adda(mass* m, pair<double,double> a){\n\tm->acceleration.first = m->acceleration.first + a.first;\n\tm->acceleration.second = m->acceleration.second + a.second;\n}\n\npair<double,double> geta(mass* m){\n\treturn m->acceleration;\n}"); 
+  fprintf(headerfile, "\n\n\n// Related to momentum\n\npair<double,double> setp(mass* m ,pair<double,double> p){\n\tm->velocity.first = p.first / m->mass;\n\tm->velocity.second = p.second / m->mass;\n}\n");
+  fprintf(headerfile, "\n\n\n// Related to energy\n\ndouble keafter(mass* m,double time){\n\tpair<double,double> vel = v_after(m,time);\n\tdouble mag_value = mag(vel);\n\treturn 0.5*m->mass*mag_value*mag_value;\n}   \n\ndouble peafter(mass* m,double time){\n\tpair<double,double> pos = r_after(m,time);\n\tpair<double,double> acc = geta(m);\n\treturn m->mass*acc.second*pos.second + m->mass*acc.first*pos.first;\n}\n\n\ndouble teafter(mass* m,double time){\n\treturn keafter(m,time) + peafter(m,time);\n}\n");
+  fprintf(headerfile, "\n\n\n// Related to angle\n\ndouble angleafter(mass* m,double time){\n\tpair<double,double> vel = v_after(m,time);\n\tif(vel.first == 0){\n\t\treturn 0;\n\t}\n\telse{\n\t\treturn atan2(vel.second,vel.first);\n\t}\n}");
+  fprintf(headerfile, "\n\n\n// Related to momentum\n\npair<double,double> setp(mass* m ,pair<double,double> p){\n\tm->velocity.first = p.first / m->mass;\n\tm->velocity.second = p.second / m->mass;\n}");
+  fprintf(headerfile, "\n\n\n// Related to Collision\n\ndouble collide(mass* m1, mass* m2, double e) {\n\t// Check if positions are the same\n\tif (m1->position == m2->position) {\n\t\t// Calculate relative velocity\n\t\tdouble v_rel_x = m2->velocity.first - m1->velocity.first;\n\t\tdouble v_rel_y = m2->velocity.second - m1->velocity.second;\n\n\t\t// Calculate final velocities using coefficient of restitution\n\t\tdouble v1_final_x = (m1->mass * m1->velocity.first + m2->mass * m2->velocity.first + e * m2->mass * v_rel_x) / (m1->mass + m2->mass);\n\t\tdouble v1_final_y = (m1->mass * m1->velocity.second + m2->mass * m2->velocity.second + e * m2->mass * v_rel_y) / (m1->mass + m2->mass);\n\t\tdouble v2_final_x = v1_final_x - m1->velocity.first + m2->velocity.first;\n\t\tdouble v2_final_y = v1_final_y - m1->velocity.second + m2->velocity.second;\n\n\t\t// Calculate energy loss\n\t\tdouble E_initial = 0.5 * m1->mass * (m1->velocity.first * m1->velocity.first + m1->velocity.second * m1->velocity.second) + 0.5 * m2->mass * (m2->velocity.first * m2->velocity.first + m2->velocity.second * m2->velocity.second);\n\t\tdouble E_final = 0.5 * (m1->mass + m2->mass) * (v1_final_x * v1_final_x + v1_final_y * v1_final_y + v2_final_x * v2_final_x + v2_final_y * v2_final_y);\n\t\tdouble E_loss = E_initial - E_final;\n\n\t\t// Update velocities\n\t\tm1->velocity = {v1_final_x, v1_final_y};\n\t\tm2->velocity = {v2_final_x, v2_final_y};\n\t\treturn E_loss;\n\n\t} else {\n\t\t// Positions are not the same, no collision\n\t\tcout << \"Error: No collision, positions are different.\" << endl;\n\t\treturn 0;\n\t}\n}");
+  fprintf(headerfile, "\n\ndouble collide(mass* m1, mass* m2) {\n\t// Check if positions are the same\n\tif (m1->position == m2->position) {\n\n\t\t// Calculate final velocities and energy loss\n\t\tdouble v1_final_x = (m1->mass * m1->velocity.first + m2->mass * m2->velocity.first) / (m1->mass + m2->mass);\n\t\tdouble v1_final_y = (m1->mass * m1->velocity.second + m2->mass * m2->velocity.second) / (m1->mass + m2->mass);\n\t\tdouble v2_final_x = v1_final_x - m1->velocity.first + m2->velocity.first;\n\t\tdouble v2_final_y = v1_final_y - m1->velocity.second + m2->velocity.second;\n\n\t\t// Calculate energy loss (assuming perfectly elastic collision)\n\t\tdouble E_initial = 0.5 * m1->mass * (m1->velocity.first * m1->velocity.first + m1->velocity.second * m1->velocity.second) + 0.5 * m2->mass * (m2->velocity.first * m2->velocity.first + m2->velocity.second * m2->velocity.second);\n\t\tdouble E_final = 0.5 * (m1->mass + m2->mass) * (v1_final_x * v1_final_x + v1_final_y * v1_final_y + v2_final_x * v2_final_x + v2_final_y * v2_final_y);\n\t\tdouble E_loss = E_initial - E_final;\n\n\t\t// Update velocities\n\t\tm1->velocity = {v1_final_x, v1_final_y};\n\t\tm2->velocity = {v2_final_x, v2_final_y};\n\t\treturn E_loss;\n\n\t} else {\n\t\t// Positions are not the same, no collision\n\t\tcout << \"Error: No collision, positions are different.\" << endl;\n\t\treturn 0;\n\t}\n}");
+  fprintf(headerfile, "\n\ndouble dotProduct(pair<double, double> v1, pair<double, double> v2) {\n\treturn v1.first * v2.first + v1.second * v2.second;\n}");
+  fprintf(headerfile, "\n\ndouble magnitude(pair<double, double> v) {\n\treturn sqrt(v.first * v.first + v.second * v.second);\n}");
+  fprintf(headerfile, "\n\ndouble time_to_collide(mass* m1, mass* m2) {\n\t// Calculate relative position, velocity, and acceleration\n\tpair<double, double> relative_position = {m2->position.first - m1->position.first, m2->position.second - m1->position.second};\n\tpair<double, double> relative_velocity = {m2->velocity.first - m1->velocity.first, m2->velocity.second - m1->velocity.second};\n\tpair<double, double> relative_acceleration = {m2->acceleration.first - m1->acceleration.first, m2->acceleration.second - m1->acceleration.second};\n\n\t// Calculate coefficients for the quadratic equation\n\tdouble a = dotProduct(relative_acceleration, relative_acceleration);\n\tdouble b = 2 * dotProduct(relative_velocity, relative_acceleration);\n\tdouble c = dotProduct(relative_position, relative_position) - (m1->mass + m2->mass) * (m1->mass + m2->mass);\n\n\t// Calculate discriminant\n\tdouble discriminant = b * b - 4 * a * c;\n\tif (discriminant < 0) {\n\t\t// No collision\n\t\tcout << \"Error: No collision, masses will not collide.\" << endl;\n\t\treturn -1;\n\t}\n\n\t// Calculate time to collision using quadratic formula\n\tdouble t1 = (-b + sqrt(discriminant)) / (2 * a);\n\tdouble t2 = (-b - sqrt(discriminant)) / (2 * a);\n\n\t// Choose the positive time (ignore negative time)\n\tdouble time_to_collision = (t1 > 0) ? t1 : t2;\n\treturn time_to_collision;\n}");
 
   construct_stack();
 	int i = yyparse();
 
-    print_table();
-    print_function_table();
+  print_table();
+  print_function_table();
 
 	if(i) printf("Failure\n");
 	else printf("Success\n");

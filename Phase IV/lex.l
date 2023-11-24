@@ -6,6 +6,7 @@
     FILE* tokfile;
     FILE* parsefile;
     FILE* outfile;
+    FILE* headerfile;
 %}
 
 arrow ("->")
