@@ -1,0 +1,91 @@
+bool nextfn ={acceleration a, velocity v, time t} =>{
+    int arr[10].
+
+    $ 
+    jn
+    imksd
+    sdbdsf
+    sgrsf
+    rf
+    sgrsf
+    gsfw
+    wfw 
+    eooiwe
+    rbfjkwnfow
+    fwejowej
+    ror3r
+    rn4iorh43orj
+    roi4r0
+    $
+
+    double arr2[23][90].
+    double _a1 , _b1 = a%5.
+    velocity new_v = [5 ,10.7], u_old1.
+    return_val = nextfn{ u_old1 , fn2{a,b,c} }. 
+    output:" hsdbd " , a,b. 
+    input: a,b. 
+
+    int a.
+
+    =>a.
+
+}
+
+
+bool nextfn_2 ={acceleration a, velocity v, time t} =>{
+    int a,b.
+    double _a1 , _b1 = 0.1.
+    velocity new_v = [5 ,10.7],u_old1.
+
+    $
+    fkjf
+    nsfn
+    frnerfre
+    rerenr
+    $
+    
+    SCOPEOPEN {
+        int a.
+        SCOPEOPEN{
+            SCOPEOPEN{
+            int b.
+            SCOPECLOSE}
+        SCOPECLOSE}
+        SCOPEOPEN{
+            int c.
+        SCOPECLOSE}
+    SCOPECLOSE}
+
+    =>false.
+}
+
+int solve ={acceleration a, velocity v, time t} =>{
+    int c.
+    string str = "fgf".
+    c = 5 + str.
+    int loop_var1.
+    c = loop_var1 - 12.
+    =>loop_var1.
+}
+
+bool solve = {int x, int y} =>{
+    string str1 = "Hello".
+    string str2 = "world".
+    string str3 = str2 - str1.
+    =>1.
+}
+
+velocity func = { bool b, double x, int b} => {
+    acceleration a.
+    velocity v.
+    time t.
+    int temp = solve{a,v,t}.
+    =>[12,4].
+}
+
+
+start {
+    int a,c.
+    output: set{a,c} , " Success ".
+    output: "Failure".
+}
