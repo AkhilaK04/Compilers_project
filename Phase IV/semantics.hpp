@@ -17,18 +17,6 @@ bool coercion(string type1, string type2){
   else if(type1 == "e" && (type2 == "e" || type2 == "int" || type2 == "double")) return true;
   else if(type1 == "vector" && (type2 == "velocity" || type2 == "position" || type2 =="acceleration" || type2 =="distance" || type2 =="momentum")) return true;
   else return false;
-
-//     unordered_map<string,int> mp_valid;
-//     unordered_map<string,int> mp_invalid;
-    
-//     mp_valid["int"] = 1;
-//     mp_valid["float"] = 1;
-//     mp_valid["bool"] = 1;
-    
-//     mp_invalid["string"] = 1;
-    
-//     if((mp_valid[type1] == 1 && mp_valid[type2] == 1) 
-//     || (mp_invalid[type1] == 1 && mp_invalid[type2] == 1) ) return true;
 return false;
 }
 
@@ -82,7 +70,6 @@ int give_type_index(string type){
     return 16;
   }
   else{
-    cout << "dont_know" << endl;
     return -1;
   }
 } 
@@ -137,7 +124,6 @@ string get_string_type(int type){
     return "?";
   }
   else{
-    cout << "dontknow" << endl;
     return "dontknow";
   }
 }
