@@ -76,7 +76,7 @@ code_subpart: comments
             ;
 
 startfn : START OPENCU 
-          {is_func_bool = true; current_pointer++;  curr_scopes[current_pointer]++; fprintf(outfile,"int main {");} 
+          {is_func_bool = true; current_pointer++;  curr_scopes[current_pointer]++; fprintf(outfile,"int main() {");} 
           body 
            {
             if (valid_func_entry($1.value , par_list)){
@@ -123,7 +123,7 @@ loop_body : exp_stmt loop_body
      | SCOPEOPEN { current_pointer++;  curr_scopes[current_pointer]++; } OPENCU {fprintf(outfile, "{");} loop_body SCOPECLOSE {current_pointer--; } CLOSECU {fprintf(outfile, "}");} body
      | inbuilt_functions_with_dot loop_body
      | decl_stmt_with_exp loop_body 
-     | BREAK DOT loop_body {fprintf(outfile, "break; %s", $3);}
+     | BREAK DOT loop_body {fprintf(outfile, "break; %s", $3.value);}
      ;
 
 bi_op : ADD {fprintf(outfile, "+");}
@@ -181,8 +181,8 @@ datatypes : primi_datatype
 
 /* DECLARATION STATEMENT needed things */
 
-single_variable : ID { fprintf(outfile,"%s", $1); arr_check = false;}
-                | ID { fprintf(outfile,"%s", $1); arr_check = true; } dimensions 
+single_variable : ID { fprintf(outfile,"%s", $1.value); arr_check = false;}
+                | ID { fprintf(outfile,"%s", $1.value); arr_check = true; } dimensions 
                 {
                   int k;
                   if((k = get_num_dim($1.value,convert_scope_to_string())) != -1 && k != dim_count){
@@ -241,22 +241,22 @@ anything_with_value : single_variable {if(($$.type = undeclare_check($1.value,co
     cout << "From anything_with_value Undeclared variable used " << $1.value << " at " << yylineno<< endl;
   }
   dim_count = 0;}
-                    | NON_NEGATIVE_INT {fprintf(outfile, "%s", $1);}
-                    | INTEGER_CONSTANT {fprintf(outfile, "%s", $1);}
-                    | FLOAT_CONSTANT {fprintf(outfile, "%s", $1);}
-                    | STRING_CONSTANT {fprintf(outfile, "%s", $1);}
-                    | TRUE {fprintf(outfile, "%s", $1);}
-                    | FALSE {fprintf(outfile, "%s", $1);}
+                    | NON_NEGATIVE_INT {fprintf(outfile, "%s", $1.value);}
+                    | INTEGER_CONSTANT {fprintf(outfile, "%s", $1.value);}
+                    | FLOAT_CONSTANT {fprintf(outfile, "%s", $1.value);}
+                    | STRING_CONSTANT {fprintf(outfile, "%s", $1.value);}
+                    | TRUE {fprintf(outfile, "%s", $1.value);}
+                    | FALSE {fprintf(outfile, "%s", $1.value);}
                     | call_stmt_without_dot
                     | vectors {$$.type = 10;}
                     | UNINEG {fprintf(outfile, "!");}anything_with_value {$$.type = 4;}
-                    | call_stmt_without_dot ARROW pos {fprintf(outfile, ".%s",$3);}{if($1.type != 5 && $1.type != 6 && $1.type != 7 && $1.type != 8 && $1.type != 9 && $1.type != 10){
+                    | call_stmt_without_dot ARROW pos {fprintf(outfile, ".%s",$3.value);}{if($1.type != 5 && $1.type != 6 && $1.type != 7 && $1.type != 8 && $1.type != 9 && $1.type != 10){
                       cout << "From anything with value call statement return is not a vector" << endl;
                     }}
-                    | inbuilt_functions ARROW pos {fprintf(outfile, ".%s",$3);}
+                    | inbuilt_functions ARROW pos {fprintf(outfile, ".%s",$3.value);}
                     | inbuilt_functions
-                    | vectors ARROW pos {fprintf(outfile, ".%s",$3);}
-                    | ID ARROW pos {fprintf(outfile, ".%s",$3);} {
+                    | vectors ARROW pos {fprintf(outfile, ".%s",$3.value);}
+                    | ID ARROW pos {fprintf(outfile, ".%s",$3.value);} {
                       if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
                         cout << "From anything_with_value Undeclared variable used " << $1.value << " at " << yylineno<< endl;
                       }
@@ -271,24 +271,24 @@ anything_with_value : single_variable {if(($$.type = undeclare_check($1.value,co
                         cout << "From anything_with_value Undeclared variable used " << $1.value << " at " << yylineno<< endl;
                       }}
                     | SIN OPENCC anything_with_value CLOSECC {
-                      fprintf(outfile,"sin(%s * (M_PI / 180.0))",$3);
+                      fprintf(outfile,"sin(%s * (M_PI / 180.0))",$3.value);
                       $$.type = 2;
                       if($3.type != 1 && $3.type != 2){cout << "Sin input is out of range" << endl;}
                     }
                     | COS OPENCC anything_with_value CLOSECC {
-                      fprintf(outfile,"cos(%s * (M_PI / 180.0))",$3);
+                      fprintf(outfile,"cos(%s * (M_PI / 180.0))",$3.value);
                       $$.type = 2;
                       if($3.type != 1 && $3.type != 2){cout << "Sin input is out of range" << endl;}
                       }
                     | TAN OPENCC anything_with_value CLOSECC {
-                      fprintf(outfile,"tan(%s * (M_PI / 180.0))",$3);
+                      fprintf(outfile,"tan(%s * (M_PI / 180.0))",$3.value);
                       $$.type = 2;
                       if($3.type != 1 && $3.type != 2){cout << "Sin input is out of range" << endl;}
                       }
                     ;
         
 operations : bi_op 
-           | LOGICOP {fprintf(outfile, "%s", $1);}
+           | LOGICOP {fprintf(outfile, "%s", $1.value);}
            | relop
            ;
 
@@ -331,9 +331,9 @@ call_stmt_without_dot : ID OPENCU CLOSECU
                         }
                         func_args_list.clear();
                         $$.type = find_return_type($1.value,templist,temp);
-                        fprintf(outfile, "%s()", $1);
+                        fprintf(outfile, "%s()", $1.value);
                       }
-	                  | ID OPENCU  {fprintf(outfile, "%s(",$1);} funccallargs CLOSECU 
+	                  | ID OPENCU  {fprintf(outfile, "%s(",$1.value);} funccallargs CLOSECU 
                       {
                           if(!check_func_args($1.value, $4.list,$4.present)){
                             cout << "From call_stmt_without_dot Undeclared function " << $1.value <<" at " << yylineno  << endl;
@@ -380,7 +380,7 @@ loop_stmt: LOOP OPENSQ {fprintf(outfile, "while(");} check_rhs_exp CLOSESQ OPENC
 /* UNIRARY OPERATION WITHOUT DOT */
 
 unary_operation_without_dot: single_variable UNIOP {
-                              fprintf(outfile, "%s", $2);
+                              fprintf(outfile, "%s", $2.value);
                               if (($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0) cout << "Undeclaration error at " << yylineno << $1.value << endl;
                               if($1.type != 1 && $1.type != 2){
                                 cout << "From unary_operation_without_dot cant perform operation" << yylineno<< endl;
@@ -447,7 +447,7 @@ inbuilt_functions : rel_to_mag
                   | miscellaneous 
                   ;
 
-stand_id : ID {fprintf(outfile,"%s",$1);}{if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
+stand_id : ID {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
                           cout << "From stand_id Undeclared variable used at " << yylineno << $1.value << endl;
                         };
                 if($$.type != 11){
@@ -460,7 +460,10 @@ rel_to_mag : MAG OPENCU check_rhs_exp CLOSECU {
               if(!std_lib_semantics($1.value,0,{$3.type})){
                 cout<<"Invalid use of std-lib : mag"<<endl;
               }
-              fprintf(outfile, "mag(%s)", $3);
+              cout<<endl<<endl;
+              cout<<$3.value<<" : this is check_rhs_exp"<<endl;
+              cout<<endl<<endl;
+              fprintf(outfile, "mag(%s)", $3.value);
             }
           
            ;
@@ -470,7 +473,7 @@ rel_to_pos : OPENCU stand_id CLOSECU SETR OPENCU check_rhs_exp CLOSECU {
               if(!std_lib_semantics($4.value,$2.type,{$6.type})){
                 cout<<"Invalid use of std-lib : setr"<<endl;
               }
-              fprintf(outfile, "setr(%s, %s)", $2, $6);
+              fprintf(outfile, "setr(%s, %s)", $2.value, $6.value);
             }
            | OPENCU stand_id CLOSECU ADDR OPENCU check_rhs_exp CLOSECU {
               if(!std_lib_semantics($4.value,$2.type,{$6.type})){
@@ -688,7 +691,7 @@ expression : single_variable_declare ASSGN {fprintf(outfile, "=");} check_rhs_ex
 
 idadd2 : ID {is_func_bool = true;
         if(!func_red_var($1.value)){cout << "Redeclaration error : Function is redeclared as variable name at " << yylineno << endl;}
-        fprintf(outfile,"%s", $1);
+        fprintf(outfile,"%s", $1.value);
         }
        ;
 
@@ -732,7 +735,7 @@ function_decl : datatypes idadd2 ASSGN OPENCU {fprintf(outfile,"(");function_ret
                 }
               ;
 
-parameters: datatypes ID {fprintf(outfile,"%s", $2);}
+parameters: datatypes ID {fprintf(outfile,"%s", $2.value);}
         {
           if(!within_func_parameters_redeclaration($2.value)) cout << "Redeclaration of parameters in the function at " << yylineno << endl;
             par_records* rec = new par_records;
@@ -748,7 +751,7 @@ parameters: datatypes ID {fprintf(outfile,"%s", $2);}
 						rec->type = type;
             par_list.push_back(rec);
           }
-          COMMA {fprintf(outfile,"%s,",$2);} parameters
+          COMMA {fprintf(outfile,"%s,",$2.value);} parameters
           ;
 
 /*  */

@@ -43,7 +43,7 @@ bool nextfn_2 ={acceleration a, velocity v, time t} =>{
     frnerfre
     rerenr
     $
-
+    
     SCOPEOPEN {
         int a.
         SCOPEOPEN{
@@ -64,32 +64,8 @@ int solve ={acceleration a, velocity v, time t} =>{
     string str = "fgf".
     c = 5 + str.
     int loop_var1.
-
     c = loop_var1 - 12.
-
-    mass m1.
-    int xx.
-    velocity x.
-    position y.
-    acceleration z.
-    time w.
-
-    mag {[1,2]}. 
-    
-    mag {x}. 
-
-    {m1} setr {y}.
-
-    
-    {m1} setr {[1,2]}.
-$
-    {m1} r_after {w}.
-
-    {m1} v_after {w}.
-    {m1} v_after {y}.
-$
     =>loop_var1.
-
 }
 
 bool solve = {int x, int y} =>{
