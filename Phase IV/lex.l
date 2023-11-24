@@ -50,31 +50,44 @@ question ("?")
     yylineno++;
     newlinePtr = strchr(newlinePtr + 1, '\n');
     }
+
+    fprintf(tokfile,"comment: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     return CMT;
 }
 
 SCOPEOPEN {
+    fprintf(tokfile,"reserved keyword: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     yylval.object.value = strdup(yytext);
     return SCOPEOPEN;
 }
 
 SCOPECLOSE {
+    fprintf(tokfile,"reserved keyword: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     yylval.object.value = strdup(yytext);
     return SCOPECLOSE;
 }
 
 "start" {
+    fprintf(tokfile,"main function: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     yylval.object.value = strdup(yytext);
     return START;
 }
 
 {question} {
+    fprintf(tokfile,"question: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     yylval.object.value = strdup(yytext);
     yylval.object.type = 16;
     return QUESTION;
 }
 
 {primi_datatype} {
+    fprintf(tokfile,"primitive datatype: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"int") == 0){
         yylval.object.value = strdup(yytext);
         yylval.object.type = 1;
@@ -98,6 +111,8 @@ SCOPECLOSE {
 }
 
 {non_pri_datatype} {
+    fprintf(tokfile,"non-primitive datatype: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"mass") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 11; return MASS;}
     else if(strcmp(yytext,"time") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 12; return TIME;}
     else if(strcmp(yytext,"position") == 0) {yylval.object.value = strdup(yytext); yylval.object.type = 6; return POSITION;}
@@ -111,6 +126,8 @@ SCOPECLOSE {
 }
 
 {reserved_keywords} {
+    fprintf(tokfile,"reserved keyword: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"input") == 0) {yylval.object.value = strdup(yytext); return INPUT;}
     else if(strcmp(yytext,"output") == 0) {yylval.object.value = strdup(yytext); return OUTPUT;}
     else if(strcmp(yytext,"true") == 0) {yylval.object.value = strdup(yytext); return TRUE;}
@@ -135,7 +152,6 @@ SCOPECLOSE {
     else if(strcmp(yytext,"time_to_v") == 0) {yylval.object.value = strdup(yytext); return TIME_TO_V;}
     else if(strcmp(yytext,"loop") == 0) {yylval.object.value = strdup(yytext); return LOOP;}
     else if(strcmp(yytext,"break") == 0) {yylval.object.value = strdup(yytext); return BREAK;}
-    // else if(strcmp(yytext,"start") == 0) return START;
     else if(strcmp(yytext,"sin") == 0) {yylval.object.value = strdup(yytext); return SIN;}
     else if(strcmp(yytext,"cos") == 0) {yylval.object.value = strdup(yytext); return COS;}
     else if(strcmp(yytext,"tan") == 0) {yylval.object.value = strdup(yytext); return TAN;}
@@ -155,6 +171,8 @@ SCOPECLOSE {
 
 
 {special_sym} {
+    fprintf(tokfile,"special symbol: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"(") == 0) {yylval.object.value = strdup(yytext); return OPENCC;}
     else if(strcmp(yytext,")") == 0) {yylval.object.value = strdup(yytext); return CLOSECC;}
     else if(strcmp(yytext,"[") == 0) {yylval.object.value = strdup(yytext); return OPENSQ;}
@@ -165,6 +183,8 @@ SCOPECLOSE {
 }
 
 {punctuation} {
+    fprintf(tokfile,"punctuation: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"\"") == 0) {yylval.object.value = strdup(yytext); return DOUBLE_QUOTE;}
     else if(strcmp(yytext,"'") == 0) {yylval.object.value = strdup(yytext); return SINGLE_QUOTE;}
     else if(strcmp(yytext,":") == 0) {yylval.object.value = strdup(yytext); return COLON;}
@@ -173,11 +193,15 @@ SCOPECLOSE {
 }
 
 {arrow} {
+    fprintf(tokfile,"operator: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     yylval.object.value = strdup(yytext); 
     return ARROW;
 }
 
 {bi_op} {
+    fprintf(tokfile,"binary operator: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"+") == 0) {yylval.object.value = strdup(yytext); return ADD;}
     else if(strcmp(yytext,"-") == 0) {yylval.object.value = strdup(yytext); return SUB;}
     else if(strcmp(yytext,"*") == 0) {yylval.object.value = strdup(yytext); return MUL;}
@@ -187,6 +211,8 @@ SCOPECLOSE {
 }
 
 {rel_op} {
+    fprintf(tokfile,"relational operator: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     if(strcmp(yytext,"==") == 0) {yylval.object.value = strdup(yytext); return EQ;}
     else if(strcmp(yytext,"!=") == 0) {yylval.object.value = strdup(yytext); return NEQ;}
     else if(strcmp(yytext,">=") == 0) {yylval.object.value = strdup(yytext); return GEQ;}
@@ -196,43 +222,59 @@ SCOPECLOSE {
 }
 
 {logic_op} {
+    fprintf(tokfile,"logical operator: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     yylval.object.value = strdup(yytext); 
     return LOGICOP; 
 }
 
 {uni_op} {
+    fprintf(tokfile,"unary operator: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     yylval.object.value = strdup(yytext); 
     return UNIOP; 
 }
 
 {uni_neg} {
+    fprintf(tokfile,"unary operator: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     yylval.object.value = strdup(yytext); 
     return UNINEG; 
 }
 
 {assgn_op} {
+    fprintf(tokfile,"assignment operator: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     yylval.object.value = strdup(yytext); 
     return ASSGN; 
 }
 
 {d_arr} {
+    fprintf(tokfile,"operator: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     yylval.object.value = strdup(yytext); 
     return DARR; 
 }
 
 [1-9][0-9]* {
+    fprintf(tokfile,"constant: %s\n",yytext);
+    fprintf(parsefile,"%s",yytext);
     yylval.object.value = strdup(yytext); 
     yylval.object.type = 1;
     return NON_NEGATIVE_INT; 
 }
 
 [-]?[1-9][0-9]*|0 {
+    fprintf(tokfile, "constant: %s\n", yytext);
+    fprintf(parsefile, "%s", yytext);
     yylval.object.value = strdup(yytext); 
     yylval.object.type = 1;
     return INTEGER_CONSTANT; 
 }
 
 [-]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)? {
+    fprintf(tokfile, "constant: %s\n", yytext);
+    fprintf(parsefile, "%s", yytext);
     yylval.object.value = strdup(yytext); 
     yylval.object.type = 2;
     return FLOAT_CONSTANT;
@@ -240,11 +282,21 @@ SCOPECLOSE {
 
 
 [a-zA-Z_][a-zA-Z0-9_]* {
+    fprintf(tokfile, "ID: %s\n", yytext);
+    fprintf(parsefile, "%s", yytext);
     yylval.object.value = strdup(yytext); 
     return ID;
 }
 
 \"([^"]*)\" {
+    fprintf(tokfile,"punctuation: \"\n");
+	fprintf(tokfile,"constant: ");
+	for(int i=1;i<yyleng-1;i++){
+		fprintf(tokfile,"%c",yytext[i]);
+	}
+	fprintf(tokfile,"\n");
+	fprintf(tokfile,"punctuation: \"\n");
+    fprintf(parsefile, "%s", yytext);
     yylval.object.value = strdup(yytext); 
     yylval.object.type = 3;
     return STRING_CONSTANT;
@@ -252,12 +304,13 @@ SCOPECLOSE {
 
 [ \t] {
 	fprintf(outfile, "%s", yytext);
+    fprintf(parsefile, "%s", yytext);
 }
 
-[\n]  { yylineno++; fprintf(outfile, "%s", yytext);}
+[\n]  { yylineno++; fprintf(outfile, "%s", yytext);fprintf(parsefile, "%s", yytext);}
 
 . {
-	fprintf(tokfile,"ERROR! Invalid token");
+	fprintf(tokfile,"ERROR : Invalid token at line no : %d", yylineno);
     return 0; 
 }
 %%
