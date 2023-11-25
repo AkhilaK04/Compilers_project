@@ -10,7 +10,7 @@ bool coercion(string type1, string type2){
   else if(type1 == "acceleration" && (type2 == "acceleration" || type2 == "vector")) return true;
   else if(type1 == "distance" && (type2 == "distance" || type2 == "vector")) return true;
   else if(type1 == "momentum" && (type2 == "momentum" || type2 == "vector")) return true;
-  else if(type1 == "mass" && (type2 == "mass")) return true;
+  else if(type1 == "mass" && (type2 == "mass" || type2 == "double" || type2 == "int")) return true;
   else if(type1 == "time" && (type2 == "time" || type2 == "int" || type2 == "double")) return true;
   else if(type1 == "energy" && (type2 == "energy" || type2 == "int" || type2 =="double")) return true;
   else if(type1 == "theta" && (type2 == "int" || type2 == "double" || type2 == "theta")) return true;
@@ -82,7 +82,6 @@ int give_type_index(string type){
     return 16;
   }
   else{
-    cout << "dont_know" << endl;
     return -1;
   }
 } 
@@ -137,7 +136,6 @@ string get_string_type(int type){
     return "?";
   }
   else{
-    cout << "dontknow" << endl;
     return "dontknow";
   }
 }
@@ -170,7 +168,7 @@ int find_return_type(string name,char** func_args_list,int present){
 }
 
 int give_result_type(int t1,string operation,int t2){
-  if(coercion(get_string_type(t1),get_string_type(t2)) == 1){
+  if(coercion(get_string_type(t1),get_string_type(t2)) == 1 || coercion(get_string_type(t2),get_string_type(t1)) == 1){
     return t1;
   }
   else{
@@ -233,9 +231,8 @@ bool std_lib_semantics (string name,int ID1,vector<int> ID2){
 
     if(ID2.size() == 2){
         // collide function.
-        bool rhs1;
-        if(get_string_type(ID2[1]) == "e" || get_string_type(ID2[1]) == "double" ) rhs1 = true; 
-        if(name == "collide" || get_string_type(ID1) == "mass" && get_string_type(ID2[1]) == "mass" && rhs1){
+        
+        if(name == "collide" || get_string_type(ID1) == "mass" && get_string_type(ID2[1]) == "mass" && (get_string_type(ID2[1]) == "e" || get_string_type(ID2[1]) == "double")){
             return true;
         }
 
@@ -249,14 +246,8 @@ bool std_lib_semantics (string name,int ID1,vector<int> ID2){
         }
         cout<<"ERROR in type check of Function args in collide!!"<<endl;
     return false;
-    }
-    // else if(ID2.size() == 0){
-
-    // return false;
-    // }
-    else{
+    }else{
         //MAG
-
         if(name == "mag" && (get_string_type(ID2[0]) == "velocity" || get_string_type(ID2[0]) == "position" || 
                             get_string_type(ID2[0]) == "acceleration" || get_string_type(ID2[0]) == "momentum" || 
                             get_string_type(ID2[0]) == "distance" || get_string_type(ID2[0]) == "vector" )){
@@ -326,10 +317,8 @@ bool std_lib_semantics (string name,int ID1,vector<int> ID2){
         else if((name == "angle_after") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "position" || get_string_type(ID2[0]) == "vector") ){
             return true;
         }
-
-        //collision
-        else if((name == "collide" || name == "time_to_collide") && get_string_type(ID1) == "mass" && get_string_type(ID2[0]) == "mass"){
-            return true;
+        else if((name == "collide" || name == "time_to_collide") && get_string_type(ID1) == "mass" && get_string_type(ID2[0]) == "mass"){    
+        return true;
         }
 
         // Misc Time:
@@ -483,5 +472,5 @@ bool within_func_parameters_redeclaration(string name){
 //Type checking for assigning variables
 bool type_checking_assign(int type1, int type2){
   if(get_string_type(type1) == "string" && get_string_type(type2) == "string") return true;
-    return coercion(get_string_type(type1),get_string_type(type2));
+    return (coercion(get_string_type(type1),get_string_type(type2)) || coercion(get_string_type(type2),get_string_type(type1)));
 }

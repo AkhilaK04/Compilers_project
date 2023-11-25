@@ -10,6 +10,7 @@ bool arr_check = false;
 int dim_count = 0;
 int num_return = 0;
 int function_return_type = 0;
+int counter = 0;
 %}
 
 %union {
@@ -61,7 +62,7 @@ int function_return_type = 0;
 %token <object> SCOPECLOSE
 
 
-%type <object> multiple_output dim_con check_rhs_exp stand_id single_variable_for_exp_stmt single_variable_declare code code_subpart comments startfn function_decl loop_body body exp_stmt call_stmt_with_dot conditional_stmt loop_stmt unary_operation_without_dot return_stmt output_stmt input_stmt inbuilt_functions_with_dot decl_stmt_with_exp bi_op relop vectors primi_datatype non_pri_datatype datatypes single_variable dimensions pos idadd2 anything_with_value operations rhs_exp rhs_term openccs closeccs call_stmt_without_dot conditional_stmt_start ids  rel_to_mag rel_to_vel rel_to_pos rel_to_acc rel_to_energy rel_to_angle  rel_to_collision rel_to_momentum miscellaneous term_misc expression expressions  parameters inbuilt_functions
+%type <object> another_temp multiple_output dim_con check_rhs_exp stand_id single_variable_for_exp_stmt single_variable_declare code code_subpart comments startfn function_decl loop_body body exp_stmt call_stmt_with_dot conditional_stmt loop_stmt unary_operation_without_dot return_stmt output_stmt input_stmt inbuilt_functions_with_dot decl_stmt_with_exp bi_op relop vectors primi_datatype non_pri_datatype datatypes single_variable dimensions pos idadd2 anything_with_value operations rhs_exp rhs_term openccs closeccs call_stmt_without_dot conditional_stmt_start ids  rel_to_mag rel_to_vel rel_to_pos rel_to_acc rel_to_energy rel_to_angle  rel_to_collision rel_to_momentum miscellaneous term_misc expression expressions  parameters inbuilt_functions
 %type <arg_object> funccallargs
 %start code
 %%
@@ -70,13 +71,13 @@ code: code_subpart
     | code code_subpart
 	;
 
-code_subpart: comments 
+code_subpart: comments {fprintf(parsefile," : comment");}
             | startfn 
             | function_decl 
             ;
 
 startfn : START OPENCU 
-          {is_func_bool = true; current_pointer++;  curr_scopes[current_pointer]++; fprintf(outfile,"int main() {");} 
+          {is_func_bool = true; current_pointer++;  curr_scopes[current_pointer]++; fprintf(outfile,"int main() {");fprintf(parsefile," : main function");} 
           body 
            {
             if (valid_func_entry($1.value , par_list)){
@@ -95,34 +96,34 @@ startfn : START OPENCU
             }
         ;
 
-body : exp_stmt body
-     | call_stmt_with_dot body
+body : exp_stmt {fprintf(parsefile," : expression statement");} body
+     | call_stmt_with_dot {fprintf(parsefile," : call statement");} body
      | conditional_stmt body
      | loop_stmt body
-     | unary_operation_without_dot DOT {fprintf(outfile, ";");} body
-     | return_stmt body
-     | comments body
-     | output_stmt body
-     | input_stmt body
+     | unary_operation_without_dot DOT { fprintf(parsefile," : call statement"); fprintf(outfile, ";");} body
+     | return_stmt {fprintf(parsefile," : return statement");} body
+     | comments {fprintf(parsefile," : comment ");} body
+     | output_stmt {fprintf(parsefile," : output statement");} body
+     | input_stmt {fprintf(parsefile," : input statement");} body
      | {}
-     | SCOPEOPEN { current_pointer++;  curr_scopes[current_pointer]++; }OPENCU {fprintf(outfile, "{");} body SCOPECLOSE {current_pointer--; }CLOSECU {fprintf(outfile, "}");} body
-     | inbuilt_functions_with_dot body
-     | decl_stmt_with_exp body 
+     | SCOPEOPEN { current_pointer++;  curr_scopes[current_pointer]++; }OPENCU {fprintf(outfile, "{");fprintf(parsefile," : opening of scope");} body SCOPECLOSE {current_pointer--; }CLOSECU {fprintf(outfile, "}"); fprintf(parsefile," : ending of scope");} body
+     | inbuilt_functions_with_dot {fprintf(parsefile," : standard-library");} body
+     | decl_stmt_with_exp {fprintf(parsefile," : declaration statement");} body 
      ;
 
-loop_body : exp_stmt loop_body
-     | call_stmt_with_dot loop_body
+loop_body : exp_stmt {fprintf(parsefile," : expression statement");} loop_body
+     | call_stmt_with_dot {fprintf(parsefile," : call statement");} loop_body
      | conditional_stmt loop_body
      | loop_stmt loop_body
-     | unary_operation_without_dot DOT {fprintf(outfile, ";");} loop_body
-     | return_stmt loop_body
-     | comments loop_body
-     | output_stmt loop_body
-     | input_stmt loop_body
+     | unary_operation_without_dot DOT {fprintf(outfile, ";"); fprintf(parsefile," : call statement");} loop_body
+     | return_stmt {fprintf(parsefile," : return statement");} loop_body
+     | comments {fprintf(parsefile," : comment");} loop_body
+     | output_stmt {fprintf(parsefile," : output statement");} loop_body
+     | input_stmt {fprintf(parsefile," : input statement");} loop_body
      | {}
-     | SCOPEOPEN { current_pointer++;  curr_scopes[current_pointer]++; } OPENCU {fprintf(outfile, "{");} loop_body SCOPECLOSE {current_pointer--; } CLOSECU {fprintf(outfile, "}");} body
-     | inbuilt_functions_with_dot loop_body
-     | decl_stmt_with_exp loop_body 
+     | SCOPEOPEN {current_pointer++;  curr_scopes[current_pointer]++; } OPENCU {fprintf(outfile, "{"); fprintf(parsefile," : opening of scope");} loop_body SCOPECLOSE {current_pointer--; } CLOSECU {fprintf(outfile, "}");fprintf(parsefile," : ending of scope");} body
+     | inbuilt_functions_with_dot {fprintf(parsefile," : standard-library");} loop_body
+     | decl_stmt_with_exp {fprintf(parsefile," : declaration statement");} loop_body 
      | BREAK DOT loop_body {fprintf(outfile, "break; %s", $3.value);}
      ;
 
@@ -181,14 +182,30 @@ datatypes : primi_datatype
 
 /* DECLARATION STATEMENT needed things */
 
-single_variable : ID { fprintf(outfile,"%s", $1.value); arr_check = false;}
-                | ID { fprintf(outfile,"%s", $1.value); arr_check = true; } dimensions 
+another_temp : ID { fprintf(outfile,"%s", $1.value); arr_check = true; } dimensions 
                 {
                   int k;
                   if((k = get_num_dim($1.value,convert_scope_to_string())) != -1 && k != dim_count){
                     cout << "Error : Invalid access of array at line no " << yylineno << endl;
                   } 
+                  $$.value = $1.value;
                 }
+                ;
+
+single_variable : ID { if(counter == 0){fprintf(outfile,"%s", $1.value);} arr_check = false;}
+                | another_temp
+                | another_temp ARROW pos {if(($1.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
+                        cout << "Error : Undeclared variable " << $1.value << " used at line no " << yylineno<< endl;
+                      }
+                      if($1.type == 5 || $1.type == 6 || $1.type == 7 || $1.type == 8 || $1.type == 9 || $1.type == 10){
+
+                      }
+                      else{
+                        cout << "Error : " << $1.value << " is not a vector to access first or second at line no " << yylineno << endl;
+                      }
+                    $$.type = 2;
+                    fprintf(outfile, ".%s",$3.value);
+                    }
                 ;
 
 dim_con : OPENSQ {fprintf(outfile, "[");} ;
@@ -224,7 +241,20 @@ single_variable_for_exp_stmt :  single_variable
                                   }
                                   dim_count = 0;
                                 }
-                                ;
+                                | ID ARROW pos {fprintf(outfile, "%s.%s",$1.value,$3.value);} {
+                                    if(($1.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
+                                      cout << "Error : Undeclared variable " << $1.value << " used at line no " << yylineno<< endl;
+                                    }
+                                    if($1.type == 5 || $1.type == 6 || $1.type == 7 || $1.type == 8 || $1.type == 9 || $1.type == 10){
+
+                                    }
+                                    else{
+                                      cout << "Error : " << $1.value << " is not a vector to access first or second at line no " << yylineno << endl;
+                                    }
+                                    $$.type = 2.
+                                  }
+                                  ;
+                                
 
 exp_stmt : single_variable_for_exp_stmt ASSGN { fprintf(outfile, "=");} check_rhs_exp DOT {fprintf(outfile, ";");} 
           {if(!type_checking_assign($1.type,$4.type)){
@@ -237,9 +267,10 @@ pos : FIRST
     | SECOND
     ;
 
-anything_with_value : single_variable {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
+anything_with_value : single_variable {if($1.type != 2){if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
     cout << "Error : Undeclared variable " << $1.value << " used at line no " << yylineno<< endl;
   }
+}
   dim_count = 0;}
                     | NON_NEGATIVE_INT {fprintf(outfile, "%s", $1.value);}
                     | INTEGER_CONSTANT {fprintf(outfile, "%s", $1.value);}
@@ -252,38 +283,43 @@ anything_with_value : single_variable {if(($$.type = undeclare_check($1.value,co
                     | UNINEG {fprintf(outfile, "!");}anything_with_value {$$.type = 4;}
                     | call_stmt_without_dot ARROW pos {fprintf(outfile, ".%s",$3.value);}{if($1.type != 5 && $1.type != 6 && $1.type != 7 && $1.type != 8 && $1.type != 9 && $1.type != 10){
                       cout << "Error : Return type is not a vector at line no " << yylineno << endl;
-                    }}
-                    | inbuilt_functions ARROW pos {fprintf(outfile, ".%s",$3.value);}
+                    }
+                    $$.type = 2.}
+                    | inbuilt_functions ARROW pos {fprintf(outfile, ".%s",$3.value); $$.type = 2.}
                     | inbuilt_functions
-                    | vectors ARROW pos {fprintf(outfile, ".%s",$3.value);}
-                    | ID ARROW pos {fprintf(outfile, ".%s",$3.value);} {
-                      if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
+                    | vectors ARROW pos {fprintf(outfile, ".%s",$3.value); $$.type = 2.}
+                    | ID ARROW pos {fprintf(outfile, "%s.%s",$1.value,$3.value);} {
+                      if(($1.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
                         cout << "Error : Undeclared variable " << $1.value << " used at line no " << yylineno<< endl;
                       }
-                      if($$.type == 5 || $$.type == 6 || $$.type == 7 || $$.type == 8 || $$.type == 9 || $$.type == 10){
+                      if($1.type == 5 || $1.type == 6 || $1.type == 7 || $1.type == 8 || $1.type == 9 || $1.type == 10){
 
                       }
                       else{
-                        cout << "Error : " << $1.value << " is not a vector to access first or second at line no " << yylineno << endl;
+                        cout << "Error : " << $1.value << "1 is not a vector to access first or second at line no " << yylineno << endl;
                       }
+                      $$.type = 2.
                     }
                     | single_variable UNIOP {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
                         cout << "Error : Undeclared variable " << $1.value << " used at line no " << yylineno<< endl;
                       }}
-                    | SIN OPENCC anything_with_value CLOSECC {
-                      fprintf(outfile,"sin(%s * (M_PI / 180.0))",$3.value);
+                    | SIN OPENCC {counter = 1;}anything_with_value {counter = 0;}CLOSECC {
+                      fprintf(outfile,"sin(%s * (M_PI / 180.0))",$4.value);
                       $$.type = 2;
-                      if($3.type != 1 && $3.type != 2){cout << "Error : Sin input is out of range at line no " << yylineno << endl;}
+                      if($4.type != 1 && $4.type != 2 && $4.type != 14){cout << "Error : Sin input is out of range at line no " << yylineno << endl;}
+                      $$.type = 2.
                     }
-                    | COS OPENCC anything_with_value CLOSECC {
-                      fprintf(outfile,"cos(%s * (M_PI / 180.0))",$3.value);
+                    | COS OPENCC {counter = 1;} anything_with_value {counter = 0;}CLOSECC {
+                      fprintf(outfile,"cos(%s * (M_PI / 180.0))",$4.value);
                       $$.type = 2;
-                      if($3.type != 1 && $3.type != 2){cout << "Error : Cos input is out of range at line no " << yylineno << endl;}
+                      if($4.type != 1 && $4.type != 2 && $4.type != 14){cout << "Error : Cos input is out of range at line no " << yylineno << endl;}
+                        $$.type = 2.
                       }
-                    | TAN OPENCC anything_with_value CLOSECC {
-                      fprintf(outfile,"tan(%s * (M_PI / 180.0))",$3.value);
+                    | TAN OPENCC {counter = 1;}anything_with_value {counter = 0;} CLOSECC {
+                      fprintf(outfile,"tan(%s * (M_PI / 180.0))",$4.value);
                       $$.type = 2;
-                      if($3.type != 1 && $3.type != 2){cout << "Error : Tan input is out of range at line no " << yylineno << endl;}
+                      if($4.type != 1 && $4.type != 2 && $4.type != 14){cout << "Error : Tan input is out of range at line no " << yylineno << endl;}
+                      $$.type = 2.
                       }
                     ;
         
@@ -362,7 +398,7 @@ funccallargs : check_rhs_exp
 
 /* CONDITIONAL STATEMENT  */
 
-conditional_stmt_start : OPENSQ {fprintf(outfile, "if(");} check_rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; fprintf(outfile, "){");}
+conditional_stmt_start : OPENSQ {fprintf(outfile, "if(");} check_rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; fprintf(outfile, "){"); fprintf(parsefile," : conditional statement");}
                       ;
 
 
@@ -372,7 +408,7 @@ conditional_stmt: conditional_stmt_start loop_body CLOSECU {current_pointer--; f
 
 /* LOOP STATEMENT */
       
-loop_stmt: LOOP OPENSQ {fprintf(outfile, "while(");} check_rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; fprintf(outfile, "){");} loop_body CLOSECU {current_pointer--; fprintf(outfile, "}");} 
+loop_stmt: LOOP OPENSQ {fprintf(outfile, "while(");} check_rhs_exp CLOSESQ OPENCU { current_pointer++;  curr_scopes[current_pointer]++; fprintf(outfile, "){"); {fprintf(parsefile," : loop statement");}} loop_body CLOSECU {current_pointer--; fprintf(outfile, "}");} 
          ; 
 
 /* UNIRARY OPERATION WITHOUT DOT */
@@ -446,11 +482,12 @@ inbuilt_functions : rel_to_mag
 
 stand_id : ID {if(($$.type = undeclare_check($1.value,convert_scope_to_string())) == 0){
                           cout << "Error : Undeclared variable used at line no " << yylineno << endl;
-                        };
+                        }
                 if($$.type != 11){
                   cout << "Error : Indentifier is of not mass datatype at line no " << yylineno << endl; 
                 }
               }
+              ;
 
 rel_to_mag : MAG OPENCU {fprintf(outfile, "mag(");}check_rhs_exp CLOSECU {
               $$.type = 2;
@@ -467,15 +504,15 @@ rel_to_pos : OPENCU stand_id CLOSECU SETR {fprintf(outfile, "setr(&%s,", $2.valu
               if(!std_lib_semantics($4.value,$2.type,{$7.type})){
                 cout<<"Invalid use of std-lib : setr"<<endl;
               }
-              fprintf(outfile, ")", $2.value, $7.value);
+              fprintf(outfile, ")");
             }
            | OPENCU stand_id CLOSECU ADDR {fprintf(outfile, "addr(&%s,", $2.value);}OPENCU check_rhs_exp CLOSECU {
               if(!std_lib_semantics($4.value,$2.type,{$7.type})){
                 cout<<"Invalid use of std-lib : addr"<<endl;
               }
-              fprintf(outfile, ")", $2, $7);
+              fprintf(outfile, ")");
             }
-           | OPENCU stand_id CLOSECU R_AFTER {fprintf(outfile, "r_after(&%s,", $2);}OPENCU check_rhs_exp CLOSECU {
+           | OPENCU stand_id CLOSECU R_AFTER {fprintf(outfile, "r_after(&%s,", $2.value);}OPENCU check_rhs_exp CLOSECU {
               $$.type = 6; 
               if(!std_lib_semantics($4.value,$2.type,{$7.type})){
                 cout<<"Invalid use of std-lib : r_after"<<endl;
@@ -495,13 +532,13 @@ rel_to_vel : OPENCU stand_id CLOSECU SETV {fprintf(outfile, "setv(&%s,", $2.valu
             if(!std_lib_semantics($4.value,$2.type,{$7.type})){
                 cout<<"Invalid use of std-lib : setv"<<endl;
             }
-            fprintf(outfile, ")", $2.value, $7.value);
+            fprintf(outfile, ")");
           }
            | OPENCU stand_id CLOSECU ADDV {fprintf(outfile, "addv(&%s,", $2.value);} OPENCU check_rhs_exp CLOSECU {
             if(!std_lib_semantics($4.value,$2.type,{$7.type})){
                 cout<<"Invalid use of std-lib : addv"<<endl;
             }
-            fprintf(outfile, ")", $2, $7);
+            fprintf(outfile, ")");
           }
            | OPENCU stand_id CLOSECU V_AFTER {fprintf(outfile, "v_after(&%s,", $2.value);} OPENCU check_rhs_exp CLOSECU {
             $$.type = 5; 
@@ -519,30 +556,30 @@ rel_to_vel : OPENCU stand_id CLOSECU SETV {fprintf(outfile, "setv(&%s,", $2.valu
           }
            ; 
 
-rel_to_momentum : OPENCU stand_id CLOSECU SETP {fprintf(outfile, "setp(&%s,",$2.value);} OPENCU check_rhs_exp CLOSECU {if($6.type != 9 && $6.type != 10){
+rel_to_momentum : OPENCU stand_id CLOSECU SETP {fprintf(outfile, "setp(&%s,",$2.value);} OPENCU check_rhs_exp CLOSECU {if($7.type != 9 && $7.type != 10){
   cout << "Error : Invalid statement at line no " << yylineno << endl;
-  fprintf(outfile, ")");
-}}
+}
+  fprintf(outfile, ")");}
                 ;
 
 rel_to_acc : OPENCU stand_id CLOSECU SETA {fprintf(outfile, "seta(&%s,", $2.value);} OPENCU check_rhs_exp CLOSECU {
             if(!std_lib_semantics($4.value,$2.type,{$7.type})){
                 cout<<"Invalid use of std-lib : seta"<<endl;
             }
-            fprintf(outfile, ")", $2.value, $7.value);
+            fprintf(outfile, ")");
           }
            | OPENCU stand_id CLOSECU ADDA {fprintf(outfile, "adda(&%s,", $2.value);} OPENCU check_rhs_exp CLOSECU {
             if(!std_lib_semantics($4.value,$2.type,{$7.type})){
                 cout<<"Invalid use of std-lib : adda"<<endl;
             }
-            fprintf(outfile, ")", $2, $7);
+            fprintf(outfile, ")");
           }
            | OPENCU stand_id CLOSECU GETA {
             $$.type = 7;
             if(!std_lib_semantics($4.value,$2.type,{})){
                 cout<<"Invalid use of std-lib : get_a"<<endl;
             }
-            fprintf(outfile, "geta(&%s)",$2);
+            fprintf(outfile, "geta(&%s)",$2.value);
           }
            ;
 
@@ -578,46 +615,46 @@ rel_to_angle: OPENCU stand_id CLOSECU ANGLE_AFTER {{fprintf(outfile, "angleafter
             }
             ;
 
-rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id COMMA ID {fprintf(outfile, "collide(&%s,&%s)", $2, $6);} CLOSECU {
+rel_to_collision: OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id COMMA ID {fprintf(outfile, "collide(&%s,&%s,%s)", $2.value, $6.value,$8.value);} CLOSECU {
                 $$.type = 13;
 
                   if(!std_lib_semantics($4.value,$2.type,{$6.type,$8.type})){
                   cout<<"Invalid use of std-lib : collide with e"<<endl;
                   }
                 }
-                | OPENCU stand_id CLOSECU COLLIDE OPENCU stand_id CLOSECU {
+                | OPENCU stand_id CLOSECU COLLIDE  OPENCU stand_id CLOSECU {
                   $$.type = 13;
                   if(!std_lib_semantics($4.value,$2.type,{$6.type})){
                   cout<<"Invalid use of std-lib : collide without e"<<endl;
                   }
-                  {fprintf(outfile, "collide(&%s,&%s)", $6);}
+                  {fprintf(outfile, "collide(&%s,&%s)", $2.value, $6.value);}
                 }
-                | OPENCU stand_id CLOSECU TIME_TO_COLLIDE {fprintf(outfile, "time_to_collide(&%s,", $2);}OPENCU stand_id CLOSECU {
+                | OPENCU stand_id CLOSECU TIME_TO_COLLIDE {fprintf(outfile, "time_to_collide(&%s,", $2.value);}OPENCU stand_id CLOSECU {
                   $$.type = 12 ;
                   if(!std_lib_semantics($4.value,$2.type,{$7.type})){
                   cout<<"Invalid use of std-lib : time to collide."<<endl;
                   }
-                  fprintf(outfile, "&%s)", $7);
+                  fprintf(outfile, "&%s)", $7.value);
                 }
                 ;
-extra : OPENCU stand_id CLOSECU TIME_TO_R OPENCU {fprintf(outfile, "time_to_r(&%s,", $2);}
-extra2: OPENCU stand_id CLOSECU TIME_TO_V OPENCU {fprintf(outfile, "time_to_v(&%s,", $2);}  
+extra : OPENCU stand_id CLOSECU TIME_TO_R OPENCU {fprintf(outfile, "time_to_r(&%s,", $2.value);}
+extra2: OPENCU stand_id CLOSECU TIME_TO_V OPENCU {fprintf(outfile, "time_to_v(&%s,", $2.value);}  
 
-miscellaneous: OPENCU stand_id CLOSECU S_AFTER {fprintf(outfile, "s_after(&%s,", $2);}OPENCU check_rhs_exp CLOSECU {
+miscellaneous: OPENCU stand_id CLOSECU S_AFTER {fprintf(outfile, "s_after(&%s,", $2.value);}OPENCU check_rhs_exp CLOSECU {
               $$.type = 8; 
               if(!std_lib_semantics($4.value,$2.type,{$7.type})){
                   cout<<"Invalid use of std-lib : s_after"<<endl;
                 }
                 fprintf(outfile, ")");
               }
-             | OPENCU stand_id CLOSECU ROC_AFTER {fprintf(outfile, "roc_after(&%s,", $2);}OPENCU check_rhs_exp CLOSECU {
+             | OPENCU stand_id CLOSECU ROC_AFTER {fprintf(outfile, "roc_after(&%s,", $2.value);}OPENCU check_rhs_exp CLOSECU {
               $$.type = 2; 
               if(!std_lib_semantics($4.value,$2.type,{$7.type})){
                   cout<<"Invalid use of std-lib : roc_after(time)."<<endl;
                 }
                 fprintf(outfile, ")");
               }
-             | OPENCU stand_id CLOSECU P_AFTER {fprintf(outfile, "p_after(&%s,", $2);} OPENCU check_rhs_exp CLOSECU {
+             | OPENCU stand_id CLOSECU P_AFTER {fprintf(outfile, "p_after(&%s,", $2.value);} OPENCU check_rhs_exp CLOSECU {
               $$.type = 9;
               if(!std_lib_semantics($4.value,$2.type,{$6.type})){
                   cout<<"Invalid use of std-lib : p_after(time)."<<endl;
@@ -687,7 +724,8 @@ single_variable_declare : single_variable {
                         else{
                           add('V',$1.value,type);
                         }
-}
+              }
+;
 
 check_rhs_exp : {open_brackets = 0;close_brackets = 0;} rhs_exp {if(open_brackets != close_brackets){cout << "Error : Incorrect RHS expression at line no " << yylineno << endl;}open_brackets = 0;close_brackets = 0;$$.type = $2.type;$$.value = $2.value;}
 
@@ -703,7 +741,7 @@ idadd2 : ID {is_func_bool = true;
         }
        ;
 
-function_decl : datatypes idadd2 ASSGN OPENCU {fprintf(outfile,"(");function_return_type = give_type_index($1.value);} parameters CLOSECU {fprintf(outfile,")");} DARR OPENCU {fprintf(outfile,"{");}
+function_decl : datatypes idadd2 ASSGN OPENCU {fprintf(outfile,"(");function_return_type = give_type_index($1.value);} parameters CLOSECU {fprintf(outfile,")");} DARR OPENCU {fprintf(outfile,"{"); fprintf(parsefile," : function declaration");}
 {current_pointer++;  curr_scopes[current_pointer]++; }body
                 {   
                   if (valid_func_entry($2.value , par_list)){
@@ -722,7 +760,7 @@ function_decl : datatypes idadd2 ASSGN OPENCU {fprintf(outfile,"(");function_ret
                 num_return  = 0;
                 }
                 
-                | datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU {fprintf(outfile,"(){");function_return_type = give_type_index($1.value);} {current_pointer++;  curr_scopes[current_pointer]++;}body 
+                | datatypes idadd2 ASSGN OPENCU CLOSECU DARR OPENCU {fprintf(outfile,"(){");function_return_type = give_type_index($1.value);fprintf(parsefile," : function declaration");} {current_pointer++;  curr_scopes[current_pointer]++;}body 
                 {
                     if (valid_func_entry($2.value , par_list)){
                       new_func_entry( $2.value, $1.value, par_list.size(), par_list, var_list);
@@ -792,8 +830,8 @@ int main(int argc ,char * argv[]){
   fprintf(headerfile, "#include <bits/stdc++.h>\nusing namespace std; \n\nclass Mass{\npublic:\n\tint mass;\n\tpair<double,double> position;\n\tpair<double,double> velocity;\n\tpair<double,double> acceleration;\n\n\tMass(int initialMass = 1) {\n\t\tmass = initialMass;\n\t\tposition.first = 0.0;\n\t\tposition.second = 0.0;\n\t\tvelocity.first = 0.0;\n\t\tvelocity.second = 0.0;\n\t\tacceleration.first = 0.0;\n\t\tacceleration.second = 0.0;\n\t}\n};\n");
 
   fprintf(headerfile, "\n\n// Related to Magnitude\n\ndouble mag(pair<double,double> vec){\n\tdouble vecx = vec.first;\n\tdouble vecy = vec.second;\n\tdouble magnitude = sqrt(vecx * vecx + vecy * vecy);\n\treturn magnitude;\n}");
-  fprintf(headerfile, "\n\n\n// Related to Position\n\nvoid setr(Mass* m, pair<double,double> r){\n\tm->position = r;\n}\n\nvoid addr(Mass* m, pair<double,double> r){\n\tm->position.first = m->position.first + r.first;\n\tm->position.second = m->position.second + r.second;\n}\npair<double,double> r_after(Mass* m, double t){\n\tpair<double,double> temp;\n\ttemp.first = m->position.first + m->velocity.first*t + 0.5*m->acceleration.first*t*t;\n\ttemp.second = m->position.second + m->velocity.second*t + 0.5*m->acceleration.second*t*t;\n\treturn temp;\n}\n\npair<double,double> get_r(Mass* m){\n\treturn m->position;\n}");
-  fprintf(headerfile, "\n\n\n// Related to velocity\n\nvoid setv(Mass* m, pair<double,double> vec){\n\tm->velocity = vec;\n}\n\nvoid addv(Mass* m, pair<double,double> v){\n\tm->velocity.first = m->velocity.first + v.first;\n\tm->velocity.second = m->velocity.second + v.second;\n}\n\npair<double,double> v_after(Mass* m, double t){\n\tpair<double,double> temp;\n\ttemp.first = m->velocity.first + m->acceleration.first*t;\n\ttemp.second = m->velocity.second + m->acceleration.second*t;\n\treturn temp;\n}\n\npair<double,double> v_after(Mass* m,  pair<double,double> r){\n\tpair<double,double> temp;\n\ttemp.first = sqrt(pow(m->velocity.first, 2) + 2 * m->acceleration.first * r.first);\n\ttemp.second = sqrt(pow(m->velocity.second, 2) + 2 * m->acceleration.second * r.second);\n\treturn temp;\n}\n\npair<double,double> get_v(Mass* m){\n\treturn m->velocity;\n}");
+  fprintf(headerfile, "\n\n\n// Related to Position\n\nvoid setr(Mass* m, pair<double,double> r){\n\tm->position = r;\n}\n\nvoid addr(Mass* m, pair<double,double> r){\n\tm->position.first = m->position.first + r.first;\n\tm->position.second = m->position.second + r.second;\n}\npair<double,double> r_after(Mass* m, double t){\n\tpair<double,double> temp;\n\ttemp.first = m->position.first + m->velocity.first*t + 0.5*m->acceleration.first*t*t;\n\ttemp.second = m->position.second + m->velocity.second*t + 0.5*m->acceleration.second*t*t;\n\treturn temp;\n}\n\npair<double,double> getr(Mass* m){\n\treturn m->position;\n}");
+  fprintf(headerfile, "\n\n\n// Related to velocity\n\nvoid setv(Mass* m, pair<double,double> vec){\n\tm->velocity = vec;\n}\n\nvoid addv(Mass* m, pair<double,double> v){\n\tm->velocity.first = m->velocity.first + v.first;\n\tm->velocity.second = m->velocity.second + v.second;\n}\n\npair<double,double> v_after(Mass* m, double t){\n\tpair<double,double> temp;\n\ttemp.first = m->velocity.first + m->acceleration.first*t;\n\ttemp.second = m->velocity.second + m->acceleration.second*t;\n\treturn temp;\n}\n\npair<double,double> v_after(Mass* m,  pair<double,double> r){\n\tpair<double,double> temp;\n\ttemp.first = sqrt(pow(m->velocity.first, 2) + 2 * m->acceleration.first * r.first);\n\ttemp.second = sqrt(pow(m->velocity.second, 2) + 2 * m->acceleration.second * r.second);\n\treturn temp;\n}\n\npair<double,double> getv(Mass* m){\n\treturn m->velocity;\n}");
   fprintf(headerfile, "\n\n\n// Related to accerlation\n\nvoid seta(Mass* m, pair<double,double> vec){\n\tm->acceleration = vec;\n}\n\nvoid adda(Mass* m, pair<double,double> a){\n\tm->acceleration.first = m->acceleration.first + a.first;\n\tm->acceleration.second = m->acceleration.second + a.second;\n}\n\npair<double,double> geta(Mass* m){\n\treturn m->acceleration;\n}"); 
   fprintf(headerfile, "\n\n\n// Related to energy\n\ndouble keafter(Mass* m,double time){\n\tpair<double,double> vel = v_after(m,time);\n\tdouble mag_value = mag(vel);\n\treturn 0.5*m->mass*mag_value*mag_value;\n}   \n\ndouble peafter(Mass* m,double time){\n\tpair<double,double> pos = r_after(m,time);\n\tpair<double,double> acc = geta(m);\n\treturn m->mass*acc.second*pos.second + m->mass*acc.first*pos.first;\n}\n\n\ndouble teafter(Mass* m,double time){\n\treturn keafter(m,time) + peafter(m,time);\n}\n");
   fprintf(headerfile, "\n\n\n// Related to angle\n\ndouble angleafter(Mass* m,double time){\n\tpair<double,double> vel = v_after(m,time);\n\tif(vel.first == 0){\n\t\treturn 0;\n\t}\n\telse{\n\t\treturn atan2(vel.second,vel.first);\n\t}\n}");
