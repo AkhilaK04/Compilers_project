@@ -1,5 +1,5 @@
 $   
-    Q) (JEE ADVANCED 2022 P2) A projectile is fired from 
+    Q)A projectile is fired from 
     ground with velocity v at an angle theta from horizontal. 
     If at the highest point the gravity changes from g to 
     newg where newg = g/0.81 , If newd = n*d , where d is 

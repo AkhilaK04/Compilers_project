@@ -1,49 +1,67 @@
-int func = {time t1, position p} => {
+$CORRECT$
 
-    int a,b,c.
-    output: "Enter the values a,b: ".
-    input: a,b.
+time cal_time = {acceleration a1, position p1, energy e1} => {
 
-    velocity v1 = [2,6],v2.
-    v2 = v1 + v3.
- 
-    b = [3,6].
+output: "Enter the values a1,p1,e1: ".
+input: a1,p1,e1.
+double x,y.
+mass m1,m2.
+output: "Enter the masses: ".
+input:x,y.
 
-    string str1,str2.
-    str1 = "hello".
-    str2 = 5.
+{m1} setm {x}.
+{m2} setm {y}.
 
-    str1++.
+time t1.
+e ece = 0.6.
 
-    int b1 = str1.
+theta ngle = 45.
+double temp1 = 9.8.
 
-    int array[67].
+{m1} collide {m2,ece}.
 
-    loop [ (((a < b) >= c) & !b) | c ] {
-
-        [array[a] == array[b]] {
-            
-            [array[b-c] + array[a+c] != array[b]]{
-                output: "Yes" , array[a] , " is valid.".
-            }
-            otherwise{ break.}
+int i = 0.
+    loop [e1 < 0.89 & e1 >= 0] {
+        energy loss = e1 / 3.
+        [ece <= 0.5] {
+            int temp = 6.
+            t1 = ((1-ece) / (1+ece)) * temp * sin(ngle).
+            {m1} v_after {t1}.
+            output: "Time is given by:",t1.
         }
-        otherwise{ output: "Invalid".}
+        otherwise {
+            [m1 != 5] {
+                {m1} addr {p1}.
+                {m1} angle_after {t1}.
+               }
+            otherwise {
+                break. 
+                }
+        }
+     i++.
     }
 
-    double b.
-
-    a = c + str1.
-    a = b - array[4].
-
-    => a.
-
+=> t1.
 }
 
 start {
-    energy e1.
-    time t1.
-    position p.
 
-    output: func{t1,p} , " ", t1.
+    int n.
+    int array[n].
+
+    int i = 0.
+
+    loop [i<=n]{
+     output:"Enter the array elements: ".
+     input: array[i].
+     bool _che.
+     [array[i]>0 & _che] {
+        output:"Is greater than zero".
+     }
+     otherwise {
+        output:"Is less than zero".
+     }
+     i++.
+    }
+
 }

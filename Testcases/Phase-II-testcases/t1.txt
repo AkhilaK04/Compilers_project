@@ -1,6 +1,6 @@
-$ Below "start" is the first function on execution. $
 $ CORRECT $
 
+$ Below "start" is the first function on execution. $
 bool nextfn = {acceleration a, velocity v, time t} => {
 
     int a,b.

@@ -1,50 +1,46 @@
-bool nextfn ={acceleration a, velocity v, time t} => {
+$FAILURE$
 
-    mass m1,m2.
-    int xx.
-    velocity x.
-    position y.
-    e e1 = 0.8.
-    acceleration z.
-    time w.
+bool check = {string str1 , string str2} => {
 
-    mag {[1,2]}. 
+    bool temp = false.
+
+    [str1 == str2]{
+        temp = false.
+        output:"Two strings are equal".
+    }
+    otherwise {
+        temp = 1.
+        output: "Not equal".
+    }
+
+=>temp.
+}
+
+start{
+
+    string str1 ="Hi".
+    string str2 = "Hi".
+
+    bool che = check{str1,str2}.
     
-    mag {x}.
-
-    {m1} setr {x}.
-    {m1} setr {y}.
-    {m1} setr {z}.
-    {m1} setr {[1,2]}.
-
-    {m1} r_after {w}.
-
-    {m1} v_after {w}.
-    {m1} v_after {y}.
-
-    {m1} ke_after {w}.
-    {m1} pe_after {w}.
-    {m1} te_after {w}.
-
-    {m1} angle_after {w}.
-    {m1} angle_after {y}.
+    [temp]{
+      output: "Success".
+    }
+    otherwise {
+      output: "Failure".
+    }
+     
+    theta angle1.
+    theta angle2.
     
-    {m1} collide {m2,e1}.
-    {m1} collide {m2}.
+    output:"Enter the angles".
+    input:angle1,angle2.
 
-    {m1} time_to_collide {m2}.
+    [angle1-angle2 >=0 ]{
+      output: tan(angle1).
+    }
+    otherwise {
+      output: cos(angle2).
+    }
 
-    {m1} s_after {w}.
-
-    {m1} roc_after {w}.
-
-    {m1} p_after {w}.
-
-    {m1} time_to_r {y}.
-
-    {m1} time_to_v {x}.
-
-    {m1} getr.
-    {m1} getv.
-    {m2} geta.
 }

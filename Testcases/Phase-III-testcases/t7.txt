@@ -1,57 +1,55 @@
-time foo = {bool b1, double do, int g} => {
+$FAILURE$
 
-    g = 7.
-    do = 5.677.
-    b1 = false.
+bool nextfn ={acceleration a, velocity v, time t} =>{
+    int arr[10].
 
-    mass m,m2.
-    position po.
-    time t1.
+    double arr2[23][90].
+    double _a1 , _b1 = a%5.
+    velocity new_v = [5 ,10.7], u_old1.
+    return_val = nextfn{ u_old1 , fn2{a,b,c} }. 
+    output:" hsdbd " , a,b. 
+    input: a,b. 
 
-    {m} te_after {t1+2}.
-   
-    [!b1]{
-        output:"False".
-        e ece.
-        {m} collide {m2,ece}.
-        double t = mag {[1,2]}. 
-        t1 = do - g.
-    }
-    otherwise{
-        output:"True".
-        t1 = do + g.
-        {m} v_after {po}.
-    }
-    => t1.
+    int a.
+    =>a.
 
 }
 
-start{
+bool nextfn_2 ={acceleration a, velocity v, time t} =>{
+    int a,b.
+    double _a1 , _b1 = 0.1.
+    velocity new_v = [5 ,10.7],u_old1.
 
-    mass m,m2.
-    {m} setm {90}.
-    int i = 5.
-    double arr[90][6].
-
-    velocity vel.
-    position po.
-
-    acceleration acc.
-    time ti = 90.
-
-    loop[i< 40]{
-       int j = 5.
-     loop [j >= 0]{
-      time t4 = {m} time_to_collide {m2}.
-       SCOPEOPEN{
-             position p1 = {m} r_after {ti}.
-             theta ang = {m} angle_after {ti}.
-       SCOPECLOSE}
-       j--.
-       output:t4,"time".
-     }
-    i++.
-    }
-
+    =>false.
 }
 
+int solve ={acceleration a, velocity v, time t} =>{
+    int c.
+    string str = "fgf".
+    c = 5 + str.
+    int loop_var1.
+    c = loop_var1 - 12.
+    =>loop_var1.
+}
+
+bool solve = {int x, int y} =>{
+    string str1 = "Hello".
+    string str2 = "world".
+    string str3 = str2 - str1.
+    =>1.
+}
+
+velocity func = { bool b, double x, int b} => {
+    acceleration a.
+    velocity v.
+    time t.
+    int temp = solve{a,v,t}.
+    =>[12,4].
+}
+
+
+start {
+    int a,c.
+    output: set{a,c} , " Success ".
+    output: "Failure".
+}

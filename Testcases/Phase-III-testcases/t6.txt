@@ -1,68 +1,58 @@
-bool get = {int x, double t} =>{
+$FAILURE$
 
-    string str1 = "Hello".
-    string str2 = "world". 
-
-    SCOPEOPEN{
-        SCOPEOPEN{
-            bool check = true.
-            SCOPEOPEN{
-                x = 4.
-                t = 7.
-                int c.
-                c = x * 6 / t.
-            SCOPECLOSE}
-            int check1 = 0.
-        SCOPECLOSE}
-    SCOPECLOSE}
-
-    => true.
-}
-
-int solve = {acceleration a, velocity v, time t} =>{
+acceleration redef = {velocity a1,double r} => {
 
     int c.
-    string str = "fgf".
-    c = 5 + a->first * v->second.
-    c = (6*c) + t.
-    int loop_var1. 
+    string str1.
 
-    => c.
+    $
+    fkjf
+    nsfn
+    frnerfre
+    rerenr
+    $
+    
+    int array1[45.7].
+    double array2[6][c+1].
+    int array3[7][1]. 
+    double array5[str1].
+
+  velocity u1 = [9,5], u2 = [0,0].
+  a1->first = u1->first + u2->second.
+
+    SCOPEOPEN {
+        int a.
+        SCOPEOPEN{
+            SCOPEOPEN{
+            int b.
+            SCOPECLOSE}
+            b = 9 + 8.
+        SCOPECLOSE}
+        SCOPEOPEN{
+            int c.
+        SCOPECLOSE}
+        double a.
+    SCOPECLOSE}
+
 }
+    
+ 
+start{
+ 
+    velocity v1.
+    double ra.
+    input: ra.
 
-int solve = {acceleration a1, velocity v1} =>{
+    [ra < 0] {
+        output: "Error: ra must be non-negative.".
+    }
+    otherwise{
+      int i = 0.
+      loop [i <= 89] {
+        output: " ", i.
+        i++.
+      }
+    }
+    acceleration a1 = redef{v1,ra}.
 
-    int sum.
-    => sum.
-
-}
-
-bool set = {int x, double t} =>{
-
-    t++.
-    velocity v.
-    double _x.
-    acceleration a1.
-
-    int call = solve {a1,v}.
-
-    => false.
-}
-
-velocity fool = {bool b, double x, int i} => {
-
-    time t = 9.
-    position p = [4,0].
-    b = get{i,x}.
-    velocity vel.
-    double _x.
-    acceleration acc.
-
-    int call2 = solve{acc, vel,t}.
-
-    => [12,4].
-}
-
-start {
-    output:"Hello world".
 }

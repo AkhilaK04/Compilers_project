@@ -1,3 +1,4 @@
+$FAILURE$
 $ start of the test case $
 
 double fun = {int n2} => {
