@@ -1,0 +1,59 @@
+$
+    Q) 2 objects A,B are seperated by distance 36m, are
+    projected with equal velocities 14.14 with angle 45
+    and 135 anticlock. Find out several properties of objects
+    before and after collision.   
+    
+$
+
+    start{
+    
+    mass m1, m2.
+    {m1} setm {10}.
+    {m2} setm {15}.
+    time t.
+    e ee = 0.5.
+
+    double vel_val.
+    theta angle1,angle2.
+
+    $ user provides values in terminal -> 45,135 (Given)$
+    output: "Enter the values of angles: ".
+    input : angle1,angle2.
+
+    output: "Enter the value of velocity: ".
+    input : vel_val.        $ Given, vel = 10^(1/2).$
+    output: sin(angle1).
+    {m1} setv {[vel_val * sin(angle1), vel_val * cos(angle1)]}.
+    {m2} setv {[-1* vel_val * sin(angle2), -1*vel_val * cos(angle2)]}.
+    {m1} setr {[-18,0]}.
+    {m2} setr {[18,0]}.
+
+    {m1} seta{[0,-10]}.
+    {m2} seta{[0,-10]}.
+
+    output: "vel1 : ", {m1}getv->first.
+
+    t = {m1} time_to_collide {m2}.
+
+    output: t.
+
+    energy LE.
+    
+    [t != -1] {
+        {m1} setv {{m1} v_after {t}}.
+        {m1} setr {{m1} r_after {t}}.
+        
+        {m2} setv {{m2} v_after {t}}.
+        {m2} setr {{m2} r_after {t}}.
+
+        {m1} collide {m2,ee}.
+    }
+    
+    output: "Time taken to collide" , t.
+    output: "Radius of curvature at 10s : " , {m1} roc_after {10}.
+    output: "Distance travelled before collision along x,y: (" , {m1} r_after {t} -> first,"),(",{m1} r_after {t} -> second,")".
+    output: "Angle at t = 10s : " ,  {m1} angle_after {10}.
+    output: "Energy loss during collision :" , LE.
+      
+    }

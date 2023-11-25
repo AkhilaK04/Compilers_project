@@ -1,0 +1,48 @@
+start {
+
+    mass m1,m2.
+
+    {m2} setr {[74.641,0]}.
+    {m1} setv {[17.32,10]}.
+    {m2} setv{[-5,0]}.
+    {m1} seta{[10,-10]}.
+    {m2} seta{[-5,0]}.
+
+    time t,t2.
+    double KE.
+
+    t = {m1} time_to_collide {m2}.
+
+    output: "after time ",t," collision takes place".
+
+    {m1}setr{{m1}r_after{t}}.
+    {m2}setr{{m2}r_after{t}}.
+
+    $Positions are updated$
+
+    {m1}setv{{m1}v_after{t}}.
+    {m2}setv{{m2}v_after{t}}.
+
+    $velocities are updated, if in accelerated motion$
+
+    {m1} collide {m2}. $collision$
+
+    [(t!=-1) & (true | ((1+2*3) & (5 | false)))]{
+
+        $ collision happens $
+
+        SCOPEOPEN{
+            KE = 0.
+            SCOPEOPEN{
+              t2 = {m2} time_to_r {20,?}.
+              KE = {m2} ke_after {t2}.
+
+              output:"Final Kinetic Energy (In Scope)= ",KE.
+
+            SCOPECLOSE}
+        output:"Final Kinetic Energy (out of Scope)= ",KE.
+        
+        SCOPECLOSE}
+    }
+
+}

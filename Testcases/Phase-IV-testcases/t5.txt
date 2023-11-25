@@ -1,0 +1,57 @@
+$   
+    Q) (JEE ADVANCED 2022 P2) A projectile is fired from 
+    ground with velocity v at an angle theta from horizontal. 
+    If at the highest point the gravity changes from g to 
+    newg where newg = g/0.81 , If newd = n*d , where d is 
+    projectile range without change in gravity and newd is 
+    the range when above said thing is done , find the value 
+    of n.
+$
+
+    time find_time = {double k,int vel} => {
+        => vel/k.
+    }
+
+    time find_time_2 = {double a ,int h} => {
+        => (2*h/a).
+    }
+    
+    start{
+        mass m.
+        {m} setm {20}.
+        theta t = 45.
+        position start_val = [0,0].
+        acceleration g = [0,-10].
+        {m} seta {g}.
+        {m} setv {[10,0]}.
+
+        double temp = {m} v_after {0}->first.
+        time max_point = find_time{temp,10}.
+
+        position top = {m} r_after {max_point}.
+        int distance_travelled = top->first.
+
+        mass newm.
+        {newm} setm {20}.
+        {newm} setr {top}.
+        {newm} setv {{m} v_after {max_point}}.
+
+        $   
+            g = g / 0.81. 
+            or this can be done
+        $
+
+        double a = g->second.
+        a = a / 0.81.
+        {m} seta {[0,a]}.
+        {newm} seta {g}.
+
+        int max_height_vertical = top->second.
+        max_point = find_time_2{a,max_height_vertical}.
+
+        position final = {newm} r_after {max_point}.
+
+        double n = (final->first)/2*(distance_travelled).
+
+        output : "The value of n is " , n.
+    }

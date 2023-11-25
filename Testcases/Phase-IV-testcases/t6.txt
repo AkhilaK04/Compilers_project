@@ -1,0 +1,48 @@
+int modify_position = {double a} => {
+    [a <= 0]{
+        => 0.
+    }
+    otherwise {
+        => a*(a+1)*(modify_position{a - 1}).
+    }
+}
+
+position modify_position = {position a} => {
+    a->first = a->first + 10.
+    double k = (a->second + a->first)*modify_position{a->second}.
+    a->second = sin(k).
+    => a.
+}
+
+start {
+    mass m.
+    {m} setm {10}.
+    {m} setv {[10,20]}.
+    int a = 1.
+    output : "The current value of a is " , a , " Give some value to change this to ".
+    input : a.
+    {m} setr {[a*5,a]}.
+    int arr[10][20][a].
+    arr[10][20][0] = (5+4|7) - 4.
+
+    SCOPEOPEN{
+        int a = 2.
+        output : a.
+
+        loop [ a > 0 ] {
+            a--.
+            output : a.
+        }
+    SCOPECLOSE}
+
+    output : a.
+
+    time t = {m} time_to_r {?,{m}getr->second}.
+
+    [t == 0]{
+        output : "This is trivial case as " , t , " is " , a.
+    }
+    otherwise {
+        output : "There is bug in this code we cant solve ".
+    }
+}

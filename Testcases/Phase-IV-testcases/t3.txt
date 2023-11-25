@@ -1,0 +1,45 @@
+start {
+
+    mass m1, m2, m3.
+    {m1} setm {10}.
+    {m2} setm {20}.
+    {m3} setm {30}.
+
+    {m1} setr {[10,-200]}.
+    {m2} addr {{m1} getr}.
+    {m3} addr {[-200,10]}.
+    {m3} addr {{m2} getr}.
+
+position x_com[3].
+int i.
+SCOPEOPEN{
+
+    i = 3.
+    x_com[0] = {m1} getr.
+    x_com[1] = {m2} getr.
+    x_com[2] = {m3} getr.
+    
+SCOPECLOSE}
+position com = [0,0].
+    SCOPEOPEN{
+
+        
+        i =3.
+        loop [i]{
+            com->first = com->first + x_com[3-i]->first.
+            com->second = com->second + x_com[3-i]->second.
+        i = i - 1.
+        }
+
+    SCOPECLOSE}
+
+
+    SCOPEOPEN{
+        i =3.
+        loop [i]{
+            output: "3 times Centre = ", com->first,",",com->second.
+        i = i - 1.
+        }
+    SCOPECLOSE}
+
+}

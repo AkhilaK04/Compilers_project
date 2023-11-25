@@ -1,9 +1,10 @@
-bool nextfn ={acceleration a, velocity v, time t} =>{
+bool nextfn ={acceleration a, velocity v, time t} => {
 
-    mass m1.
+    mass m1,m2.
     int xx.
     velocity x.
     position y.
+    e e1 = 0.8.
     acceleration z.
     time w.
 
@@ -28,10 +29,10 @@ bool nextfn ={acceleration a, velocity v, time t} =>{
     {m1} angle_after {w}.
     {m1} angle_after {y}.
     
-    {m1} collide {m1,xx}.
-    {m1} collide {m1}.
+    {m1} collide {m2,e1}.
+    {m1} collide {m2}.
 
-    {m1} time_to_collide {m1}.
+    {m1} time_to_collide {m2}.
 
     {m1} s_after {w}.
 
@@ -44,4 +45,6 @@ bool nextfn ={acceleration a, velocity v, time t} =>{
     {m1} time_to_v {x}.
 
     {m1} getr.
+    {m1} getv.
+    {m2} geta.
 }

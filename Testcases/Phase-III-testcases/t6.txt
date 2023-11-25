@@ -1,0 +1,68 @@
+bool get = {int x, double t} =>{
+
+    string str1 = "Hello".
+    string str2 = "world". 
+
+    SCOPEOPEN{
+        SCOPEOPEN{
+            bool check = true.
+            SCOPEOPEN{
+                x = 4.
+                t = 7.
+                int c.
+                c = x * 6 / t.
+            SCOPECLOSE}
+            int check1 = 0.
+        SCOPECLOSE}
+    SCOPECLOSE}
+
+    => true.
+}
+
+int solve = {acceleration a, velocity v, time t} =>{
+
+    int c.
+    string str = "fgf".
+    c = 5 + a->first * v->second.
+    c = (6*c) + t.
+    int loop_var1. 
+
+    => c.
+}
+
+int solve = {acceleration a1, velocity v1} =>{
+
+    int sum.
+    => sum.
+
+}
+
+bool set = {int x, double t} =>{
+
+    t++.
+    velocity v.
+    double _x.
+    acceleration a1.
+
+    int call = solve {a1,v}.
+
+    => false.
+}
+
+velocity fool = {bool b, double x, int i} => {
+
+    time t = 9.
+    position p = [4,0].
+    b = get{i,x}.
+    velocity vel.
+    double _x.
+    acceleration acc.
+
+    int call2 = solve{acc, vel,t}.
+
+    => [12,4].
+}
+
+start {
+    output:"Hello world".
+}

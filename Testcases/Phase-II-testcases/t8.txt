@@ -1,0 +1,65 @@
+$ FAIL $
+
+bool finding = {int n} =>{
+
+   int count = hi. 
+   double array[45].
+   double ans = 9.5.
+   ans = ans * count.
+
+SCOPEOPEN{
+    a = 78.
+    {m} setv {556}. 
+
+    SCOPEOPEN{
+      output:"Enter the values:".
+      input:array[i].
+      i++.
+    SCOPECLOSE}
+
+    {m1} p_after {tim}.
+
+SCOPECLOSE}
+
+ velocity error.
+
+$ ERROR! datatype as variable $
+ position position = [0,8].
+ 
+ => ans.
+}
+
+start{
+
+   bool hi = 0.
+   acceleration fi =hi.
+
+   velocity n3.
+    
+    mag{v3}. 
+
+   string n = "60".
+
+   bool temp = finding{67}.
+
+   count = fi * hi + 88.
+    
+    hi = fi.
+
+   loop[j >=0]
+   {
+    [count < n]
+     {
+      loop [k<9]
+       {
+        output: "success".
+        k++.
+       }
+       break.
+     }
+     otherwise{
+        output: "fail", y.
+     }
+j++.
+}
+}

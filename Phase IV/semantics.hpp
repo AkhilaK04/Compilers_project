@@ -1,5 +1,8 @@
 #include "symbtab.hpp"
 
+
+
+
 bool coercion(string type1, string type2){
 
   if(type1 == "int" && (type2 == "double" || type2 == "bool" || type2 == "int")) return true;
@@ -128,6 +131,12 @@ string get_string_type(int type){
   }
 }
 
+//Type checking for assigning variables
+bool type_checking_assign(int type1, int type2){
+  if(get_string_type(type1) == "string" && get_string_type(type2) == "string") return true;
+    return (coercion(get_string_type(type1),get_string_type(type2)) || coercion(get_string_type(type2),get_string_type(type1)));
+}
+
 
 int find_return_type(string name,char** func_args_list,int present){
   for(int i=0; i < function_sym_table.size(); i++){
@@ -189,6 +198,30 @@ bool valid_func_entry(string name,vector<par_records*> &new_par_list){
 return true;
 }
 
+void insert_var_list(string name,vector<par_records*> &new_par_list,vector<var_records*> var_list){
+      for(int i=0; i < function_sym_table.size(); i++){
+        //check for name
+        if(function_sym_table[i]->name == name){
+            //check for par-list (overloading.)
+            vector<par_records*> curr_par_list = function_sym_table[i]->par_list;
+            // sort(curr_par_list.begin(),curr_par_list.end(),compare_par_records);
+
+            if(curr_par_list.size() == new_par_list.size()){
+              int counter = 0;
+              for(int j=0;j<curr_par_list.size();j++){
+                if(curr_par_list[j]->type != new_par_list[j]->type){
+                  counter = 1;
+                } 
+              }
+              if(counter == 0){
+                function_sym_table[i]->var_list = var_list;
+                return;
+              }
+            }
+        }
+        }
+}
+
 bool check_func_args(string name,char** func_args_list,int present){ //fn name, types of fn_args.
     for(int i=0; i < function_sym_table.size(); i++){
         if(function_sym_table[i]->name == name){
@@ -197,7 +230,7 @@ bool check_func_args(string name,char** func_args_list,int present){ //fn name, 
 
             if(present == curr_par_list.size()){
               for(int i=0;i<curr_par_list.size();i++){
-                  if(curr_par_list[i]->type != func_args_list[i]){
+                  if( curr_par_list[i]->type != func_args_list[i]){
                       valid_fn = false;
                       break;
                   }
@@ -256,9 +289,17 @@ bool std_lib_semantics (string name,int ID1,vector<int> ID2){
             return true;
         }
 
+        else if(name == "getm" && get_string_type(ID1) == "mass"){
+            return true;
+        }
+
         //SET_R ADD_R
         else if((name == "addr"|| name == "setr") && get_string_type(ID1) == "mass" && (get_string_type(ID2[0]) == "position" || get_string_type(ID2[0]) == "vector")){
             return true;
+        }
+
+        else if((name == "setm" && get_string_type(ID1) == "mass" && get_string_type(ID2[0]) == "int" || get_string_type(ID2[0]) == "double")){
+          return true;
         }
 
         // //GET R
@@ -455,10 +496,4 @@ bool within_func_parameters_redeclaration(string name){
       }
   }
   return true;
-}
-
-//Type checking for assigning variables
-bool type_checking_assign(int type1, int type2){
-  if(get_string_type(type1) == "string" && get_string_type(type2) == "string") return true;
-    return (coercion(get_string_type(type1),get_string_type(type2)) || coercion(get_string_type(type2),get_string_type(type1)));
 }

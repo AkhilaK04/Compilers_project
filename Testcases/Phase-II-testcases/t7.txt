@@ -1,0 +1,56 @@
+$ start of the test case $
+
+double fun = {int n2} => {
+   
+   velocity temp = 0.
+   double remainder.
+    
+    remainder = n2 % 10.
+    temp = temp * 10 + remainder.
+    n2 = n2 / 10.
+     [n2 != 0 & t >= 9 | r < 99]
+      {
+         func{a,h}.
+         str++.
+      }
+    
+   => "string".
+}
+
+$ ERROR! Function declaration syntax $
+
+momentum mom = {acceleration n, momentum p} {
+
+    acceleration y = [9.78,67].
+    energy x1 = 16.89.
+    string temp1 = "xfs".
+
+    [remainder{1,2} / (fun{ac} + ug) == 0]
+    {
+        y = 1.
+    }
+    otherwise {
+       remp = "hello".
+      int array[90][67].
+    }
+ }
+
+$
+compilers project 
+topic: projectile and collisions
+phase 2
+$
+
+start {
+
+energy e1.
+e ece.
+output:"enter values:".
+input: e1,ece.
+
+velocity v2 = fun{n2}.
+
+output:"Result: ",x,y.
+}
+
+$ end of the test case $

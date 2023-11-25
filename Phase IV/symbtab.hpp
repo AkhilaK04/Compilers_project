@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-
+extern FILE* symbfile;
 extern char* yytext;
 extern int yylineno;
 bool q;
@@ -114,7 +114,7 @@ return true;
 void fn_var_entry(var_records* rec){
   if(bool_fn_var_entry(rec)) var_list.push_back(rec);
   else {
-    cout<<rec->name<<" !ERROR: Redefining of variable at " << yylineno <<" ("<< rec->type <<")"<<endl;
+    cout<<" !ERROR: Redefining of variable at " << yylineno <<" ("<< rec->type <<")"<<endl;
   }
 }
 
@@ -195,42 +195,48 @@ void add(char c,string id,string type) {
 }
 
 void print_table(){
-  printf("\n\n");
-	printf("\nNAME   DATATYPE   TYPE   SCOPE \n");
-	printf("_______________________________________\n\n");
+  fprintf(symbfile,"GLOBAL TABLE\n");
+	fprintf(symbfile,"\nNAME   DATATYPE   TYPE   SCOPE \n");
+	fprintf(symbfile,"_______________________________________\n\n");
 	for(int i = 0; i< symbol_table.size(); i++) {
-    cout<< symbol_table[i]->id_name<<" "<<symbol_table[i]->data_type<<" "<<symbol_table[i]->type<<" "<<symbol_table[i]->scope<<endl;
+    fprintf(symbfile,"%s %s %s %s\n",symbol_table[i]->id_name.c_str(),symbol_table[i]->data_type.c_str(),symbol_table[i]->type.c_str(),symbol_table[i]->scope.c_str());
+    // cout<< symbol_table[i]->id_name<<" "<<symbol_table[i]->data_type<<" "<<symbol_table[i]->type<<" "<<symbol_table[i]->scope<<endl;
 	}
 
 }
 
 
 void print_function_table() {
-    printf("\n\n");
-    printf("NAME   RETURNTYPE   NO_OF_PARAM  PAR_LIST   VAR_LIST  SCOPE  ARRAY_TYPE  DIMENSIONS\n");
-    printf("______________________________________________________________\n\n");
+    fprintf(symbfile,"\n\nFUNCTION TABLE\n\n");
+    fprintf(symbfile,"NAME   RETURNTYPE   NO_OF_PARAM  PAR_LIST   VAR_LIST  SCOPE  ARRAY_TYPE  DIMENSIONS\n");
+    fprintf(symbfile,"______________________________________________________________\n\n");
     
     for (int i = 0; i < function_sym_table.size(); i++) {
-        cout << function_sym_table[i]->name << "   " << function_sym_table[i]->result_type << "   " << function_sym_table[i]->num_of_param << "   ";
+        fprintf(symbfile,"%s\t%s\t%d",function_sym_table[i]->name.c_str(),function_sym_table[i]->result_type.c_str(),function_sym_table[i]->num_of_param);
+        // cout << function_sym_table[i]->name << "   " << function_sym_table[i]->result_type << "   " << function_sym_table[i]->num_of_param << "   ";
         
         // Print the parameter list
-        cout << "[";
+        fprintf(symbfile,"\t[");
+        // cout << "[";
         for (int j = 0; j < function_sym_table[i]->par_list.size(); j++) {
-            cout << "(" << function_sym_table[i]->par_list[j]->name << ", " << function_sym_table[i]->par_list[j]->type << ")";
+          fprintf(symbfile,"( %s, %s)",function_sym_table[i]->par_list[j]->name.c_str(),function_sym_table[i]->par_list[j]->type.c_str());
+            // cout << "(" << function_sym_table[i]->par_list[j]->name << ", " << function_sym_table[i]->par_list[j]->type << ")";
             if (j < function_sym_table[i]->par_list.size() - 1) {
-                cout << ", ";
+                fprintf(symbfile,", ");
             }
         }
-        cout << "]\n";
+        fprintf(symbfile,"]\n");
+        // cout << "]\n";
         
         // Print the variable list
-        cout << "[\n";
+        fprintf(symbfile,"[\n");
         for (int j = 0; j < function_sym_table[i]->var_list.size(); j++) {
-            cout << "(" << function_sym_table[i]->var_list[j]->name << ", " << function_sym_table[i]->var_list[j]->type << ", " << function_sym_table[i]->var_list[j]->scope << ", " << function_sym_table[i]->var_list[j]->arr_type << ", " << function_sym_table[i]->var_list[j]-> dim_countt <<")\n";
+          fprintf(symbfile,"(%s, %s, %s, %s ,%d)\n",function_sym_table[i]->var_list[j]->name.c_str(),function_sym_table[i]->var_list[j]->type.c_str(),function_sym_table[i]->var_list[j]->scope.c_str(),function_sym_table[i]->var_list[j]->arr_type.c_str(),function_sym_table[i]->var_list[j]-> dim_countt);
+            // cout << "(" << function_sym_table[i]->var_list[j]->name << ", " << function_sym_table[i]->var_list[j]->type << ", " << function_sym_table[i]->var_list[j]->scope << ", " << function_sym_table[i]->var_list[j]->arr_type << ", " << function_sym_table[i]->var_list[j]-> dim_countt <<")\n";
             if (j < function_sym_table[i]->var_list.size() - 1) {
-                cout << ", ";
+                fprintf(symbfile,", ");
             }
         }
-        cout << "]\n   " << /* Add scope information here */ endl;
+        fprintf(symbfile,"]\n\n");
     }
 }

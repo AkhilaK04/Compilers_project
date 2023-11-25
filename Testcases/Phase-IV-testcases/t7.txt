@@ -1,0 +1,38 @@
+int do_this = {int value} => {
+    => value + 1.
+    loop [1] {
+        $THIS WONT BE EXECUTED$
+    }
+}
+
+int do_this = {} => {
+    double temp = 0.
+
+    mass m.
+    {m}setm{10}.
+
+    {m}setp{[10,0]}.
+    {m}seta{[9,0]}.
+
+    position r = {m}r_after{10}.
+    SCOPEOPEN{
+        double temp = r->first.
+        => temp*do_this{temp}.
+    SCOPECLOSE}
+}
+
+start {
+    mass m.
+
+    {m} setm {20}.
+
+    int arr[21].
+
+    double m = {m}getm.
+
+    loop [m > 0]{
+        arr[m] = do_this{arr[m]}.
+        arr[m] = do_this{"overloading"}.
+        m = m / 2.
+    }
+}

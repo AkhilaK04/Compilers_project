@@ -1,10 +1,20 @@
+
+$ Two billiard balls collide. Ball 1 moves with a velocity of 6 m/s, and ball 2 is at rest. 
+Find the velocities of ball 1 and ball 2 after the collision. Find time to collide.
+The mass of each ball is 0.20 kg. Find the kinetuc energy loss after the collison. $
 start{
+
     mass m1, m2.
+
     {m1} setm {0.20}.
     {m2} setm {0.20}.
 
-    velocity u1 = [2,0],u2 = [0,0].
-    
+    velocity u1 = [2,0].
+    velocity u2 = [0,0].
+
+    velocity v1.
+    velocity v2.
+
     {m1} setv {u1}.
     {m2} setv {u2}.
 
@@ -12,11 +22,13 @@ start{
     output:"intial velocity of m2 is : ", {m2} getv->second.
 
     e enew = 0.1.
+
     output: "Coff of rest: ",enew.
 
     {m1} collide {m2,enew}.
 
-    velocity v1 = {m1} getv, v2 = {m2} getv.
+    v1 = {m1} getv.
+    v2 = {m2} getv.
 
     output:"Final velocity of m1 is : ", v1->first.
     output:"Final velocity of m2 is : ", v2->second.

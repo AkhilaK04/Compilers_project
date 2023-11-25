@@ -1,0 +1,49 @@
+int func = {time t1, position p} => {
+
+    int a,b,c.
+    output: "Enter the values a,b: ".
+    input: a,b.
+
+    velocity v1 = [2,6],v2.
+    v2 = v1 + v3.
+ 
+    b = [3,6].
+
+    string str1,str2.
+    str1 = "hello".
+    str2 = 5.
+
+    str1++.
+
+    int b1 = str1.
+
+    int array[67].
+
+    loop [ (((a < b) >= c) & !b) | c ] {
+
+        [array[a] == array[b]] {
+            
+            [array[b-c] + array[a+c] != array[b]]{
+                output: "Yes" , array[a] , " is valid.".
+            }
+            otherwise{ break.}
+        }
+        otherwise{ output: "Invalid".}
+    }
+
+    double b.
+
+    a = c + str1.
+    a = b - array[4].
+
+    => a.
+
+}
+
+start {
+    energy e1.
+    time t1.
+    position p.
+
+    output: func{t1,p} , " ", t1.
+}

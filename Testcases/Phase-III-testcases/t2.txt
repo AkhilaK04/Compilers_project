@@ -1,0 +1,56 @@
+acceleration redef = {velocity a1,double r} => {
+
+    int c.
+    string str1.
+
+    $
+    fkjf
+    nsfn
+    frnerfre
+    rerenr
+    $
+    
+    int array1[45.7].
+    double array2[6][c+1].
+    int array3[7][1]. 
+    double array5[str1].
+
+  velocity u1 = [9,5], u2 = [0,0].
+  a1->first = u1->first + u2->second.
+
+    SCOPEOPEN {
+        int a.
+        SCOPEOPEN{
+            SCOPEOPEN{
+            int b.
+            SCOPECLOSE}
+            b = 9 + 8.
+        SCOPECLOSE}
+        SCOPEOPEN{
+            int c.
+        SCOPECLOSE}
+        double a.
+    SCOPECLOSE}
+
+}
+    
+ 
+start{
+ 
+    velocity v1.
+    double ra.
+    input: ra.
+
+    [ra < 0] {
+        output: "Error: ra must be non-negative.".
+    }
+    otherwise{
+      int i = 0.
+      loop [i <= 89] {
+        output: " ", i.
+        i++.
+      }
+    }
+    acceleration a1 = redef{v1,ra}.
+
+}

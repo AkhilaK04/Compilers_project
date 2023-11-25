@@ -1,0 +1,28 @@
+position do_this_function = {time t} => {
+    position r = [0,0].
+    loop [t] {
+        r->first = r->first + 10.
+        r->second = r->second + r->first.
+        t = t - 1.
+    }
+    double array[10][20].
+
+    loop [t < 11] {
+        [t < 0] {
+            break.
+        }
+        t = t + 2.
+        output : t.
+        int u = t.
+        array[0][u] = 1.
+    }
+    => r.
+}
+
+start {
+    mass m.
+    {m} setm {10}.
+    time t = 20.
+
+    {m} setr {do_this_function{t}}.
+}

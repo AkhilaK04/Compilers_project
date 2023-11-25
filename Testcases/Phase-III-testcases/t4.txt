@@ -1,0 +1,44 @@
+bool check = {string str1 , string str2} => {
+
+    bool temp = false.
+
+    [str1 == str2]{
+        temp = false.
+        output:"Two strings are equal".
+    }
+    otherwise {
+        temp = 1.
+        output: "Not equal".
+    }
+
+=>temp.
+}
+
+start{
+
+    string str1 ="Hi".
+    string str2 = "Hi".
+
+    bool che = check{str1,str2}.
+    
+    [temp]{
+      output: "Success".
+    }
+    otherwise {
+      output: "Failure".
+    }
+     
+    theta angle1.
+    theta angle2.
+    
+    output:"Enter the angles".
+    input:angle1,angle2.
+
+    [angle1-angle2 >=0 ]{
+      output: tan(angle1).
+    }
+    otherwise {
+      output: cos(angle2).
+    }
+
+}

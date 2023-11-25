@@ -1,0 +1,59 @@
+$FAILURE$
+
+acceleration set = {int w, time h} =>{
+
+    int width, height.
+    mass m1.
+
+$ ERROR! semicolon: invalid punctuation $
+
+    output:" Enter the value: ";
+    input: width, height.
+
+    {m1} roc_after {43}.
+
+    width = w.
+    height = h.
+
+    {m1} addr {[7,6]}.
+
+    => width.
+}
+
+start
+{
+    string str, str2.
+    x = 10.
+    t@w = 5.
+    x++.
+
+    x = f++.
+
+    double area.
+    velocity rect.
+    set{x, y}.
+    area{}.
+
+    {m1} angle_after {t2}.
+
+    
+    loop [a < b]
+    {
+         bool y.
+         y = hi{a, b, c}.
+         break.
+    }
+    
+    int i =0,j=10.
+
+    loop [ i< 10]{
+        loop[j>0]
+        {
+         x = !y & !z.
+         output<<"YES".
+         j--. 
+        }
+        output<<"NO".
+        i++.
+    }
+}

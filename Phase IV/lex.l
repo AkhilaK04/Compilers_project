@@ -7,6 +7,7 @@
     FILE* parsefile;
     FILE* outfile;
     FILE* headerfile;
+    FILE* symbfile;
 %}
 
 arrow ("->")
@@ -19,7 +20,7 @@ primi_datatype ("int"|"double"|"string"|"bool")
 
 non_pri_datatype ("mass"|"time"|"position"|"velocity"|"acceleration"|"energy"|"theta"|"e"|"distance"|"momentum")
 
-reserved_keywords ("input"|"output"|"true"|"false"|"setr"|"addr"|"setv"|"addv"|"seta"|"adda"|"ke_after"|"pe_after"|"te_after"|"angle_after"|"get_traj"|"collide"|"time_to_collide"|"roc_after"|"p_after"|"s_after"|"time_to_r"|"time_to_v"|"loop"|"break"|"sin"|"cos"|"tan"|"mag"|"setp"|"v_after"|"r_after"|"getr"|"getv"|"geta"|"first"|"second"|"otherwise")
+reserved_keywords ("input"|"output"|"true"|"false"|"setm"|"getm"|"setr"|"addr"|"setv"|"addv"|"seta"|"adda"|"ke_after"|"pe_after"|"te_after"|"angle_after"|"get_traj"|"collide"|"time_to_collide"|"roc_after"|"p_after"|"s_after"|"time_to_r"|"time_to_v"|"loop"|"break"|"sin"|"cos"|"tan"|"mag"|"setp"|"v_after"|"r_after"|"getr"|"getv"|"geta"|"first"|"second"|"otherwise")
 
 bi_op ("^"|"*"|"/"|"%"|"+"|"-")
 
@@ -165,6 +166,8 @@ SCOPECLOSE {
     else if(strcmp(yytext,"first") == 0) {yylval.object.value = strdup(yytext); return FIRST;}
     else if(strcmp(yytext,"second") == 0) {yylval.object.value = strdup(yytext); return SECOND;}
     else if(strcmp(yytext,"otherwise") == 0) {yylval.object.value = strdup(yytext); return OTHERWISE;}
+    else if(strcmp(yytext,"setm") == 0) {yylval.object.value = strdup(yytext); return SETM;}
+    else if(strcmp(yytext,"getm") == 0) {yylval.object.value = strdup(yytext); return GETM;}
 
 }
 

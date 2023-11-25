@@ -1,0 +1,45 @@
+$FAILURE$
+
+bool hi = {energy a, e b, momentum c} =>
+{
+    wish{a,b,v}.
+    greet{}.
+    {m1} ke_after {t}.
+    => sth.
+}
+
+$ ERROR! ID regular expression $
+double @rea = {} =>{
+    time result.
+    {m1} setr {ac}.
+    result = 89.
+    => result.
+}
+
+start {
+    [x<0 & x >-5] 
+    {
+        [sum <20]
+        {
+            a = theta.
+        }
+    }
+    otherwise
+    {
+        [(u < U) | (v >= V)]
+        {
+            y = x+y*(z-w).
+           {m1} v_after {y1}.
+
+        }
+
+        otherwise
+        {
+            n = 1/3 + 2-w.
+           {m1} setv {v1}. 
+        }
+
+        => func{}.
+    }
+
+}
