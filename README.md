@@ -33,9 +33,20 @@ Phase II focused on implementing the lexer and parser for **phiC**:
 
 ### Phase III: Semantic Analysis
 
+Phase III of the compiler includes semantic analysis. This phase ensures the correctnes of the all program statements and declarations. The evaluation of semantic rules involve inclusion of symbol table, execution of semantic checks and generation of error messages.
+
+### Phase IV: Code Generation
+
+Code generation, the fourth phase of compiler design, transforms the source code into correspondent cpp code that can be directly executed by the target system.
+
 ##  Team Members
 
 • [Srinith Dasari](https://github.com/Srinith04)  
 • [Santoshi Gayatri Mavuru](https://github.com/SantoshiGayatri)  
 • [Pranav Varma Pericherla](https://github.com/Pranav-Varma-03)  
-• [Akhila Kumbha](https://github.com/AkhilaK04)
+• [Akhila Kumbha](https://github.com/AkhilaK04) 
+
+### Work Division and Team Meets Log
+[LOG](https://docs.google.com/spreadsheets/d/1ETEy9Yb0NO1S7Q3EFXXnQJBY2lGCzA8NBun03dXzW8w/edit#gid=0)
+
+
